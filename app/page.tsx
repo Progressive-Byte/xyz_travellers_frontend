@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/sections/Hero";
 import { Listings } from "@/sections/Listings";
 import { WhyChooseUs } from "@/sections/WhyChooseUs";
+import { AboutTravela } from "@/sections/AboutTravela";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
         <Hero />
         <Listings />
         <WhyChooseUs />
+        <AboutTravela />
       </main>
       <Footer />
     </div>
