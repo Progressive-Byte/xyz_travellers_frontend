@@ -34,7 +34,7 @@ export const Navbar: React.FC = () => {
                   </linearGradient>
                 </defs>
                 <path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" fill="url(#logoGradient)"/>
-                <path d="M10 14H14V17H10V14Z" fill="white"/>
+                <path d="M10 14H14V17H10V14Z" fill="var(--color-text-primary)"/>
               </svg>
               <span className="font-sora text-2xl font-bold text-text-primary tracking-tight">travela</span>
             </Link>
@@ -54,7 +54,7 @@ export const Navbar: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
                 <div className="w-7 h-7 bg-primary rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-text-primary" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                   </svg>
                 </div>
