@@ -28,7 +28,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           className="object-cover"
         />
         {isNew && (
-          <span className="absolute top-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
+          <span className="absolute top-4 left-4 bg-primary text-text-primary px-3 py-1 rounded-full text-sm font-semibold">
             New
           </span>
         )}

@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #EC4899;
-  --color-primary-hover: #DB2777;
-  --color-primary-light: #FCE7F3;
-  --color-text-primary: #111827;
-  --color-text-secondary: #6B7280;
-  --color-background: #F9FAFB;
+  --color-primary: #D9F14B;
+  --color-primary-hover: #CDE243;
+  --color-primary-light: #F5FBE0;
+  --color-text-primary: #1A1B12;
+  --color-text-secondary: #6C6D66;
+  --color-background: #EFEDE6;
   --color-card: #FFFFFF;
-  --color-border: #E5E7EB;
-  --color-border-light: #F3F4F6;
-  --color-footer-bg: #111827;
+  --color-border: #D9D8D0;
+  --color-border-light: #E9E8DF;
+  --color-footer-bg: #1A1B12;
   --color-footer-text: #FFFFFF;
   --color-footer-text-muted: rgba(255, 255, 255, 0.7);
   --color-footer-border: rgba(255, 255, 255, 0.2);
@@ -61,7 +61,7 @@ body {
 .react-datepicker__day--in-selecting-range,
 .react-datepicker__day--in-range {
   background-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-primary);
 }
 
 .react-datepicker__day--selected:hover,
