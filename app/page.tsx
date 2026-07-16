@@ -5,7 +5,7 @@ import { Listings } from "@/sections/Listings";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-cream-white">
+    <div className="min-h-screen bg-background">
       <Navbar />
       <main>
         <Hero />

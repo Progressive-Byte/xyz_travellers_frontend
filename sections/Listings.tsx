@@ -54,9 +54,9 @@ const listings = [
 
 export const Listings: React.FC = () => {
   return (
-    <section className="py-12">
+    <section className="py-12 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="font-sora text-3xl font-bold text-false-black mb-8">
+        <h2 className="font-sora text-3xl font-bold text-text-primary mb-8">
           Popular stays
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

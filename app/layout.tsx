@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${sora.variable} ${instrumentSans.variable}`}>
-      <body className="font-instrument-sans bg-cream-white text-false-black">{children}</body>
+      <body className="font-instrument-sans bg-background text-text-primary">{children}</body>
     </html>
   );
 }
