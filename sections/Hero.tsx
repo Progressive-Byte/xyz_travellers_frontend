@@ -79,7 +79,7 @@ export const Hero: React.FC = () => {
               <p className="text-xs font-bold text-text-primary uppercase tracking-wide mb-1">Check in</p>
               <DatePicker
                 selected={checkInDate}
-                onChange={(date) => setCheckInDate(date)}
+                onChange={(date: Date | null) => setCheckInDate(date)}
                 selectsStart
                 startDate={checkInDate}
                 endDate={checkOutDate}
@@ -104,7 +104,7 @@ export const Hero: React.FC = () => {
               <p className="text-xs font-bold text-text-primary uppercase tracking-wide mb-1">Check out</p>
               <DatePicker
                 selected={checkOutDate}
-                onChange={(date) => setCheckOutDate(date)}
+                onChange={(date: Date | null) => setCheckOutDate(date)}
                 selectsEnd
                 startDate={checkInDate}
                 endDate={checkOutDate}
