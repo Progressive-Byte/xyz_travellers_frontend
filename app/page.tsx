@@ -4,6 +4,7 @@ import { Hero } from "@/sections/Hero";
 import { Listings } from "@/sections/Listings";
 import { WhyChooseUs } from "@/sections/WhyChooseUs";
 import { AboutTravela } from "@/sections/AboutTravela";
+import { Blogs } from "@/sections/Blogs";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
         <Listings />
         <WhyChooseUs />
         <AboutTravela />
+        <Blogs />
       </main>
       <Footer />
     </div>
