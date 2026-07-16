@@ -31,7 +31,7 @@ export const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="mt-14 bg-footer-bg text-footer-text">
+    <footer className="section-shell mt-6 bg-footer-bg text-footer-text">
       <div className="mx-auto max-w-7xl px-6 py-10 md:py-14">
         <div className="rounded-[32px] border border-footer-border bg-white/5 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.22)] backdrop-blur-sm md:p-8">
           <div className="flex flex-col gap-8 border-b border-footer-border pb-8 lg:flex-row lg:items-end lg:justify-between">

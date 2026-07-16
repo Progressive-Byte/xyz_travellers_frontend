@@ -5,91 +5,99 @@ import Image from "next/image";
 
 const aboutImage = "/images/find_you_perfect_accommodation.jpg";
 
-const points = [
-  "Verified Properties: All accommodations are verified for quality and safety",
-  "Flexible Booking: Daily, weekly, and monthly rental options available",
-  "Secure Payments: Protected transactions for both guests and hosts",
-  "24/7 Support: Round-the-clock customer service assistance",
-  "Best Rates: Competitive pricing across all accommodation types",
-  "Easy Management: Simple listing and booking management tools",
+const featurePoints = [
+  "Verified properties across major cities and travel destinations",
+  "Flexible short stays for business, family, exams, events, and leisure travel",
+  "Protected booking experience with easier host and guest coordination",
+  "Reliable support for both travelers and property owners",
+];
+
+const extraSections = [
+  {
+    title: "Built for real travel needs in Bangladesh",
+    text:
+      "Travela connects guests with furnished rooms, apartments, hotels, resorts, and villas across all eight divisions. Whether the stay is for work, family visits, hospital support, events, or short holidays, the platform is designed to make discovery and booking feel faster and less stressful.",
+  },
+  {
+    title: "A better path for hosts, too",
+    text:
+      "Property owners can turn furnished spaces into dependable income with less operational friction. Travela helps hosts present their listings more clearly, attract the right guests, and manage short-term demand with greater confidence.",
+  },
 ];
 
 export const AboutTravela: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <section className="bg-card py-20">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="font-sora text-[28px] font-bold leading-tight text-text-primary md:text-[46px]">
-            Travela: Bangladesh&apos;s Leading Short Term Accommodation Platform
+    <section className="bg-card py-16 md:py-20">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="section-badge">About Travela</span>
+          <h2 className="section-heading mt-6">
+            Bangladesh&apos;s short stay platform for guests who want more clarity and comfort
           </h2>
-          <p className="mt-4 text-[16px] font-semibold text-text-secondary md:text-[18px]">
-            Find Your Perfect Short Term Accommodation in Bangladesh
+          <p className="section-subtitle mx-auto mt-5">
+            Travela helps people find furnished short term accommodation with a
+            cleaner, more reliable booking experience built around trust.
           </p>
+          <div className="section-divider mx-auto mt-6" />
         </div>
 
-        <div
-          className={`mt-12 grid overflow-hidden transition-all duration-500 ease-in-out ${
-            isExpanded
-              ? "grid-rows-[0fr] opacity-0 -translate-y-2"
-              : "grid-rows-[1fr] opacity-100 translate-y-0"
-          }`}
-        >
-          <div className="min-h-0">
-            <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_1fr]">
-              <div>
-                <p className="text-[15px] leading-8 text-text-primary">
-                  Travela is Bangladesh&apos;s premier{" "}
-                  <strong>short term accommodation platform</strong> connecting
-                  guests with quality <strong>furnished apartment rent</strong> and{" "}
-                  <strong>furnished room rent</strong> options across the country.
-                  Whether you need <strong>rooms</strong>,{" "}
-                  <strong>apartments</strong>, <strong>hotels</strong>,{" "}
-                  <strong>resorts</strong>, or <strong>villas</strong>, Travela
-                  offers verified accommodations in all 8 divisions including Dhaka,
-                  Chattogram, Khulna, Rajshahi, Barishal, Sylhet, Rangpur, and
-                  Mymensingh, as well as popular districts like Cox&apos;s Bazar,
-                  Comilla, Gazipur, Narayanganj, Bogura, Jessore, Moulvibazar, and
-                  more. Our platform serves diverse accommodation needs for hospital
-                  attendants, wedding events, business and corporate events
-                  travelling, public examinations, university exams, and leisure
-                  travelers seeking comfortable short-stay solutions. Our platform is
-                  designed to make short-term rentals easy, fast, and reliable, all
-                  through your smartphone or computer. Simply search, choose and book
-                  your ideal accommodation instantly through the Travela App or
-                  Website.
-                </p>
+        <div className="mt-12 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="surface-card-strong rounded-panel p-6 md:p-8">
+            <p className="text-[16px] leading-8 text-text-primary">
+              Travela is a Bangladesh-focused accommodation platform connecting guests
+              with verified furnished rooms, apartments, hotels, resorts, and villas.
+              It is designed for people who need short stays that feel easier to search,
+              easier to trust, and easier to book.
+            </p>
 
-                <button
-                  type="button"
-                  onClick={() => setIsExpanded(true)}
-                  className="mt-8 text-[15px] font-semibold text-[#ff6aa2] transition-colors duration-200 hover:text-text-primary"
-                >
-                  See More
-                </button>
-              </div>
-
-              <div className="relative overflow-hidden rounded-[28px]">
-                <Image
-                  src={aboutImage}
-                  alt="Travela short term accommodation room"
-                  width={720}
-                  height={540}
-                  className="h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/10 to-transparent" />
-                <div className="absolute inset-x-0 bottom-10 text-center text-white">
-                  <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#ff2d87] shadow-lg">
-                    <span className="h-3 w-3 rounded-full bg-white" />
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {featurePoints.map((point) => (
+                <div key={point} className="rounded-[22px] bg-surface px-4 py-4">
+                  <div className="flex items-start gap-3">
+                    <span className="mt-1 h-2.5 w-2.5 rounded-full bg-primary" />
+                    <p className="text-[14px] leading-7 text-text-primary">{point}</p>
                   </div>
-                  <h3 className="mx-auto mt-4 max-w-xs text-[18px] font-semibold leading-7">
-                    Wherever you go, There is always a place for you...
-                  </h3>
-                  <p className="mt-2 text-[11px] uppercase tracking-[0.22em] text-white/75">
-                    Book your stay
-                  </p>
                 </div>
+              ))}
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setIsExpanded((value) => !value)}
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover"
+              >
+                <span>{isExpanded ? "See Less" : "See More"}</span>
+                <span aria-hidden="true">{isExpanded ? "↑" : "↓"}</span>
+              </button>
+              <div className="inline-flex items-center rounded-full border border-border bg-card px-4 py-3 text-[14px] font-medium text-text-secondary">
+                Ideal for city stays, business trips, and family travel
+              </div>
+            </div>
+          </div>
+
+          <div className="surface-card-strong overflow-hidden rounded-panel">
+            <div className="relative h-full min-h-[420px]">
+              <Image
+                src={aboutImage}
+                alt="Travela short term accommodation room"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1A1B12]/78 via-[#1A1B12]/18 to-transparent" />
+
+              <div className="absolute inset-x-0 bottom-0 p-7 text-white">
+                <div className="inline-flex rounded-full bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-text-primary">
+                  Stay better
+                </div>
+                <h3 className="mt-4 max-w-sm font-sora text-[28px] font-bold leading-tight">
+                  Wherever you go, there should always be a place that feels ready for you.
+                </h3>
+                <p className="mt-3 max-w-md text-[14px] leading-7 text-white/82">
+                  Better presentation, stronger trust, and a booking flow that feels lighter from the first search.
+                </p>
               </div>
             </div>
           </div>
@@ -97,84 +105,33 @@ export const AboutTravela: React.FC = () => {
 
         <div
           className={`overflow-hidden transition-all duration-500 ease-in-out ${
-            isExpanded
-              ? "mt-12 max-h-[2200px] opacity-100 translate-y-0"
-              : "mt-0 max-h-0 opacity-0 translate-y-2"
+            isExpanded ? "mt-8 max-h-[1200px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="mx-auto max-w-6xl">
-            <p className="text-[15px] leading-8 text-text-primary">
-              Travela is Bangladesh&apos;s premier{" "}
-              <strong>short term accommodation platform</strong> connecting
-              guests with quality <strong>furnished apartment rent</strong> and{" "}
-              <strong>furnished room rent</strong> options across the country.
-              Whether you need <strong>rooms</strong>,{" "}
-              <strong>apartments</strong>, <strong>hotels</strong>,{" "}
-              <strong>resorts</strong>, or <strong>villas</strong>, Travela
-              offers verified accommodations in all 8 divisions including Dhaka,
-              Chattogram, Khulna, Rajshahi, Barishal, Sylhet, Rangpur, and
-              Mymensingh, as well as popular districts like Cox&apos;s Bazar,
-              Comilla, Gazipur, Narayanganj, Bogura, Jessore, Moulvibazar, and
-              more. Our platform serves diverse accommodation needs for hospital
-              attendants, wedding events, business and corporate events
-              travelling, public examinations, university exams, and leisure
-              travelers seeking comfortable short-stay solutions. Our platform is
-              designed to make short-term rentals easy, fast, and reliable, all
-              through your smartphone or computer. Simply search, choose and book
-              your ideal accommodation instantly through the Travela App or
-              Website.
-            </p>
-
-            <h3 className="mt-10 text-[20px] font-bold text-text-primary">
-              Earn Money as a Host: Your Gateway to Passive Income in Bangladesh
-            </h3>
-            <p className="mt-5 text-[15px] leading-8 text-text-primary">
-              If you&apos;re a property owner, Travela helps you turn your
-              furnished room, flat, or holiday home into a source of{" "}
-              <strong>passive income</strong>. Become a Travela Host and earn from
-              short-term guests without the headache of managing bookings or
-              marketing, we take care of that. Whether you live in a major city or
-              a tourist destination, this is the easiest way to build a side
-              hustle, generate monthly earnings from renting, or explore a
-              hassle-free investment opportunity in Bangladesh&apos;s growing
-              accommodation market.
-            </p>
-            <p className="mt-5 text-[15px] leading-8 text-text-primary">
-              Travela is redefining how people find stays and how property owners
-              earn money, making short term accommodation simpler for both guests
-              and hosts.
-            </p>
-
-            <h3 className="mt-10 text-[20px] font-bold text-text-primary">
-              WhyChooseTravela?
-            </h3>
-            <ul className="mt-5 space-y-5 text-[15px] leading-8 text-text-primary">
-              {points.map((point) => (
-                <li key={point} className="flex items-start gap-3">
-                  <span className="mt-[11px] h-2 w-2 flex-shrink-0 rounded-full bg-text-primary" />
-                  <span>{point}</span>
-                </li>
+          <div className="surface-card rounded-panel p-6 md:p-8">
+            <div className="grid gap-6 lg:grid-cols-2">
+              {extraSections.map((section) => (
+                <div key={section.title} className="rounded-[24px] bg-card p-5 shadow-soft">
+                  <h3 className="text-[20px] font-semibold leading-8 text-text-primary">
+                    {section.title}
+                  </h3>
+                  <p className="mt-3 text-[15px] leading-8 text-text-secondary">
+                    {section.text}
+                  </p>
+                </div>
               ))}
-            </ul>
+            </div>
 
-            <h3 className="mt-10 text-[20px] font-bold text-text-primary">
-              Book Your Next Stay or Start Hosting Today
-            </h3>
-            <p className="mt-5 text-[15px] leading-8 text-text-primary">
-              Experience hassle-free short term accommodation booking across
-              Bangladesh or begin your journey as a successful host. Travela makes
-              finding quality furnished rentals simple for guests while helping
-              hosts maximize their earning potential in Bangladesh&apos;s growing
-              accommodation market.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => setIsExpanded(false)}
-              className="mt-10 text-[15px] font-semibold text-[#ff6aa2] transition-colors duration-200 hover:text-text-primary"
-            >
-              See Less
-            </button>
+            <div className="mt-6 rounded-[24px] bg-surface px-5 py-5">
+              <h3 className="text-[18px] font-semibold text-text-primary">
+                Book your next stay or start hosting today
+              </h3>
+              <p className="mt-3 max-w-4xl text-[15px] leading-8 text-text-secondary">
+                Travela is built to make short term accommodation feel simpler for both
+                sides of the marketplace, helping guests find quality stays while helping
+                hosts present their spaces with more confidence.
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -21,6 +21,8 @@ const config: Config = {
         },
         background: "var(--color-background)",
         card: "var(--color-card)",
+        surface: "var(--color-surface)",
+        "surface-muted": "var(--color-surface-muted)",
         border: {
           DEFAULT: "var(--color-border)",
           light: "var(--color-border-light)",
@@ -33,13 +35,17 @@ const config: Config = {
         },
       },
       boxShadow: {
-        "soft": "0 2px 8px rgba(0,0,0,0.04)",
-        "medium": "0 4px 16px rgba(0,0,0,0.06)",
-        "strong": "0 8px 24px rgba(0,0,0,0.08)",
+        "soft": "var(--shadow-soft)",
+        "medium": "var(--shadow-medium)",
+        "strong": "var(--shadow-strong)",
+        "glow": "var(--shadow-glow)",
       },
       fontFamily: {
         sora: ["var(--font-sora)", "sans-serif"],
         "instrument-sans": ["var(--font-instrument-sans)", "sans-serif"],
+      },
+      borderRadius: {
+        panel: "var(--radius-panel)",
       },
     },
   },
