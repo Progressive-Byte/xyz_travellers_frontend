@@ -3,10 +3,10 @@
 import React, { useMemo, useRef } from "react";
 import { ListingCard } from "@/components/ui/ListingCard";
 
-const imageUrl = (prompt: string, image_size: string) =>
+const imageUrl = (prompt: string, imageSize: string) =>
   `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
     prompt,
-  )}&image_size=${encodeURIComponent(image_size)}`;
+  )}&image_size=${encodeURIComponent(imageSize)}`;
 
 type Listing = {
   id: number;
@@ -17,6 +17,81 @@ type Listing = {
   isNew?: boolean;
   imagePrompt: string;
 };
+
+type ListingRailProps = {
+  title: string;
+  subtitle: string;
+  listings: Listing[];
+  railRef: React.RefObject<HTMLDivElement | null>;
+  onScrollLeft: () => void;
+  onScrollRight: () => void;
+};
+
+const ArrowButton: React.FC<{
+  direction: "left" | "right";
+  onClick: () => void;
+}> = ({ direction, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface hover:shadow-medium"
+    aria-label={`Scroll ${direction}`}
+  >
+    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
+      <path
+        d={direction === "left" ? "M15 18l-6-6 6-6" : "M9 6l6 6-6 6"}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </button>
+);
+
+const ListingRail: React.FC<ListingRailProps> = ({
+  title,
+  subtitle,
+  listings,
+  railRef,
+  onScrollLeft,
+  onScrollRight,
+}) => (
+  <div className="surface-card-strong rounded-panel p-5 md:p-6">
+    <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <h3 className="font-sora text-[26px] font-bold tracking-[-0.04em] text-text-primary">
+          {title}
+        </h3>
+        <p className="mt-2 max-w-2xl text-[15px] leading-7 text-text-secondary">
+          {subtitle}
+        </p>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <ArrowButton direction="left" onClick={onScrollLeft} />
+        <ArrowButton direction="right" onClick={onScrollRight} />
+      </div>
+    </div>
+
+    <div
+      ref={railRef}
+      className="scrollbar-hide mt-7 flex gap-5 overflow-x-auto scroll-smooth pb-2"
+    >
+      {listings.map((listing) => (
+        <ListingCard
+          key={listing.id}
+          title={listing.title}
+          location={listing.location}
+          price={listing.price}
+          rating={listing.rating}
+          isNew={listing.isNew}
+          imageUrl={imageUrl(listing.imagePrompt, "landscape_4_3")}
+        />
+      ))}
+    </div>
+  </div>
+);
 
 export const Listings: React.FC = () => {
   const newArrivalsRef = useRef<HTMLDivElement>(null);
@@ -81,14 +156,13 @@ export const Listings: React.FC = () => {
         price: 2499,
         rating: 5.0,
         isNew: false,
-        imagePrompt:
-          "cozy bedroom interior, clean sheets, warm lamp light, realistic photo",
+        imagePrompt: "cozy bedroom interior, clean sheets, warm lamp light, realistic photo",
       },
     ],
     [],
   );
 
-  const bangladeshGateaways = useMemo<Listing[]>(
+  const bangladeshGetaways = useMemo<Listing[]>(
     () => [
       {
         id: 11,
@@ -117,8 +191,7 @@ export const Listings: React.FC = () => {
         price: 4999,
         rating: 5.0,
         isNew: false,
-        imagePrompt:
-          "simple clean room interior, minimalist, daylight, realistic photo",
+        imagePrompt: "simple clean room interior, minimalist, daylight, realistic photo",
       },
       {
         id: 14,
@@ -137,8 +210,7 @@ export const Listings: React.FC = () => {
         price: 4199,
         rating: undefined,
         isNew: true,
-        imagePrompt:
-          "apartment interior with balcony light, modern decor, realistic photo",
+        imagePrompt: "apartment interior with balcony light, modern decor, realistic photo",
       },
       {
         id: 16,
@@ -154,125 +226,43 @@ export const Listings: React.FC = () => {
     [],
   );
 
-  const scrollByAmount = (el: HTMLDivElement | null, dir: "left" | "right") => {
-    if (!el) return;
-    const amount = Math.round(el.clientWidth * 0.9);
-    el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+  const scrollByAmount = (element: HTMLDivElement | null, direction: "left" | "right") => {
+    if (!element) return;
+    const amount = Math.round(element.clientWidth * 0.88);
+    element.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" });
   };
 
   return (
-    <section className="bg-card py-12">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between">
-          <h2 className="font-sora text-2xl font-bold text-text-primary">New Arrivals</h2>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => scrollByAmount(newArrivalsRef.current, "left")}
-              className="h-8 w-8 rounded-full border border-border bg-card text-text-primary hover:bg-background transition-colors grid place-items-center"
-              aria-label="Scroll left"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M15 18l-6-6 6-6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollByAmount(newArrivalsRef.current, "right")}
-              className="h-8 w-8 rounded-full border border-border bg-card text-text-primary hover:bg-background transition-colors grid place-items-center"
-              aria-label="Scroll right"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M9 6l6 6-6 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
+    <section className="bg-card py-16 md:py-20">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="section-badge">Featured Stays</span>
+          <h2 className="section-heading mt-6">Handpicked places worth booking next</h2>
+          <p className="section-subtitle mx-auto mt-5">
+            Browse fresh arrivals and guest-loved stays curated to feel reliable,
+            polished, and easy to compare at a glance.
+          </p>
+          <div className="section-divider mx-auto mt-6" />
         </div>
 
-        <div
-          ref={newArrivalsRef}
-          className="scrollbar-hide mt-5 flex gap-6 overflow-x-auto scroll-smooth pb-2"
-        >
-          {newArrivals.map((listing) => (
-            <ListingCard
-              key={listing.id}
-              title={listing.title}
-              location={listing.location}
-              price={listing.price}
-              rating={listing.rating}
-              isNew={listing.isNew}
-              imageUrl={imageUrl(listing.imagePrompt, "landscape_4_3")}
-            />
-          ))}
-        </div>
+        <div className="mt-12 space-y-8">
+          <ListingRail
+            title="New Arrivals"
+            subtitle="Freshly listed properties with strong visuals, clean interiors, and flexible stay options."
+            listings={newArrivals}
+            railRef={newArrivalsRef}
+            onScrollLeft={() => scrollByAmount(newArrivalsRef.current, "left")}
+            onScrollRight={() => scrollByAmount(newArrivalsRef.current, "right")}
+          />
 
-        <div className="mt-12 flex items-center justify-between">
-          <h2 className="font-sora text-2xl font-bold text-text-primary">
-            Bangladesh Gateaways
-          </h2>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => scrollByAmount(bangladeshRef.current, "left")}
-              className="h-8 w-8 rounded-full border border-border bg-card text-text-primary hover:bg-background transition-colors grid place-items-center"
-              aria-label="Scroll left"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M15 18l-6-6 6-6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollByAmount(bangladeshRef.current, "right")}
-              className="h-8 w-8 rounded-full border border-border bg-card text-text-primary hover:bg-background transition-colors grid place-items-center"
-              aria-label="Scroll right"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M9 6l6 6-6 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div
-          ref={bangladeshRef}
-          className="scrollbar-hide mt-5 flex gap-6 overflow-x-auto scroll-smooth pb-2"
-        >
-          {bangladeshGateaways.map((listing) => (
-            <ListingCard
-              key={listing.id}
-              title={listing.title}
-              location={listing.location}
-              price={listing.price}
-              rating={listing.rating}
-              isNew={listing.isNew}
-              imageUrl={imageUrl(listing.imagePrompt, "landscape_4_3")}
-            />
-          ))}
+          <ListingRail
+            title="Bangladesh Getaways"
+            subtitle="A wider mix of city stays, family-ready homes, and destination-focused escapes across the country."
+            listings={bangladeshGetaways}
+            railRef={bangladeshRef}
+            onScrollLeft={() => scrollByAmount(bangladeshRef.current, "left")}
+            onScrollRight={() => scrollByAmount(bangladeshRef.current, "right")}
+          />
         </div>
       </div>
     </section>
