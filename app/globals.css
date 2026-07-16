@@ -44,6 +44,7 @@ body {
 
 a {
   text-decoration: none;
+  cursor: pointer;
 }
 
 button,
@@ -51,6 +52,35 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+button,
+[role="button"],
+summary,
+select,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="search"],
+input[type="password"],
+input[type="tel"],
+input[type="url"],
+textarea {
+  cursor: text;
 }
 
 .section-shell {
@@ -197,6 +227,13 @@ textarea {
   margin: 2px;
   border-radius: 12px;
   transition: all 0.15s ease;
+}
+
+.react-datepicker__day,
+.react-datepicker__navigation,
+.react-datepicker__month-read-view--down-arrow,
+.react-datepicker__year-read-view--down-arrow {
+  cursor: pointer;
 }
 
 .react-datepicker__day:hover:not(.react-datepicker__day--disabled):not(.react-datepicker__day--selected) {

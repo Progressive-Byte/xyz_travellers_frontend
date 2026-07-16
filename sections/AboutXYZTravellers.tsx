@@ -16,28 +16,28 @@ const extraSections = [
   {
     title: "Built for real travel needs in Bangladesh",
     text:
-      "Travela connects guests with furnished rooms, apartments, hotels, resorts, and villas across all eight divisions. Whether the stay is for work, family visits, hospital support, events, or short holidays, the platform is designed to make discovery and booking feel faster and less stressful.",
+      "XYZ Travellers connects guests with furnished rooms, apartments, hotels, resorts, and villas across all eight divisions. Whether the stay is for work, family visits, hospital support, events, or short holidays, the platform is designed to make discovery and booking feel faster and less stressful.",
   },
   {
     title: "A better path for hosts, too",
     text:
-      "Property owners can turn furnished spaces into dependable income with less operational friction. Travela helps hosts present their listings more clearly, attract the right guests, and manage short-term demand with greater confidence.",
+      "Property owners can turn furnished spaces into dependable income with less operational friction. XYZ Travellers helps hosts present their listings more clearly, attract the right guests, and manage short-term demand with greater confidence.",
   },
 ];
 
-export const AboutTravela: React.FC = () => {
+export const AboutXYZTravellers: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <section className="bg-card py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="section-badge">About Travela</span>
+          <span className="section-badge">About XYZ Travellers</span>
           <h2 className="section-heading mt-6">
             Bangladesh&apos;s short stay platform for guests who want more clarity and comfort
           </h2>
           <p className="section-subtitle mx-auto mt-5">
-            Travela helps people find furnished short term accommodation with a
+            XYZ Travellers helps people find furnished short term accommodation with a
             cleaner, more reliable booking experience built around trust.
           </p>
           <div className="section-divider mx-auto mt-6" />
@@ -46,7 +46,7 @@ export const AboutTravela: React.FC = () => {
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="surface-card-strong rounded-panel p-6 md:p-8">
             <p className="text-[16px] leading-8 text-text-primary">
-              Travela is a Bangladesh-focused accommodation platform connecting guests
+              XYZ Travellers is a Bangladesh-focused accommodation platform connecting guests
               with verified furnished rooms, apartments, hotels, resorts, and villas.
               It is designed for people who need short stays that feel easier to search,
               easier to trust, and easier to book.
@@ -82,7 +82,7 @@ export const AboutTravela: React.FC = () => {
             <div className="relative h-full min-h-[420px]">
               <Image
                 src={aboutImage}
-                alt="Travela short term accommodation room"
+                alt="XYZ Travellers short term accommodation room"
                 fill
                 className="object-cover"
               />
@@ -127,7 +127,7 @@ export const AboutTravela: React.FC = () => {
                 Book your next stay or start hosting today
               </h3>
               <p className="mt-3 max-w-4xl text-[15px] leading-8 text-text-secondary">
-                Travela is built to make short term accommodation feel simpler for both
+                XYZ Travellers is built to make short term accommodation feel simpler for both
                 sides of the marketplace, helping guests find quality stays while helping
                 hosts present their spaces with more confidence.
               </p>

@@ -3,7 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/sections/Hero";
 import { Listings } from "@/sections/Listings";
 import { WhyChooseUs } from "@/sections/WhyChooseUs";
-import { AboutTravela } from "@/sections/AboutTravela";
+import { AboutXYZTravellers } from "@/sections/AboutXYZTravellers";
 import { Blogs } from "@/sections/Blogs";
 
 export default function Home() {
@@ -14,7 +14,7 @@ export default function Home() {
         <Hero />
         <Listings />
         <WhyChooseUs />
-        <AboutTravela />
+        <AboutXYZTravellers />
         <Blogs />
       </main>
       <Footer />
