@@ -161,10 +161,10 @@ export const Listings: React.FC = () => {
   };
 
   return (
-    <section className="bg-background py-12">
-      <div className="max-w-6xl mx-auto px-6">
+    <section className="bg-card py-12">
+      <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between">
-          <h2 className="font-sora text-xl font-bold text-text-primary">New Arrivals</h2>
+          <h2 className="font-sora text-2xl font-bold text-text-primary">New Arrivals</h2>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -203,7 +203,7 @@ export const Listings: React.FC = () => {
 
         <div
           ref={newArrivalsRef}
-          className="mt-5 flex gap-6 overflow-x-auto scroll-smooth pb-2"
+          className="scrollbar-hide mt-5 flex gap-6 overflow-x-auto scroll-smooth pb-2"
         >
           {newArrivals.map((listing) => (
             <ListingCard
@@ -219,7 +219,7 @@ export const Listings: React.FC = () => {
         </div>
 
         <div className="mt-12 flex items-center justify-between">
-          <h2 className="font-sora text-xl font-bold text-text-primary">
+          <h2 className="font-sora text-2xl font-bold text-text-primary">
             Bangladesh Gateaways
           </h2>
           <div className="flex items-center gap-2">
@@ -260,7 +260,7 @@ export const Listings: React.FC = () => {
 
         <div
           ref={bangladeshRef}
-          className="mt-5 flex gap-6 overflow-x-auto scroll-smooth pb-2"
+          className="scrollbar-hide mt-5 flex gap-6 overflow-x-auto scroll-smooth pb-2"
         >
           {bangladeshGateaways.map((listing) => (
             <ListingCard

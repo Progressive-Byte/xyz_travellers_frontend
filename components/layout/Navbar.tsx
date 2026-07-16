@@ -20,8 +20,8 @@ export const Navbar: React.FC = () => {
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   return (
-    <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border">
-      <div className="max-w-6xl mx-auto px-6 py-3">
+    <header className="sticky top-0 z-50 bg-background border-b border-border">
+      <div className="max-w-7xl mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex-shrink-0">
