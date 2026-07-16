@@ -20,3 +20,9 @@
 - Use cream white for the main page background and soft surfaces.
 - Use false black for headings, primary text, and dark sections like the footer.
 - Keep `Sora` for headings and `Instrument Sans` for body/UI text for consistency.
+
+## Regression Notes
+
+- Do not hide `react-datepicker` custom inputs with `className="hidden"` when using `customInput`; it can remove the visible trigger and break open/click behavior.
+- When redesigning the Hero search bar, preserve enough layout space for the guest dropdown so it does not visually overlap the category row in a broken way.
+- Avoid leaving browser-default focus outlines on custom pill/segment buttons inside the Hero search bar; use intentional focus styling instead.

@@ -56,6 +56,31 @@ type GuestType = {
   onIncrease: () => void;
 };
 
+type DateInputButtonProps = {
+  value?: string;
+  onClick?: () => void;
+  label: string;
+  hint: string;
+};
+
+const DateInputButton = React.forwardRef<HTMLButtonElement, DateInputButtonProps>(
+  ({ value, onClick, label, hint }, ref) => (
+    <button
+      ref={ref}
+      type="button"
+      onClick={onClick}
+      className="mt-2 w-full text-left outline-none focus:outline-none focus-visible:outline-none"
+    >
+      <span className="block text-[16px] font-semibold text-text-primary">
+        {value || label}
+      </span>
+      <span className="mt-1 block text-[13px] text-text-secondary">{hint}</span>
+    </button>
+  ),
+);
+
+DateInputButton.displayName = "DateInputButton";
+
 export const Hero: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState("Apartments");
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
@@ -138,7 +163,7 @@ export const Hero: React.FC = () => {
           </div>
         </div>
 
-        <div className="mx-auto mt-10 flex w-full max-w-[980px] justify-center">
+        <div className="relative z-30 mx-auto mt-10 flex w-full max-w-[980px] justify-center">
           <div className="surface-card-strong w-full rounded-[30px] p-3 md:p-4">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
               <div className="flex-1 rounded-[24px] px-5 py-4 transition-colors duration-200 hover:bg-surface">
@@ -167,21 +192,11 @@ export const Hero: React.FC = () => {
                   endDate={checkOutDate}
                   minDate={new Date()}
                   placeholderText="Add dates"
-                  className="hidden"
                   customInput={
-                    <button type="button" className="mt-2 text-left">
-                      <span className="block text-[16px] font-semibold text-text-primary">
-                        {checkInDate
-                          ? checkInDate.toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })
-                          : "Add dates"}
-                      </span>
-                      <span className="mt-1 block text-[13px] text-text-secondary">
-                        Choose your arrival date
-                      </span>
-                    </button>
+                    <DateInputButton
+                      label="Add dates"
+                      hint="Choose your arrival date"
+                    />
                   }
                 />
               </div>
@@ -200,21 +215,11 @@ export const Hero: React.FC = () => {
                   endDate={checkOutDate}
                   minDate={checkInDate || new Date()}
                   placeholderText="Add dates"
-                  className="hidden"
                   customInput={
-                    <button type="button" className="mt-2 text-left">
-                      <span className="block text-[16px] font-semibold text-text-primary">
-                        {checkOutDate
-                          ? checkOutDate.toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })
-                          : "Add dates"}
-                      </span>
-                      <span className="mt-1 block text-[13px] text-text-secondary">
-                        Select your departure
-                      </span>
-                    </button>
+                    <DateInputButton
+                      label="Add dates"
+                      hint="Select your departure"
+                    />
                   }
                 />
               </div>
@@ -225,7 +230,7 @@ export const Hero: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowGuestDropdown((open) => !open)}
-                  className="flex w-full items-center justify-between rounded-[24px] px-5 py-4 text-left transition-colors duration-200 hover:bg-surface"
+                  className="flex w-full items-center justify-between rounded-[24px] px-5 py-4 text-left outline-none transition-colors duration-200 hover:bg-surface focus:outline-none focus-visible:outline-none"
                 >
                   <span>
                     <span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-text-secondary">
@@ -315,7 +320,7 @@ export const Hero: React.FC = () => {
 
               <button
                 type="button"
-                className="flex items-center justify-center gap-2 rounded-[22px] bg-primary px-6 py-4 text-[15px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover lg:min-w-[132px]"
+                className="flex items-center justify-center gap-2 rounded-[22px] bg-primary px-6 py-4 text-[15px] font-semibold text-text-primary shadow-glow outline-none transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover focus:outline-none focus-visible:outline-none lg:min-w-[132px]"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -330,6 +335,12 @@ export const Hero: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <div
+          className={`hidden transition-[height] duration-300 lg:block ${
+            showGuestDropdown ? "h-[238px]" : "h-0"
+          }`}
+        />
 
         <div className="mx-auto mt-7 flex w-full max-w-[980px] flex-wrap items-center justify-center gap-3">
           {categories.map((category) => {
