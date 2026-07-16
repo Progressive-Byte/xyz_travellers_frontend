@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 
-const aboutImage =
-  "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=bright%20modern%20bedroom%20interior%20with%20blue%20accent%20wall%2C%20clean%20hotel-style%20bed%2C%20large%20window%2C%20realistic%20architectural%20photo&image_size=landscape_4_3";
+const aboutImage = "/images/find_you_perfect_accommodation.jpg";
 
 const points = [
   "Verified Properties: All accommodations are verified for quality and safety",
