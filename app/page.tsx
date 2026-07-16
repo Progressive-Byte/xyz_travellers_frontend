@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/sections/Hero";
 import { Listings } from "@/sections/Listings";
+import { WhyChooseUs } from "@/sections/WhyChooseUs";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <main>
         <Hero />
         <Listings />
+        <WhyChooseUs />
       </main>
       <Footer />
     </div>

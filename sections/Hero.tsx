@@ -65,17 +65,17 @@ export const Hero: React.FC = () => {
   ];
 
   return (
-    <section className="bg-card">
-      <div className="max-w-6xl mx-auto px-6 pt-8 pb-6">
+    <section className="bg-background">
+      <div className="max-w-7xl mx-auto px-6 pt-8 pb-6">
         {/* Search Bar */}
         <div className="flex justify-center pb-6">
-          <div className="flex items-center bg-card border border-border rounded-full shadow-md hover:shadow-lg transition-all duration-300">
-            <div className="px-6 py-3 border-r border-border cursor-pointer hover:bg-background rounded-l-full transition-colors">
+          <div className="flex w-full max-w-[980px] items-center bg-card border border-border rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="flex-1 px-6 py-3 border-r border-border cursor-pointer hover:bg-background rounded-l-full transition-colors">
               <p className="text-xs font-bold text-text-primary uppercase tracking-wide mb-1">Where</p>
               <p className="text-sm text-text-secondary font-medium">Search destinations</p>
             </div>
             <div className="w-px h-8 bg-border"></div>
-            <div className="px-6 py-3 border-r border-border cursor-pointer hover:bg-background transition-colors">
+            <div className="flex-1 px-6 py-3 border-r border-border cursor-pointer hover:bg-background transition-colors">
               <p className="text-xs font-bold text-text-primary uppercase tracking-wide mb-1">Check in</p>
               <DatePicker
                 selected={checkInDate}
@@ -100,7 +100,7 @@ export const Hero: React.FC = () => {
               />
             </div>
             <div className="w-px h-8 bg-border"></div>
-            <div className="px-6 py-3 border-r border-border cursor-pointer hover:bg-background transition-colors">
+            <div className="flex-1 px-6 py-3 border-r border-border cursor-pointer hover:bg-background transition-colors">
               <p className="text-xs font-bold text-text-primary uppercase tracking-wide mb-1">Check out</p>
               <DatePicker
                 selected={checkOutDate}
@@ -125,7 +125,7 @@ export const Hero: React.FC = () => {
               />
             </div>
             <div className="w-px h-8 bg-border"></div>
-            <div className="relative flex items-center" ref={guestDropdownRef}>
+            <div className="relative flex flex-1 items-center" ref={guestDropdownRef}>
               <div 
                 className="px-6 py-3 flex items-center gap-3 cursor-pointer hover:bg-background transition-colors"
                 onClick={() => setShowGuestDropdown(!showGuestDropdown)}

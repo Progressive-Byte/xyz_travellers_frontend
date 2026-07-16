@@ -6,7 +6,7 @@
   --color-primary-light: #F5FBE0;
   --color-text-primary: #1A1B12;
   --color-text-secondary: #6C6D66;
-  --color-background: #EFEDE6;
+  --color-background: #F5F3ED;
   --color-card: #FFFFFF;
   --color-border: #D9D8D0;
   --color-border-light: #E9E8DF;
@@ -23,6 +23,15 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* Custom react-datepicker styles */

@@ -33,11 +33,11 @@ export const ListingCard: React.FC<ListingCardProps> = ({
       </div>
 
       <div className="pt-3">
-        <p className="text-[12px] font-semibold text-text-primary leading-4">
+        <p className="text-[13px] font-semibold text-text-primary leading-5">
           {location}
         </p>
 
-        <div className="mt-1 flex items-center gap-1.5 text-[11px] leading-4">
+        <div className="mt-1 flex items-center gap-1.5 text-[12px] leading-5">
           <span className="font-semibold text-primary">BDT {price.toLocaleString()}</span>
           <span className="text-border">•</span>
           {typeof rating === "number" ? (
@@ -51,7 +51,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           ) : null}
         </div>
 
-        <p className="mt-1 text-[11px] text-text-secondary leading-4">
+        <p className="mt-1 text-[12px] text-text-secondary leading-5">
           {title}
         </p>
       </div>
