@@ -15,7 +15,7 @@ const instrumentSans = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Travela Clone",
+  title: "XYZ Travellers",
   description: "Travel booking site clone",
 };
 
