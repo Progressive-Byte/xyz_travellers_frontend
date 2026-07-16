@@ -60,21 +60,19 @@ type DateInputButtonProps = {
   value?: string;
   onClick?: () => void;
   label: string;
-  hint: string;
 };
 
 const DateInputButton = React.forwardRef<HTMLButtonElement, DateInputButtonProps>(
-  ({ value, onClick, label, hint }, ref) => (
+  ({ value, onClick, label }, ref) => (
     <button
       ref={ref}
       type="button"
       onClick={onClick}
-      className="mt-2 w-full text-left outline-none focus:outline-none focus-visible:outline-none"
+      className="mt-1 w-full text-left outline-none focus:outline-none focus-visible:outline-none"
     >
-      <span className="block text-[16px] font-semibold text-text-primary">
+      <span className="block text-[14px] font-semibold text-text-primary">
         {value || label}
       </span>
-      <span className="mt-1 block text-[13px] text-text-secondary">{hint}</span>
     </button>
   ),
 );
@@ -83,6 +81,7 @@ DateInputButton.displayName = "DateInputButton";
 
 export const Hero: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState("Apartments");
+  const [destination, setDestination] = useState("");
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
   const [adults, setAdults] = useState(2);
@@ -164,24 +163,25 @@ export const Hero: React.FC = () => {
         </div>
 
         <div className="relative z-30 mx-auto mt-10 flex w-full max-w-[980px] justify-center">
-          <div className="surface-card-strong w-full rounded-[30px] p-3 md:p-4">
+          <div className="surface-card-strong w-full rounded-[26px] p-1.5">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
-              <div className="flex-1 rounded-[24px] px-5 py-4 transition-colors duration-200 hover:bg-surface">
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-text-secondary">
+              <div className="flex-1 rounded-[18px] px-4 py-1.5 transition-colors duration-200 hover:bg-surface">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                   Where
                 </p>
-                <p className="mt-2 text-[16px] font-semibold text-text-primary">
-                  Search destinations
-                </p>
-                <p className="mt-1 text-[13px] text-text-secondary">
-                  Dhaka, Cox&apos;s Bazar, Sylhet and more
-                </p>
+                <input
+                  type="text"
+                  value={destination}
+                  onChange={(event) => setDestination(event.target.value)}
+                  placeholder="Search destinations"
+                  className="mt-1 w-full bg-transparent text-[1px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-primary"
+                />
               </div>
 
               <div className="hidden h-auto w-px bg-border lg:block" />
 
-              <div className="flex-1 rounded-[24px] px-5 py-4 transition-colors duration-200 hover:bg-surface">
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-text-secondary">
+              <div className="flex-1 rounded-[18px] px-4 py-1.5 transition-colors duration-200 hover:bg-surface">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                   Check in
                 </p>
                 <DatePicker
@@ -193,18 +193,15 @@ export const Hero: React.FC = () => {
                   minDate={new Date()}
                   placeholderText="Add dates"
                   customInput={
-                    <DateInputButton
-                      label="Add dates"
-                      hint="Choose your arrival date"
-                    />
+                    <DateInputButton label="Add dates" />
                   }
                 />
               </div>
 
               <div className="hidden h-auto w-px bg-border lg:block" />
 
-              <div className="flex-1 rounded-[24px] px-5 py-4 transition-colors duration-200 hover:bg-surface">
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-text-secondary">
+              <div className="flex-1 rounded-[18px] px-4 py-1.5 transition-colors duration-200 hover:bg-surface">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                   Check out
                 </p>
                 <DatePicker
@@ -216,10 +213,7 @@ export const Hero: React.FC = () => {
                   minDate={checkInDate || new Date()}
                   placeholderText="Add dates"
                   customInput={
-                    <DateInputButton
-                      label="Add dates"
-                      hint="Select your departure"
-                    />
+                    <DateInputButton label="Add dates" />
                   }
                 />
               </div>
@@ -230,21 +224,18 @@ export const Hero: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowGuestDropdown((open) => !open)}
-                  className="flex w-full items-center justify-between rounded-[24px] px-5 py-4 text-left outline-none transition-colors duration-200 hover:bg-surface focus:outline-none focus-visible:outline-none"
+                  className="flex w-full items-center justify-between rounded-[18px] px-4 py-1.5 text-left outline-none transition-colors duration-200 hover:bg-surface focus:outline-none focus-visible:outline-none"
                 >
                   <span>
-                    <span className="block text-[11px] font-bold uppercase tracking-[0.22em] text-text-secondary">
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                       Who
                     </span>
-                    <span className="mt-2 block text-[16px] font-semibold text-text-primary">
+                    <span className="mt-1 block text-[13px] font-semibold text-text-primary">
                       {totalGuests} {totalGuests === 1 ? "guest" : "guests"}
                       {infants > 0 ? `, ${infants} infant${infants > 1 ? "s" : ""}` : ""}
                     </span>
-                    <span className="mt-1 block text-[13px] text-text-secondary">
-                      Adjust travelers and family size
-                    </span>
                   </span>
-                  <span className="rounded-full bg-surface px-3 py-1 text-[12px] font-semibold text-text-secondary">
+                  <span className="rounded-full bg-surface px-2 py-0.5 text-[10px] font-semibold text-text-secondary">
                     Edit
                   </span>
                 </button>
@@ -320,7 +311,7 @@ export const Hero: React.FC = () => {
 
               <button
                 type="button"
-                className="flex items-center justify-center gap-2 rounded-[22px] bg-primary px-6 py-4 text-[15px] font-semibold text-text-primary shadow-glow outline-none transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover focus:outline-none focus-visible:outline-none lg:min-w-[132px]"
+                className="flex items-center justify-center gap-2 rounded-[18px] bg-primary px-5 py-1.5 text-[13px] font-semibold text-text-primary shadow-glow outline-none transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover focus:outline-none focus-visible:outline-none lg:min-w-[112px]"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path

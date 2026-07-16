@@ -33,7 +33,7 @@ const features = [
     id: "03",
     title: "Search, book, and host in one smoother flow",
     description:
-      "Travela simplifies the full journey with a lighter interface, better filtering, and clearer calls to action for both booking and hosting.",
+      "XYZ Travellers simplifies the full journey with a lighter interface, better filtering, and clearer calls to action for both booking and hosting.",
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
         <rect x="3" y="4" width="18" height="17" rx="2" />
@@ -62,7 +62,7 @@ export const WhyChooseUs: React.FC = () => {
     <section className="section-shell bg-background py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="section-badge">Why Travela</span>
+          <span className="section-badge">Why XYZ Travellers</span>
           <h2 className="section-heading mt-6">A booking experience designed to feel calmer and more trustworthy</h2>
           <p className="section-subtitle mx-auto mt-5">
             We focus on the details that make short stays feel easier: verified

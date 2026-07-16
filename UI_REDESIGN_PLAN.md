@@ -1,10 +1,10 @@
-# Travela Homepage Redesign Plan
+# XYZ Travellers Homepage Redesign Plan
 
 ## Objective
 
 Refine the full homepage so it feels more premium, consistent, and intentional from top to bottom while preserving the existing product direction:
 
-- Keep the current Travela visual identity: Sora + Instrument Sans, lime accent, cream background, false-black text.
+- Keep the current XYZ Travellers visual identity: Sora + Instrument Sans, lime accent, cream background, false-black text.
 - Preserve the modular section-based structure already in place.
 - Improve the core design system if needed, not just isolated components.
 - Avoid random one-off styling and move toward a reusable visual language.
@@ -21,7 +21,7 @@ This plan is intentionally written before implementation so the redesign stays c
   - `Hero`
   - `Listings`
   - `WhyChooseUs`
-  - `AboutTravela`
+  - `AboutXYZTravellers`
   - `Blogs`
   - `Footer`
 
@@ -59,11 +59,11 @@ This plan is intentionally written before implementation so the redesign stays c
    - About and Blogs introduce accents and card treatments that do not fully match the rest.
 
 3. **A few hard-coded colors are still breaking the system**
-   - `sections/AboutTravela.tsx` still includes pink accent values like `#ff6aa2` and `#ff2d87`.
+   - `sections/AboutXYZTravellers.tsx` still includes pink accent values like `#ff6aa2` and `#ff2d87`.
    - These should be replaced by theme-driven accents or redesigned entirely.
 
 4. **Content density is too high in some sections**
-   - About Travela has long uninterrupted paragraphs.
+   - About XYZ Travellers has long uninterrupted paragraphs.
    - The expanded state is functional but visually heavy.
 
 5. **Shared UI primitives are missing**
@@ -164,7 +164,7 @@ Planned improvements by section:
 - Keep the section concept, but refine card rhythm and heading composition.
 - Re-evaluate number sizing and text balance so the cards do not feel template-like.
 
-#### `sections/AboutTravela.tsx`
+#### `sections/AboutXYZTravellers.tsx`
 
 - This is the highest-priority cleanup area after the hero.
 - Remove hard-coded pink accents and redesign the section around theme tokens.
@@ -204,7 +204,7 @@ These do not need to become over-engineered abstractions. The goal is to reduce 
 - Ensure naming consistency:
   - `bangladeshGateaways` should likely become `bangladeshGetaways`
   - copy such as `Earn By hosting` should be normalized
-  - `WhyChooseTravela?` should be rewritten to a cleaner label
+  - `WhyChooseXYZTravellers?` should be rewritten to a cleaner label
 
 ## Implementation Phases
 
@@ -253,7 +253,7 @@ Tasks:
 Files:
 
 - `sections/WhyChooseUs.tsx`
-- `sections/AboutTravela.tsx`
+- `sections/AboutXYZTravellers.tsx`
 - `sections/Blogs.tsx`
 
 Tasks:

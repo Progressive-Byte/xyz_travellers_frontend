@@ -7,7 +7,7 @@ const menuItems = [
   { label: "Log in or sign up", href: "/login", emphasis: true },
   { label: "Earn by Hosting", href: "/host" },
   { label: "Help Center", href: "/help" },
-  { label: "About Travela", href: "/about" },
+  { label: "About XYZ Travellers", href: "/about" },
 ];
 
 export const Navbar: React.FC = () => {
@@ -49,7 +49,7 @@ export const Navbar: React.FC = () => {
 
               <span className="min-w-0">
                 <span className="block font-sora text-[27px] font-bold tracking-[-0.04em] text-text-primary">
-                  travela
+                  XYZ Travellers
                 </span>
                 <span className="hidden text-[11px] font-medium tracking-[0.18em] text-text-secondary md:block">
                   STAY BETTER IN BANGLADESH

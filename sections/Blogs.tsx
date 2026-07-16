@@ -10,7 +10,7 @@ const blogs = [
     title: "Top 10 Tourist Places in Dhaka With a First-Time Visitor's Guide",
     excerpt:
       "A practical starting point for travelers who want culture, landmarks, and city energy without missing the essentials.",
-    author: "Travela Team",
+    author: "XYZ Travellers Team",
     date: "Oct 09, 2025",
     readTime: "8 min read",
     image:
@@ -21,7 +21,7 @@ const blogs = [
     title: "Top 5 Side Hustles in Bangladesh You Can Start Today",
     excerpt:
       "A more grounded look at flexible income ideas for young professionals, students, and aspiring hosts who want smarter earning options.",
-    author: "Travela Team",
+    author: "XYZ Travellers Team",
     date: "Oct 08, 2025",
     readTime: "6 min read",
     image:
@@ -34,7 +34,7 @@ export const Blogs: React.FC = () => {
     <section className="section-shell bg-background py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="section-badge">Travela Blogs</span>
+          <span className="section-badge">XYZ Travellers Blogs</span>
           <h2 className="section-heading mt-6">Stories, practical guides, and smarter ways to stay</h2>
           <p className="section-subtitle mx-auto mt-5">
             Read travel ideas, hosting insights, and helpful recommendations curated

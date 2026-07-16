@@ -37,13 +37,13 @@ export const Footer: React.FC = () => {
           <div className="flex flex-col gap-8 border-b border-footer-border pb-8 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-footer-border bg-white/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Stay Better With Travela
+                Stay Better With XYZ Travellers
               </div>
               <h2 className="mt-4 font-sora text-3xl font-bold leading-tight text-footer-text md:text-[42px]">
                 Find the right stay faster, book with confidence, and travel lighter.
               </h2>
               <p className="mt-4 max-w-xl text-[15px] leading-7 text-footer-text-muted">
-                From short city breaks to longer stays, Travela helps guests discover
+                From short city breaks to longer stays, XYZ Travellers helps guests discover
                 verified spaces across Bangladesh with a cleaner booking experience.
               </p>
               <div className="mt-5 flex flex-wrap gap-2.5 text-[12px] font-medium text-footer-text">
@@ -92,7 +92,7 @@ export const Footer: React.FC = () => {
                   <path d="M10 14H14V17H10V14Z" fill="white" />
                 </svg>
                 <span className="font-sora text-[28px] font-bold tracking-tight text-footer-text">
-                  travela
+                  XYZ Travellers
                 </span>
               </Link>
 
@@ -103,13 +103,13 @@ export const Footer: React.FC = () => {
 
               <div className="mt-6 space-y-3 text-[14px] text-footer-text-muted">
                 <a
-                  href="mailto:hello@travela.com"
+                  href="mailto:hello@xyztravellers.com"
                   className="flex items-center gap-3 rounded-2xl border border-footer-border bg-white/5 px-4 py-3 transition-colors duration-200 hover:bg-white/8"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 text-primary">
                     @
                   </span>
-                  hello@travela.com
+                  hello@xyztravellers.com
                 </a>
                 <a
                   href="tel:+8801700000000"
@@ -145,7 +145,7 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="mt-10 flex flex-col gap-4 border-t border-footer-border pt-6 text-[13px] text-footer-text-muted md:flex-row md:items-center md:justify-between">
-            <p>© 2026 Travela. All rights reserved.</p>
+            <p>© 2026 XYZ Travellers. All rights reserved.</p>
             <div className="flex flex-wrap items-center gap-5">
               <Link href="/privacy" className="transition-colors duration-200 hover:text-primary">
                 Privacy Policy
