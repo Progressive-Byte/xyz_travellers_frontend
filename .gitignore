@@ -36,7 +36,5 @@ yarn-error.log*
 next-env.d.ts
 
 debug.log
-SINGLE_PROPERTY_PAGE_PLAN.md
-BLOG_SINGLE_PAGE_PLAN.md
-AUTH_LOGIN_REGISTRATION_PLAN.md
-user-auth.md
+api/*
+HOST_PORTAL_DASHBOARD_PLAN.md
