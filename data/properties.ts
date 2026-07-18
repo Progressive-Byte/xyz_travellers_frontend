@@ -50,7 +50,6 @@ export type Property = {
   description: string[];
   highlights: string[];
   facilities: string[];
-  houseRules: string[];
   host: PropertyHost;
   gallery: PropertyImage[];
   map: PropertyMapInfo;
@@ -106,12 +105,6 @@ export const properties: Property[] = [
       "Dedicated workspace",
       "Smart TV",
       "Elevator access",
-    ],
-    houseRules: [
-      "Check-in after 2:00 PM",
-      "Check-out before 11:00 AM",
-      "No smoking indoors",
-      "Quiet hours after 10:00 PM",
     ],
     host: {
       name: "Nafisa Rahman",
@@ -193,12 +186,6 @@ export const properties: Property[] = [
       "Smart TV",
       "On-call support",
     ],
-    houseRules: [
-      "Check-in after 1:00 PM",
-      "Check-out before 11:30 AM",
-      "No parties or events",
-      "Please share guest count before arrival",
-    ],
     host: {
       name: "Ahmed Kabir",
       initials: "AK",
@@ -279,12 +266,6 @@ export const properties: Property[] = [
       "Backup power",
       "Housekeeping support",
     ],
-    houseRules: [
-      "Check-in after 2:00 PM",
-      "Check-out before 12:00 PM",
-      "No pets",
-      "ID required before check-in",
-    ],
     host: {
       name: "Farzana Iqbal",
       initials: "FI",
@@ -363,12 +344,6 @@ export const properties: Property[] = [
       "Laundry area",
       "TV lounge",
       "Car parking",
-    ],
-    houseRules: [
-      "Check-in after 2:00 PM",
-      "Check-out before 11:00 AM",
-      "No loud gatherings after 10:00 PM",
-      "Please coordinate parking before arrival",
     ],
     host: {
       name: "Samiha Karim",
@@ -449,12 +424,6 @@ export const properties: Property[] = [
       "Smart TV",
       "Housekeeping on request",
     ],
-    houseRules: [
-      "Check-in after 1:30 PM",
-      "Check-out before 11:00 AM",
-      "No smoking indoors",
-      "Registered guests only",
-    ],
     host: {
       name: "Afsana Noor",
       initials: "AN",
@@ -532,12 +501,6 @@ export const properties: Property[] = [
       "Laundry support",
       "TV",
       "Family seating area",
-    ],
-    houseRules: [
-      "Check-in after 2:00 PM",
-      "Check-out before 11:30 AM",
-      "No pets",
-      "Please respect building quiet hours",
     ],
     host: {
       name: "Helal Uddin",

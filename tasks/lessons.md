@@ -41,3 +41,7 @@
 - In the Hero search bar, `Where` must remain a real text input. `Search destinations` is placeholder text, not static copy.
 - During UI polish passes, explicitly verify cursor behavior on interactive elements; clickable controls should show a pointer, while true text-entry fields should keep the text cursor.
 - In this Hero search bar, the `Search destinations` placeholder should use the same black text tone as the other search values instead of a faded placeholder color.
+
+## Property Page Notes
+
+- For the single-property page, avoid over-designed nested gradient boxes inside content cards; prefer cleaner `surface-card` sections with one strong inner block and simpler hierarchy.
