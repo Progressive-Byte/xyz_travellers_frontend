@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Sora, Instrument_Sans } from "next/font/google";
+import { AuthProvider } from "@/context/AuthContext";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -26,7 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${sora.variable} ${instrumentSans.variable}`}>
-      <body className="font-instrument-sans bg-background text-text-primary">{children}</body>
+      <body className="font-instrument-sans bg-background text-text-primary">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
