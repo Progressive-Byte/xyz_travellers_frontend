@@ -171,11 +171,20 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent }) => {
             password: values.password,
           });
 
+      const hasHostAccess = session.user.roles.includes("host");
+      const shouldGoToHostDashboard = intent === "host" && hasHostAccess;
+
       setSession(session);
       setSuccessMessage(
-        isRegisterMode ? "Account created successfully. Redirecting..." : "Login successful. Redirecting...",
+        shouldGoToHostDashboard
+          ? "Host access confirmed. Redirecting..."
+          : isRegisterMode && intent === "host"
+            ? "Account created successfully. Host dashboard access depends on approval. Redirecting..."
+            : isRegisterMode
+              ? "Account created successfully. Redirecting..."
+              : "Login successful. Redirecting...",
       );
-      router.push("/");
+      router.push(shouldGoToHostDashboard ? "/host/dashboard" : "/");
       router.refresh();
     } catch (error) {
       if (error instanceof ApiError) {
