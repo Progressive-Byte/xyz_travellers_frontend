@@ -34,48 +34,7 @@ export const Footer: React.FC = () => {
     <footer className="section-shell mt-6 bg-footer-bg text-footer-text">
       <div className="mx-auto max-w-7xl px-6 py-10 md:py-14">
         <div className="rounded-[32px] border border-footer-border bg-white/5 p-6 shadow-[0_24px_60px_rgba(0,0,0,0.22)] backdrop-blur-sm md:p-8">
-          <div className="flex flex-col gap-8 border-b border-footer-border pb-8 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-footer-border bg-white/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Stay Better With XYZ Travellers
-              </div>
-              <h2 className="mt-4 font-sora text-3xl font-bold leading-tight text-footer-text md:text-[42px]">
-                Find the right stay faster, book with confidence, and travel lighter.
-              </h2>
-              <p className="mt-4 max-w-xl text-[15px] leading-7 text-footer-text-muted">
-                From short city breaks to longer stays, XYZ Travellers helps guests discover
-                verified spaces across Bangladesh with a cleaner booking experience.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2.5 text-[12px] font-medium text-footer-text">
-                <span className="rounded-full border border-footer-border bg-white/7 px-3 py-2">
-                  Verified properties
-                </span>
-                <span className="rounded-full border border-footer-border bg-white/7 px-3 py-2">
-                  Flexible stays
-                </span>
-                <span className="rounded-full border border-footer-border bg-white/7 px-3 py-2">
-                  24/7 support
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/apartments"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary transition-all duration-200 hover:bg-primary-hover"
-              >
-                Browse stays
-              </Link>
-              <Link
-                href="/host"
-                className="inline-flex items-center justify-center rounded-full border border-footer-border px-5 py-3 text-[14px] font-semibold text-footer-text transition-all duration-200 hover:bg-white/8"
-              >
-                Become a host
-              </Link>
-            </div>
-          </div>
-
-          <div className="grid gap-10 pt-8 md:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
+          <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
             <div>
               <Link href="/" className="inline-flex items-center gap-2">
                 <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none">
