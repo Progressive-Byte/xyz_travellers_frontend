@@ -1,27 +1,13 @@
 'use client';
 
-import React, { useMemo, useRef } from "react";
+import React, { useRef } from "react";
 import { ListingCard } from "@/components/ui/ListingCard";
-
-const imageUrl = (prompt: string, imageSize: string) =>
-  `https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=${encodeURIComponent(
-    prompt,
-  )}&image_size=${encodeURIComponent(imageSize)}`;
-
-type Listing = {
-  id: number;
-  title: string;
-  location: string;
-  price: number;
-  rating?: number;
-  isNew?: boolean;
-  imagePrompt: string;
-};
+import { getPropertiesByRail } from "@/data/properties";
 
 type ListingRailProps = {
   title: string;
   subtitle: string;
-  listings: Listing[];
+  listings: ReturnType<typeof getPropertiesByRail>;
   railRef: React.RefObject<HTMLDivElement | null>;
   onScrollLeft: () => void;
   onScrollRight: () => void;
@@ -80,13 +66,14 @@ const ListingRail: React.FC<ListingRailProps> = ({
     >
       {listings.map((listing) => (
         <ListingCard
-          key={listing.id}
+          key={listing.slug}
           title={listing.title}
           location={listing.location}
-          price={listing.price}
+          price={listing.pricePerNight}
           rating={listing.rating}
           isNew={listing.isNew}
-          imageUrl={imageUrl(listing.imagePrompt, "landscape_4_3")}
+          imageUrl={listing.gallery[0]?.src}
+          href={`/properties/${listing.slug}`}
         />
       ))}
     </div>
@@ -96,135 +83,8 @@ const ListingRail: React.FC<ListingRailProps> = ({
 export const Listings: React.FC = () => {
   const newArrivalsRef = useRef<HTMLDivElement>(null);
   const bangladeshRef = useRef<HTMLDivElement>(null);
-
-  const newArrivals = useMemo<Listing[]>(
-    () => [
-      {
-        id: 1,
-        title: "Cozy Apartment",
-        location: "Bashundhara",
-        price: 4999,
-        rating: undefined,
-        isNew: true,
-        imagePrompt:
-          "bright modern apartment interior, minimal design, cozy sofa, warm daylight, realistic photo",
-      },
-      {
-        id: 2,
-        title: "Modern Stay",
-        location: "Uttara | Sector 9",
-        price: 6999,
-        rating: undefined,
-        isNew: true,
-        imagePrompt:
-          "modern living room interior, neutral palette, wide angle, realistic photo, soft natural light",
-      },
-      {
-        id: 3,
-        title: "Diplomatic Zone",
-        location: "Baridhara | Diplomatic Zone",
-        price: 12959,
-        rating: undefined,
-        isNew: true,
-        imagePrompt:
-          "luxury bedroom interior, hotel style, premium textures, warm lighting, realistic photo",
-      },
-      {
-        id: 4,
-        title: "City Apartment",
-        location: "Moddho Badda",
-        price: 3699,
-        rating: 4.8,
-        isNew: false,
-        imagePrompt:
-          "small stylish apartment interior, tidy, contemporary furniture, evening ambience, realistic photo",
-      },
-      {
-        id: 5,
-        title: "Jashiri Abashon",
-        location: "Jashiri Abashon",
-        price: 12500,
-        rating: undefined,
-        isNew: true,
-        imagePrompt:
-          "night exterior of modern villa, architectural lighting, high contrast, realistic photo",
-      },
-      {
-        id: 6,
-        title: "Cozy Room",
-        location: "Adabor | Mohammadpur",
-        price: 2499,
-        rating: 5.0,
-        isNew: false,
-        imagePrompt: "cozy bedroom interior, clean sheets, warm lamp light, realistic photo",
-      },
-    ],
-    [],
-  );
-
-  const bangladeshGetaways = useMemo<Listing[]>(
-    () => [
-      {
-        id: 11,
-        title: "Triplex Apartment",
-        location: "Triplex Apartment, Bashundhara",
-        price: 18500,
-        rating: 5.0,
-        isNew: false,
-        imagePrompt:
-          "lush green garden with small house, bangladesh countryside vibe, daytime, realistic photo",
-      },
-      {
-        id: 12,
-        title: "Premium Stay",
-        location: "Dhanmondi",
-        price: 7500,
-        rating: 5.0,
-        isNew: false,
-        imagePrompt:
-          "bright airy apartment interior, cream and wood tones, realistic photo, soft shadows",
-      },
-      {
-        id: 13,
-        title: "City Retreat",
-        location: "Mymensingh",
-        price: 4999,
-        rating: 5.0,
-        isNew: false,
-        imagePrompt: "simple clean room interior, minimalist, daylight, realistic photo",
-      },
-      {
-        id: 14,
-        title: "Family Apartment",
-        location: "Banasree, Dhaka",
-        price: 7000,
-        rating: 5.0,
-        isNew: false,
-        imagePrompt:
-          "comfortable living room with tv and sofa, warm evening light, realistic photo",
-      },
-      {
-        id: 15,
-        title: "Uttara Stay",
-        location: "Uttara, Dhaka",
-        price: 4199,
-        rating: undefined,
-        isNew: true,
-        imagePrompt: "apartment interior with balcony light, modern decor, realistic photo",
-      },
-      {
-        id: 16,
-        title: "Heritage Stay",
-        location: "Bogura",
-        price: 5499,
-        rating: undefined,
-        isNew: true,
-        imagePrompt:
-          "cozy traditional room, warm colors, bangladesh travel vibe, realistic photo",
-      },
-    ],
-    [],
-  );
+  const newArrivals = getPropertiesByRail("new-arrivals");
+  const bangladeshGetaways = getPropertiesByRail("bangladesh-getaways");
 
   const scrollByAmount = (element: HTMLDivElement | null, direction: "left" | "right") => {
     if (!element) return;

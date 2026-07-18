@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface ListingCardProps {
   title: string;
@@ -8,6 +9,8 @@ interface ListingCardProps {
   rating?: number;
   isNew?: boolean;
   imageUrl?: string;
+  href?: string;
+  className?: string;
 }
 
 export const ListingCard: React.FC<ListingCardProps> = ({
@@ -17,9 +20,11 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   rating,
   isNew = false,
   imageUrl,
+  href,
+  className = "",
 }) => {
-  return (
-    <article className="group hover-lift w-[220px] flex-shrink-0 cursor-pointer rounded-[26px] border border-border bg-card p-3 shadow-soft">
+  const cardContent = (
+    <>
       <div className="relative h-[170px] overflow-hidden rounded-[20px] bg-surface-muted">
         {imageUrl ? (
           <Image
@@ -75,6 +80,18 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         </div>
       </div>
-    </article>
+    </>
   );
+
+  const cardClassName = `group hover-lift w-[220px] flex-shrink-0 rounded-[26px] border border-border bg-card p-3 shadow-soft ${href ? "cursor-pointer" : ""} ${className}`.trim();
+
+  if (href) {
+    return (
+      <Link href={href} className={cardClassName}>
+        {cardContent}
+      </Link>
+    );
+  }
+
+  return <article className={cardClassName}>{cardContent}</article>;
 };
