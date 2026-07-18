@@ -120,7 +120,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
       <main className="section-shell overflow-hidden bg-background pb-20 pt-8 md:pb-24">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto">
             <div className="flex flex-wrap items-center gap-3 text-[13px] font-medium text-text-secondary">
               <Link href="/" className="transition-colors duration-200 hover:text-text-primary">
                 Home
@@ -165,10 +165,6 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                 Up to {property.guestCount} guests
               </span>
             </div>
-
-            <p className="mt-6 max-w-3xl text-[16px] leading-8 text-text-secondary">
-              {property.summary}
-            </p>
           </div>
 
           <PropertyGallery title={property.title} images={property.gallery} />
@@ -176,17 +172,24 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
           <section className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_360px]">
             <div className="space-y-8">
               <div className="surface-card-strong rounded-[30px] p-6 md:p-8">
-                <SectionTitle
-                  eyebrow="About This Stay"
-                  title={`A ${property.propertyType.toLowerCase()} in ${property.shortLocation}`}
-                  description="Structured for easy scanning, comfortable booking, and a cleaner guest experience from arrival to checkout."
-                />
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                  About This Stay
+                </p>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary md:text-[34px]">
+                  {`A ${property.propertyType.toLowerCase()} in ${property.shortLocation}`}
+                </h2>
+
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   {statItems(property).map((item) => (
                     <DetailStat key={item.label} label={item.label} value={item.value} />
                   ))}
                 </div>
+
+                <p className="mt-5 max-w-3xl text-[15px] leading-7 text-text-secondary">
+                  Structured for easy scanning, comfortable booking, and a cleaner guest
+                  experience from arrival to checkout.
+                </p>
 
                 <div className="mt-8 space-y-5">
                   {property.description.map((paragraph) => (
@@ -199,19 +202,6 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                   ))}
                 </div>
 
-                <div className="mt-8 grid gap-3 md:grid-cols-3">
-                  {property.highlights.map((highlight) => (
-                    <div
-                      key={highlight}
-                      className="rounded-[24px] border border-border bg-surface px-5 py-5"
-                    >
-                      <div className="icon-chip h-11 w-11 rounded-[14px] text-[12px] font-bold">
-                        +
-                      </div>
-                      <p className="mt-4 text-[14px] leading-7 text-text-primary">{highlight}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               <div className="surface-card rounded-[30px] p-6 md:p-8">
@@ -244,20 +234,46 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                     description={property.host.note}
                   />
 
-                  <div className="mt-6 flex items-start gap-4">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary text-[18px] font-bold text-text-primary shadow-glow">
-                      {property.host.initials}
+                  <div className="mt-7 rounded-[26px] border border-border-light bg-card p-5 shadow-soft">
+                    <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-[24px] font-bold text-text-primary shadow-glow">
+                        {property.host.initials}
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="text-[19px] font-semibold text-text-primary">
+                            {property.host.tagline}
+                          </p>
+                          <span className="rounded-full border border-border bg-surface px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-text-secondary">
+                            {property.host.isVerified ? "Verified host" : "Independent host"}
+                          </span>
+                        </div>
+
+                        <p className="mt-2 text-[14px] leading-7 text-text-secondary">
+                          Languages: {property.host.languages.join(", ")}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[16px] font-semibold text-text-primary">
-                        {property.host.tagline}
-                      </p>
-                      <p className="mt-2 text-[14px] leading-7 text-text-secondary">
-                        Languages: {property.host.languages.join(", ")}
-                      </p>
-                      <p className="mt-2 text-[14px] font-medium text-text-primary">
-                        {property.host.isVerified ? "Verified host" : "Independent host"}
-                      </p>
+
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-[20px] border border-border-light bg-surface px-4 py-4">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+                          Support style
+                        </p>
+                        <p className="mt-2 text-[14px] leading-7 text-text-primary">
+                          Calm communication and local help before arrival when needed.
+                        </p>
+                      </div>
+
+                      <div className="rounded-[20px] border border-border-light bg-surface px-4 py-4">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+                          Best for
+                        </p>
+                        <p className="mt-2 text-[14px] leading-7 text-text-primary">
+                          Guests who want a simple, reliable check-in and quick answers.
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -276,17 +292,17 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                     description={property.map.summary}
                   />
 
-                  <div className="mt-6 overflow-hidden rounded-[24px] border border-border bg-surface">
+                  <div className="mt-7 overflow-hidden rounded-[26px] border border-border bg-surface shadow-soft">
                     <div className="relative h-[260px] bg-[linear-gradient(180deg,rgba(227,235,241,0.95),rgba(244,248,250,0.98))]">
                       <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(26,27,18,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(26,27,18,0.08)_1px,transparent_1px)] [background-size:32px_32px]" />
-                      <div className="absolute left-[12%] top-[18%] rounded-full bg-white/90 px-3 py-2 text-[12px] font-semibold text-text-primary shadow-soft">
+                      <div className="absolute left-[10%] top-[16%] rounded-full bg-white/92 px-4 py-2 text-[12px] font-semibold text-text-primary shadow-soft">
                         {property.map.area}
                       </div>
-                      <div className="absolute right-[14%] top-[34%] rounded-full bg-white/90 px-3 py-2 text-[12px] font-semibold text-text-primary shadow-soft">
+                      <div className="absolute right-[12%] top-[32%] rounded-full bg-white/92 px-4 py-2 text-[12px] font-semibold text-text-primary shadow-soft">
                         Nearby
                       </div>
-                      <div className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-text-primary text-primary shadow-strong">
-                        <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none">
+                      <div className="absolute left-1/2 top-1/2 flex h-[72px] w-[72px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-text-primary text-primary shadow-strong">
+                        <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none">
                           <path
                             d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11Z"
                             fill="currentColor"
@@ -351,24 +367,6 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
                 </div>
               </div>
 
-              <div className="surface-card rounded-[30px] p-6 md:p-8">
-                <SectionTitle
-                  eyebrow="More Details"
-                  title="House rules and stay notes"
-                  description="Clear pre-arrival expectations help the booking process feel simpler and more trustworthy."
-                />
-
-                <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                  {property.houseRules.map((rule) => (
-                    <div
-                      key={rule}
-                      className="rounded-[22px] border border-border-light bg-white/80 px-4 py-4"
-                    >
-                      <p className="text-[14px] font-medium text-text-primary">{rule}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
 
             <div className="self-start lg:sticky lg:top-28">
