@@ -82,7 +82,7 @@ export const HostShell: React.FC<HostShellProps> = ({
   return (
     <div className="min-h-screen bg-background">
       <div className="lg:flex lg:min-h-screen">
-        <aside className="hidden lg:block lg:w-[340px] lg:flex-none lg:border-r lg:border-border-light lg:bg-[linear-gradient(180deg,rgba(255,252,247,0.9)_0%,rgba(240,238,231,0.72)_100%)]">
+        <aside className="hidden lg:block lg:w-[312px] lg:flex-none lg:border-r lg:border-border-light lg:bg-[linear-gradient(180deg,rgba(255,252,247,0.9)_0%,rgba(240,238,231,0.72)_100%)]">
           <div className="sticky top-0 h-screen">
             <HostSidebar />
           </div>
@@ -96,20 +96,20 @@ export const HostShell: React.FC<HostShellProps> = ({
             quickAction={topbarAction}
           />
 
-          <main className="px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8 xl:px-10">
+          <main className="px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6 xl:px-10">
             <div className="mx-auto w-full max-w-7xl">
-              <div className="surface-card mb-6 rounded-[28px] px-4 py-4 sm:px-5 lg:px-6">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="surface-card mb-4 rounded-[24px] px-4 py-3.5 sm:px-5">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-[14px] font-bold uppercase text-text-primary shadow-glow">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-[13px] font-bold uppercase text-text-primary shadow-glow">
                       {initials}
                     </span>
 
                     <div className="min-w-0">
-                      <p className="truncate text-[15px] font-semibold text-text-primary">
+                      <p className="truncate text-[14px] font-semibold text-text-primary">
                         {user ? `${user.firstName} ${user.lastName}` : "Host account"}
                       </p>
-                      <p className="truncate text-[13px] text-text-secondary">
+                      <p className="truncate text-[12px] text-text-secondary">
                         {user?.email ?? "Signed in to the host workspace"}
                       </p>
                     </div>
@@ -118,7 +118,7 @@ export const HostShell: React.FC<HostShellProps> = ({
                   <div className="flex flex-wrap gap-2">
                     <Link
                       href="/"
-                      className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                      className="inline-flex items-center justify-center rounded-[16px] border border-border bg-white px-3.5 py-2.5 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
                     >
                       Back to homepage
                     </Link>
@@ -126,7 +126,7 @@ export const HostShell: React.FC<HostShellProps> = ({
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+                      className="inline-flex items-center justify-center rounded-[16px] bg-primary px-3.5 py-2.5 text-[13px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
                     >
                       Log out
                     </button>
@@ -134,25 +134,25 @@ export const HostShell: React.FC<HostShellProps> = ({
                 </div>
               </div>
 
-              <div className="surface-card-strong rounded-panel p-6 md:p-8">
-                <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <div className="surface-card-strong rounded-panel p-5 md:p-6">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                   <div>
                     <span className="section-badge">{badge}</span>
-                    <h1 className="mt-5 font-sora text-[34px] font-bold tracking-[-0.05em] text-text-primary md:text-[46px]">
+                    <h1 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.05em] text-text-primary md:text-[34px]">
                       {resolvedTitle}
                     </h1>
                     {resolvedSubtitle ? (
-                      <p className="mt-4 max-w-2xl text-[15px] leading-7 text-text-secondary">
+                      <p className="mt-2.5 max-w-2xl text-[14px] leading-6 text-text-secondary">
                         {resolvedSubtitle}
                       </p>
                     ) : null}
                   </div>
 
-                  {headerAside ? <div className="grid gap-3 sm:grid-cols-2">{headerAside}</div> : null}
+                  {headerAside ? <div className="grid gap-2.5 sm:grid-cols-2">{headerAside}</div> : null}
                 </div>
               </div>
 
-              <div className="mt-8">{children}</div>
+              <div className="mt-6">{children}</div>
             </div>
           </main>
         </div>
@@ -172,7 +172,7 @@ export const HostShell: React.FC<HostShellProps> = ({
         />
 
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-[min(88vw,360px)] p-4 transition-transform duration-250 ${
+          className={`fixed inset-y-0 left-0 z-50 w-[min(88vw,340px)] p-4 transition-transform duration-250 ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           role="dialog"

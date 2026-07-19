@@ -1,6 +1,5 @@
 export type HostNavIcon =
   | "dashboard"
-  | "add-property"
   | "properties"
   | "reservations"
   | "messages"
@@ -30,14 +29,6 @@ export const hostNavigationItems: HostNavItem[] = [
     group: "Main",
     isLive: true,
     description: "Overview of hosting performance and current activity.",
-  },
-  {
-    label: "Add Property",
-    href: "/host/properties/new",
-    icon: "add-property",
-    group: "Main",
-    isLive: true,
-    description: "Start a new listing draft and continue through the add-property workflow.",
   },
   {
     label: "Properties",
@@ -117,11 +108,11 @@ export const hostNavigationGroups: HostNavGroupKey[] = ["Main", "Operations", "S
 
 export const isHostNavItemActive = (pathname: string, href: string) => {
   if (href === "/host/properties") {
-    return pathname === href;
-  }
-
-  if (href === "/host/properties/new") {
-    return pathname === href || /^\/host\/properties\/[^/]+\/(edit|media|units|pricing|calendar|verification)$/.test(pathname);
+    return (
+      pathname === href ||
+      pathname === "/host/properties/new" ||
+      /^\/host\/properties\/[^/]+\/(edit|media|units|pricing|calendar|verification)$/.test(pathname)
+    );
   }
 
   return pathname === href || pathname.startsWith(`${href}/`);

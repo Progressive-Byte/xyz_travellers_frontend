@@ -24,13 +24,6 @@ const HostNavIconMark: React.FC<{ icon: HostNavIcon; isActive: boolean }> = ({ i
           <path d="M7 11.5V20h10v-8.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       );
-    case "add-property":
-      return (
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">
-          <path d="M12 5v14M5 12h14" strokeLinecap="round" />
-          <path d="M5 7.5h3" strokeLinecap="round" />
-        </svg>
-      );
     case "properties":
       return (
         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">
@@ -107,14 +100,14 @@ export const HostSidebar: React.FC<HostSidebarProps> = ({ onNavigate }) => {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col overflow-hidden border border-border-light bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(255,252,247,0.94)_100%)] p-5 shadow-[0_20px_60px_rgba(26,27,18,0.08)]">
-      <div className="border-b border-border-light/90 pb-5">
+    <div className="flex h-full flex-col overflow-hidden border border-border-light bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(255,252,247,0.94)_100%)] p-4 shadow-[0_20px_60px_rgba(26,27,18,0.08)]">
+      <div className="border-b border-border-light/90 pb-4">
         <Link
           href="/"
           onClick={onNavigate}
-          className="flex items-center gap-3 rounded-[24px] px-1 py-1.5 transition-all duration-200 hover:bg-white/70"
+          className="flex items-center gap-3 rounded-[20px] px-1 py-1 transition-all duration-200 hover:bg-white/70"
         >
-          <span className="icon-chip h-12 w-12 rounded-[20px] shadow-soft">
+          <span className="icon-chip h-11 w-11 rounded-[18px] shadow-soft">
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
               <defs>
                 <linearGradient id="hostSidebarLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -131,7 +124,7 @@ export const HostSidebar: React.FC<HostSidebarProps> = ({ onNavigate }) => {
           </span>
 
           <span className="min-w-0">
-            <span className="block font-sora text-[22px] font-bold tracking-[-0.04em] text-text-primary">
+            <span className="block font-sora text-[20px] font-bold tracking-[-0.04em] text-text-primary">
               XYZ Travellers
             </span>
             <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -141,21 +134,21 @@ export const HostSidebar: React.FC<HostSidebarProps> = ({ onNavigate }) => {
         </Link>
       </div>
 
-      <div className="scrollbar-hide flex-1 overflow-y-auto py-6">
-        <div className="space-y-7">
+      <div className="scrollbar-hide flex-1 overflow-y-auto py-5">
+        <div className="space-y-6">
           {hostNavigationGroups.map((group) => {
             const groupItems = hostNavigationItems.filter((item) => item.group === group);
 
             return (
               <section key={group}>
-                <p className="px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-text-secondary">
+                <p className="px-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
                   {group}
                 </p>
 
-                <div className="mt-3 space-y-1.5">
+                <div className="mt-2.5 space-y-1.5">
                   {groupItems.map((item) => {
                     const isActive = isHostNavItemActive(pathname, item.href);
-                    const itemClasses = `group flex w-full items-center justify-between rounded-[22px] border px-3.5 py-3 text-left transition-all duration-200 ${
+                    const itemClasses = `group flex w-full items-center justify-between rounded-[18px] border px-3 py-2.5 text-left transition-all duration-200 ${
                       isActive
                         ? "border-primary/55 bg-primary-light text-text-primary shadow-soft"
                         : item.isLive
@@ -167,7 +160,7 @@ export const HostSidebar: React.FC<HostSidebarProps> = ({ onNavigate }) => {
                       <>
                         <span className="flex min-w-0 items-center gap-3">
                           <span
-                            className={`flex h-11 w-11 items-center justify-center rounded-[16px] border transition-all duration-200 ${
+                            className={`flex h-10 w-10 items-center justify-center rounded-[14px] border transition-all duration-200 ${
                               isActive
                                 ? "border-primary/50 bg-white text-text-primary"
                                 : item.isLive
@@ -180,7 +173,7 @@ export const HostSidebar: React.FC<HostSidebarProps> = ({ onNavigate }) => {
 
                           <span className="min-w-0">
                             <span
-                              className={`block text-[14px] ${
+                              className={`block text-[13px] ${
                                 isActive || item.isLive
                                   ? "font-semibold text-current"
                                   : "font-medium text-current"
@@ -188,9 +181,11 @@ export const HostSidebar: React.FC<HostSidebarProps> = ({ onNavigate }) => {
                             >
                               {item.label}
                             </span>
-                            <span className="mt-0.5 block text-[12px] leading-5 text-text-secondary">
-                              {item.isLive ? item.description : "Coming soon"}
-                            </span>
+                            {item.isLive ? null : (
+                              <span className="mt-0.5 block text-[11px] leading-4 text-text-secondary">
+                                Coming soon
+                              </span>
+                            )}
                           </span>
                         </span>
 
