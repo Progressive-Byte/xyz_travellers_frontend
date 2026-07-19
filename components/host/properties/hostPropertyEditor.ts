@@ -1,3 +1,13 @@
+import type {
+  HostBusiness,
+  HostPropertyDetail,
+  HostPropertyMediaItem,
+  HostPropertyUnit,
+  HostPropertyVerification,
+  HostUnitCalendarRules,
+  HostUnitPricing,
+} from "@/lib/host";
+
 export type HostPropertyEditorStepState = "active" | "available" | "upcoming";
 export type HostPropertyEditorStepKey =
   | "basics"
@@ -64,9 +74,26 @@ const stepRouteKeys: HostPropertyEditorStepKey[] = [
   "verification",
 ];
 
-const getEditorStepHref = (propertyId: string, key: HostPropertyEditorStepKey) => {
-  if (key === "basics" || key === "location") {
-    return `/host/properties/${propertyId}/edit`;
+export type HostPropertyWorkflowSnapshot = {
+  property: HostPropertyDetail;
+  mediaItems?: HostPropertyMediaItem[];
+  units?: HostPropertyUnit[];
+  pricings?: HostUnitPricing[];
+  calendars?: HostUnitCalendarRules[];
+  verification?: HostPropertyVerification | null;
+  businesses?: HostBusiness[];
+};
+
+export const getHostPropertyEditorStepHref = (
+  propertyId: string,
+  key: HostPropertyEditorStepKey,
+) => {
+  if (key === "basics") {
+    return `/host/properties/${propertyId}/edit?step=basics`;
+  }
+
+  if (key === "location") {
+    return `/host/properties/${propertyId}/edit?step=location`;
   }
 
   if (key === "media") {
@@ -92,6 +119,66 @@ const getEditorStepHref = (propertyId: string, key: HostPropertyEditorStepKey) =
   return undefined;
 };
 
+const hasPropertyBasics = (
+  property: HostPropertyDetail,
+  businesses: HostBusiness[] = [],
+) => {
+  const isCommercial = property.ownershipType.trim().toLowerCase() === "commercial";
+  const hasCommercialLinkage =
+    !isCommercial ||
+    (Boolean(property.businessId.trim()) &&
+      businesses.some((business) => business.id === property.businessId));
+
+  return (
+    Boolean(property.name.trim()) &&
+    Boolean(property.description.trim()) &&
+    Boolean(property.propertyType.trim()) &&
+    Boolean(property.ownershipType.trim()) &&
+    hasCommercialLinkage
+  );
+};
+
+const hasPropertyLocation = (property: HostPropertyDetail) =>
+  Boolean(property.address.trim()) &&
+  Boolean(property.city.trim()) &&
+  Boolean(property.country.trim());
+
+export const getHostPropertyWorkflowCompletion = ({
+  property,
+  mediaItems = [],
+  units = [],
+  pricings = [],
+  calendars = [],
+  verification = null,
+  businesses = [],
+}: HostPropertyWorkflowSnapshot): Record<HostPropertyEditorStepKey, boolean> => ({
+  basics: hasPropertyBasics(property, businesses),
+  location: hasPropertyLocation(property),
+  media:
+    mediaItems.length > 0 &&
+    mediaItems.some((item) => item.type === "image" && item.isCover),
+  units: units.length > 0,
+  pricing: pricings.some((item) => item.basePrice.trim() && item.currency.trim()),
+  calendar: calendars.some(
+    (item) =>
+      item.minimumStay.trim() ||
+      item.maximumStay.trim() ||
+      item.blockedDates.length > 0,
+  ),
+  verification: (verification?.documents.length ?? 0) > 0,
+});
+
+export const getNextIncompleteHostPropertyStep = (
+  snapshot: HostPropertyWorkflowSnapshot,
+): HostPropertyEditorStepKey => {
+  const completion = getHostPropertyWorkflowCompletion(snapshot);
+
+  return (
+    stepRouteKeys.find((stepKey) => !completion[stepKey]) ??
+    stepRouteKeys[stepRouteKeys.length - 1]
+  );
+};
+
 export const getHostPropertyEditorSteps = (
   propertyId: string,
   currentStep: HostPropertyEditorStepKey,
@@ -112,7 +199,9 @@ export const getHostPropertyEditorSteps = (
     return {
       ...step,
       state,
-      href: stepRouteKeys.includes(step.key) ? getEditorStepHref(propertyId, step.key) : undefined,
+      href: stepRouteKeys.includes(step.key)
+        ? getHostPropertyEditorStepHref(propertyId, step.key)
+        : undefined,
     };
   });
 };

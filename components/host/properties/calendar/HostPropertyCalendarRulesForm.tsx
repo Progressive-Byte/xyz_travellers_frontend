@@ -13,6 +13,7 @@ type HostPropertyCalendarRulesFormProps = {
   successMessage: string;
   isSubmitting: boolean;
   disabled?: boolean;
+  submitLabel?: string;
   onChange: (field: keyof Pick<HostUnitCalendarRules, "minimumStay" | "maximumStay">, value: string) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 };
@@ -26,6 +27,7 @@ export const HostPropertyCalendarRulesForm: React.FC<HostPropertyCalendarRulesFo
   successMessage,
   isSubmitting,
   disabled = false,
+  submitLabel = "Save rules",
   onChange,
   onSubmit,
 }) => {
@@ -99,7 +101,7 @@ export const HostPropertyCalendarRulesForm: React.FC<HostPropertyCalendarRulesFo
           disabled={disabled || isSubmitting}
           className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:opacity-70"
         >
-          {isSubmitting ? "Saving rules..." : "Save rules"}
+          {isSubmitting ? "Saving rules..." : submitLabel}
         </button>
       </div>
     </form>

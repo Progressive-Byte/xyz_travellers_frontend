@@ -446,6 +446,8 @@ export type HostPropertyUnit = {
   id: string;
   propertyId: string;
   name: string;
+  unitNumber: string;
+  unitType: string;
   capacity: string;
   bedrooms: string;
   bathrooms: string;
@@ -458,6 +460,8 @@ export type HostPropertyUnit = {
 
 export type UpsertHostPropertyUnitPayload = {
   name: string;
+  unitNumber: string;
+  unitType: string;
   capacity: string;
   bedrooms: string;
   bathrooms: string;
@@ -508,6 +512,11 @@ export type BlockHostUnitDatesPayload = {
 
 export type HostUnitAvailabilityPreview = {
   unitId: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  minimumStay: string;
+  maximumStay: string;
   availableDates: string[];
   blockedDates: string[];
   summary: string;
@@ -612,6 +621,9 @@ export type UpdateHostPropertyMediaPayload = {
   caption: string;
   sortOrder: string;
   isCover?: boolean;
+  mediaType?: "image" | "video";
+  mediaUrl?: string;
+  file?: File | null;
 };
 
 const emptyHostProfile = (): HostProfile => ({
@@ -772,6 +784,8 @@ const emptyHostPropertyUnit = (): HostPropertyUnit => ({
   id: "",
   propertyId: "",
   name: "",
+  unitNumber: "",
+  unitType: "",
   capacity: "",
   bedrooms: "",
   bathrooms: "",
@@ -796,6 +810,18 @@ const emptyHostUnitCalendarRules = (): HostUnitCalendarRules => ({
   maximumStay: "",
   note: "",
   blockedDates: [],
+});
+
+const emptyHostUnitAvailabilityPreview = (): HostUnitAvailabilityPreview => ({
+  unitId: "",
+  startDate: "",
+  endDate: "",
+  isActive: true,
+  minimumStay: "",
+  maximumStay: "",
+  availableDates: [],
+  blockedDates: [],
+  summary: "",
 });
 
 const emptyHostPropertyVerification = (): HostPropertyVerification => ({
@@ -1365,6 +1391,8 @@ const normalizeHostPropertyUnit = (payload: unknown): HostPropertyUnit => {
       asString(source.unitName ?? source.unit_name) ||
       asString(source.title) ||
       asString(source.label),
+    unitNumber: asString(source.unitNumber ?? source.unit_number),
+    unitType: asString(source.unitType ?? source.unit_type),
     capacity: asTextValue(source.capacity ?? source.maxGuests ?? source.max_guests ?? source.guests),
     bedrooms: asTextValue(source.bedrooms ?? source.bedroomCount ?? source.bedroom_count),
     bathrooms: asTextValue(source.bathrooms ?? source.bathroomCount ?? source.bathroom_count),
@@ -1439,11 +1467,33 @@ const normalizeHostUnitAvailabilityPreview = (
   unitId = "",
 ): HostUnitAvailabilityPreview => {
   const source = asRecord(payload);
+  const days = asArray(source.days);
+  const availableDatesFromDays = days
+    .map((item) => asRecord(item))
+    .filter((item) => item && item.isAvailable === true)
+    .map((item) => asString(item.date))
+    .filter(Boolean);
+  const blockedDatesFromDays = days
+    .map((item) => asRecord(item))
+    .filter((item) => item && item.isAvailable === false)
+    .map((item) => asString(item.date))
+    .filter(Boolean);
 
   return {
     unitId: asString(source.unitId ?? source.unit_id) || unitId,
-    availableDates: normalizeAvailabilityDates(source.availableDates ?? source.available_dates ?? source.available),
-    blockedDates: normalizeAvailabilityDates(source.blockedDates ?? source.blocked_dates ?? source.blocks),
+    startDate: asString(source.startDate ?? source.start_date),
+    endDate: asString(source.endDate ?? source.end_date),
+    isActive: normalizeHostUnitActive(source.isActive ?? source.is_active ?? true),
+    minimumStay: asTextValue(source.minimumStay ?? source.minimum_stay ?? source.minStay ?? source.min_stay),
+    maximumStay: asTextValue(source.maximumStay ?? source.maximum_stay ?? source.maxStay ?? source.max_stay),
+    availableDates:
+      availableDatesFromDays.length > 0
+        ? availableDatesFromDays
+        : normalizeAvailabilityDates(source.availableDates ?? source.available_dates ?? source.available),
+    blockedDates:
+      blockedDatesFromDays.length > 0
+        ? blockedDatesFromDays
+        : normalizeAvailabilityDates(source.blockedDates ?? source.blocked_dates ?? source.blocks),
     summary: asString(source.summary ?? source.note ?? source.description),
   };
 };
@@ -2946,7 +2996,10 @@ export async function getHostProperties(token: string): Promise<HostPropertySumm
     .filter((item) => item.id);
 }
 
-export async function createHostPropertyDraft(token: string): Promise<HostPropertyDetail> {
+export async function createHostProperty(
+  token: string,
+  payload: UpdateHostPropertyPayload,
+): Promise<HostPropertyDetail> {
   if (!token) {
     throw new ApiError("Missing access token.", 401);
   }
@@ -2956,7 +3009,24 @@ export async function createHostPropertyDraft(token: string): Promise<HostProper
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    body: {},
+    body: {
+      propertyName: payload.name.trim() || undefined,
+      description: payload.description.trim() || undefined,
+      propertyTypeId: payload.propertyType.trim() || undefined,
+      ownershipType: payload.ownershipType.trim() || undefined,
+      businessId: payload.businessId.trim() || undefined,
+      selectedBusinessDocumentIds:
+        payload.selectedBusinessDocumentIds.length > 0
+          ? payload.selectedBusinessDocumentIds
+          : undefined,
+      amenityIds: payload.amenities,
+      address: payload.address.trim() || undefined,
+      city: payload.city.trim() || undefined,
+      country: payload.country.trim() || undefined,
+      lat: payload.lat.trim() || undefined,
+      lng: payload.lng.trim() || undefined,
+      houseRules: payload.houseRules.trim() || undefined,
+    },
     cache: "no-store",
   });
 
@@ -2994,16 +3064,16 @@ export async function updateHostProperty(
       Authorization: `Bearer ${token}`,
     },
     body: {
-      name: payload.name.trim() || undefined,
+      propertyName: payload.name.trim() || undefined,
       description: payload.description.trim() || undefined,
-      propertyType: payload.propertyType.trim() || undefined,
+      propertyTypeId: payload.propertyType.trim() || undefined,
       ownershipType: payload.ownershipType.trim() || undefined,
       businessId: payload.businessId.trim() || undefined,
       selectedBusinessDocumentIds:
         payload.selectedBusinessDocumentIds.length > 0
           ? payload.selectedBusinessDocumentIds
           : undefined,
-      amenities: payload.amenities,
+      amenityIds: payload.amenities,
       address: payload.address.trim() || undefined,
       city: payload.city.trim() || undefined,
       country: payload.country.trim() || undefined,
@@ -3381,7 +3451,7 @@ export async function uploadHostPropertyImage(
 
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("type", "image");
+  formData.append("mediaType", "image");
 
   await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/media`, {
     method: "POST",
@@ -3403,18 +3473,16 @@ export async function createHostPropertyVideoUrl(
   }
 
   const normalizedUrl = videoUrl.trim();
+  const formData = new FormData();
+  formData.append("mediaType", "video");
+  formData.append("mediaUrl", normalizedUrl);
 
   await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/media`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    body: {
-      type: "video",
-      mediaType: "video",
-      videoUrl: normalizedUrl,
-      url: normalizedUrl,
-    },
+    body: formData,
     cache: "no-store",
   });
 }
@@ -3430,17 +3498,38 @@ export async function updateHostPropertyMedia(
   }
 
   const normalizedSortOrder = payload.sortOrder.trim();
+  const formData = new FormData();
+
+  if (payload.file) {
+    formData.append("file", payload.file);
+  }
+
+  if (payload.mediaType?.trim()) {
+    formData.append("mediaType", payload.mediaType.trim());
+  }
+
+  if (payload.mediaUrl?.trim()) {
+    formData.append("mediaUrl", payload.mediaUrl.trim());
+  }
+
+  if (payload.caption.trim()) {
+    formData.append("caption", payload.caption.trim());
+  }
+
+  if (normalizedSortOrder) {
+    formData.append("sortOrder", normalizedSortOrder);
+  }
+
+  if (typeof payload.isCover === "boolean") {
+    formData.append("isCover", String(payload.isCover));
+  }
 
   await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/media/${mediaId}`, {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    body: {
-      caption: payload.caption.trim() || undefined,
-      sortOrder: normalizedSortOrder ? Number(normalizedSortOrder) : undefined,
-      isCover: payload.isCover,
-    },
+    body: formData,
     cache: "no-store",
   });
 }
@@ -3510,12 +3599,14 @@ export async function createHostPropertyUnit(
       Authorization: `Bearer ${token}`,
     },
     body: {
-      name: payload.name.trim() || undefined,
+      unitName: payload.name.trim() || undefined,
+      unitNumber: payload.unitNumber.trim() || undefined,
+      unitType: payload.unitType.trim() || undefined,
       capacity: toOptionalNumber(payload.capacity),
       bedrooms: toOptionalNumber(payload.bedrooms),
       bathrooms: toOptionalNumber(payload.bathrooms),
       beds: toOptionalNumber(payload.beds),
-      amenities: payload.amenities,
+      amenityIds: payload.amenities,
       isActive: payload.isActive,
     },
     cache: "no-store",
@@ -3540,12 +3631,14 @@ export async function updateHostPropertyUnit(
       Authorization: `Bearer ${token}`,
     },
     body: {
-      name: payload.name.trim() || undefined,
+      unitName: payload.name.trim() || undefined,
+      unitNumber: payload.unitNumber.trim() || undefined,
+      unitType: payload.unitType.trim() || undefined,
       capacity: toOptionalNumber(payload.capacity),
       bedrooms: toOptionalNumber(payload.bedrooms),
       bathrooms: toOptionalNumber(payload.bathrooms),
       beds: toOptionalNumber(payload.beds),
-      amenities: payload.amenities,
+      amenityIds: payload.amenities,
       isActive: payload.isActive,
     },
     cache: "no-store",
@@ -3695,7 +3788,6 @@ export async function blockHostUnitDates(
     body: {
       startDate: payload.startDate,
       endDate: payload.endDate,
-      note: payload.note.trim() || undefined,
     },
     cache: "no-store",
   });
@@ -3716,11 +3808,8 @@ export async function unblockHostUnitDates(
       Authorization: `Bearer ${token}`,
     },
     body: {
-      blockId: blockedDate.id || undefined,
-      id: blockedDate.id || undefined,
       startDate: blockedDate.startDate || undefined,
       endDate: blockedDate.endDate || undefined,
-      date: blockedDate.startDate || undefined,
     },
     cache: "no-store",
   });
@@ -3735,7 +3824,16 @@ export async function getHostUnitAvailabilityPreview(
   }
 
   try {
-    const response = await apiRequest<unknown>(`/api/v1/host/units/${unitId}/availability`, {
+    const today = new Date();
+    const startDate = today.toISOString().slice(0, 10);
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 30);
+    const endDate = futureDate.toISOString().slice(0, 10);
+    const query = buildQueryString({
+      startDate,
+      endDate,
+    });
+    const response = await apiRequest<unknown>(`/api/v1/host/units/${unitId}/availability${query}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

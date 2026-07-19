@@ -29,7 +29,9 @@ export const HostPropertyCard: React.FC<HostPropertyCardProps> = ({
   onDelete,
 }) => {
   const canEdit = isHostPropertyEditable(property.status);
-  const editHref = `/host/properties/${property.id}/edit`;
+  const editHref = canEdit
+    ? `/host/properties/${property.id}/continue`
+    : `/host/properties/${property.id}/verification`;
 
   return (
     <div className="surface-card rounded-[24px] p-4">

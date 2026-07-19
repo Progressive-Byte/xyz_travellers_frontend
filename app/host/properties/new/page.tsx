@@ -1,10 +1,10 @@
 import { HostRouteGate } from "@/components/host/HostRouteGate";
-import { HostPropertyStartPage } from "@/components/host/properties/HostPropertyStartPage";
+import { HostPropertyCreatePage } from "@/components/host/properties/HostPropertyCreatePage";
 
 export default function HostPropertyStartRoute() {
   return (
     <HostRouteGate mode="portal">
-      <HostPropertyStartPage />
+      <HostPropertyCreatePage />
     </HostRouteGate>
   );
 }

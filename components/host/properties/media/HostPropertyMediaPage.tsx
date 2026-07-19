@@ -207,10 +207,10 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
               Try again
             </button>
             <Link
-              href={`/host/properties/${propertyId}/edit`}
+              href={`/host/properties/${propertyId}/edit?step=location`}
               className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
             >
-              Back to editor
+              Back to location
             </Link>
           </div>
         </div>
@@ -319,16 +319,16 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
-                  href={`/host/properties/${propertyId}/edit`}
+                  href={`/host/properties/${propertyId}/edit?step=location`}
                   className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
                 >
-                  Back to editor
+                  Back to location
                 </Link>
                 <Link
                   href={`/host/properties/${propertyId}/units`}
                   className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
                 >
-                  Open units
+                  Next: Units
                 </Link>
                 <Link
                   href="/host/properties"

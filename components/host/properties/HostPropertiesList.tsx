@@ -50,7 +50,9 @@ export const HostPropertiesList: React.FC<HostPropertiesListProps> = ({
         <tbody>
           {properties.map((property) => {
             const canEdit = isHostPropertyEditable(property.status);
-            const editHref = `/host/properties/${property.id}/edit`;
+            const editHref = canEdit
+              ? `/host/properties/${property.id}/continue`
+              : `/host/properties/${property.id}/verification`;
 
             return (
               <tr

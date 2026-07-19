@@ -13,6 +13,7 @@ type HostPropertyLocationFormProps = {
   isSubmitting: boolean;
   successMessage: string;
   disabled?: boolean;
+  submitLabel?: string;
   onChange: (field: keyof HostPropertyDetail, value: string) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 };
@@ -48,6 +49,7 @@ export const HostPropertyLocationForm: React.FC<HostPropertyLocationFormProps> =
   isSubmitting,
   successMessage,
   disabled = false,
+  submitLabel = "Save location",
   onChange,
   onSubmit,
 }) => {
@@ -145,7 +147,7 @@ export const HostPropertyLocationForm: React.FC<HostPropertyLocationFormProps> =
           disabled={disabled || isSubmitting}
           className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:opacity-70"
         >
-          {isSubmitting ? "Saving location..." : "Save location"}
+          {isSubmitting ? "Saving location..." : submitLabel}
         </button>
       </div>
     </form>

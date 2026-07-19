@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { HostShell } from "@/components/host/HostShell";
 import { HostPropertyEditorShell } from "@/components/host/properties/HostPropertyEditorShell";
 import { HostPropertyPricingForm } from "@/components/host/properties/pricing/HostPropertyPricingForm";
@@ -46,6 +47,7 @@ const PricingPageSkeleton = () => (
 const isNumericFieldValid = (value: string) => !value.trim() || !Number.isNaN(Number(value));
 
 export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = ({ propertyId }) => {
+  const router = useRouter();
   const { token } = useAuth();
   const [property, setProperty] = useState<HostPropertyDetail | null>(null);
   const [units, setUnits] = useState<HostPropertyUnit[]>([]);
@@ -221,6 +223,8 @@ export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = (
 
       setValues(pricing);
       setSuccessMessage("Pricing updated successfully.");
+      router.push(`/host/properties/${propertyId}/calendar`);
+      router.refresh();
     } catch (requestError) {
       setErrors({
         form:
@@ -354,6 +358,7 @@ export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = (
                 successMessage={successMessage}
                 isSubmitting={isSaving}
                 disabled={!canEdit}
+                submitLabel="Save pricing and continue"
                 onChange={handleChange}
                 onSubmit={handleSubmit}
               />

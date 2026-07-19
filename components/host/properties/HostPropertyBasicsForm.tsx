@@ -18,6 +18,7 @@ type HostPropertyBasicsFormProps = {
   isSubmitting: boolean;
   successMessage: string;
   disabled?: boolean;
+  submitLabel?: string;
   onChange: (field: keyof HostPropertyDetail, value: string | string[]) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 };
@@ -39,6 +40,7 @@ export const HostPropertyBasicsForm: React.FC<HostPropertyBasicsFormProps> = ({
   isSubmitting,
   successMessage,
   disabled = false,
+  submitLabel = "Save basics",
   onChange,
   onSubmit,
 }) => {
@@ -185,7 +187,7 @@ export const HostPropertyBasicsForm: React.FC<HostPropertyBasicsFormProps> = ({
           disabled={disabled || isSubmitting}
           className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:opacity-70"
         >
-          {isSubmitting ? "Saving basics..." : "Save basics"}
+          {isSubmitting ? "Saving basics..." : submitLabel}
         </button>
       </div>
     </form>
