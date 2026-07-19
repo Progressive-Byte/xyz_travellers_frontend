@@ -18,7 +18,7 @@ type ProfileFormErrors = Partial<
 >;
 
 const ProfileSkeleton = () => (
-  <HostShell badge="Setup">
+  <HostShell badge="Profile">
     <div className="grid gap-6 lg:grid-cols-[1.25fr_0.8fr]">
       <div className="surface-card rounded-panel h-[520px] animate-pulse bg-white/75" />
       <div className="space-y-6">
@@ -191,7 +191,7 @@ export const HostProfilePage: React.FC = () => {
 
   return (
     <HostShell
-      badge="Setup"
+      badge="Profile"
       headerAside={
         <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -223,9 +223,9 @@ export const HostProfilePage: React.FC = () => {
             </h2>
             <div className="mt-5 space-y-3">
               {[
-                "Guests and later listing flows rely on clear host identity details.",
+                "Guests and listing workflows rely on clear host identity details.",
                 "A short bio helps your profile feel complete and trustworthy.",
-                "Contact and address data help later setup steps stay consistent.",
+                "Contact and address data help the rest of the host portal stay consistent.",
               ].map((item) => (
                 <div
                   key={item}

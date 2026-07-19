@@ -37,7 +37,7 @@ export const HostBusinessesList: React.FC<HostBusinessesListProps> = ({
       {businesses.length === 0 ? (
         <div className="mt-6 rounded-[22px] border border-border-light bg-white/80 px-5 py-5 text-[14px] leading-7 text-text-secondary">
           No businesses have been created yet. Start with one business profile so commercial
-          properties can reuse the same identity and document library later.
+          properties can reuse the same identity and document library across the listing workflow.
         </div>
       ) : (
         <div className="mt-6 space-y-3">

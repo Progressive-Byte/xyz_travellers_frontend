@@ -108,7 +108,7 @@ export const HostPropertiesPage: React.FC = () => {
           </div>
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Drafts to continue
+              Listings to continue
             </p>
             <p className="mt-3 text-[17px] font-semibold text-text-primary">{counts.draft + counts.rejected}</p>
           </div>
@@ -170,7 +170,7 @@ export const HostPropertiesPage: React.FC = () => {
           </h2>
           <p className="mt-4 max-w-3xl text-[15px] leading-7 text-text-secondary">
             Your property workspace is ready. Create a draft listing now, then continue through basics
-            and location before later media, units, pricing, and verification steps land.
+            and location before continuing into media, units, pricing, calendar, and verification.
           </p>
           <div className="mt-6">
             <Link

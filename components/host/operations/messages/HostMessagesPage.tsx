@@ -199,17 +199,64 @@ export const HostMessagesPage: React.FC = () => {
           <div className="mt-6 rounded-[24px] border border-dashed border-border bg-[rgba(184,82,82,0.05)] px-5 py-6">
             <p className="text-[15px] font-semibold text-text-primary">Messages unavailable</p>
             <p className="mt-2 max-w-2xl text-[14px] leading-7 text-text-secondary">{error}</p>
-            <button
-              type="button"
-              onClick={() => setRetryKey((current) => current + 1)}
-              className="mt-5 inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-            >
-              Reload inbox
-            </button>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setRetryKey((current) => current + 1)}
+                className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+              >
+                Reload inbox
+              </button>
+              {reservationId ? (
+                <Link
+                  href={`/host/reservations/${reservationId}`}
+                  className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                >
+                  Back to reservation
+                </Link>
+              ) : null}
+            </div>
           </div>
         ) : threads.length > 0 ? (
           <div className="mt-6">
-            <HostMessagesList threads={threads} />
+            <HostMessagesList threads={threads} reservationId={reservationId} />
+          </div>
+        ) : unreadOnly ? (
+          <div className="mt-6 rounded-[24px] border border-dashed border-border-light bg-white/80 px-5 py-6">
+            <p className="text-[15px] font-semibold text-text-primary">No unread threads right now</p>
+            <p className="mt-2 max-w-2xl text-[14px] leading-7 text-text-secondary">
+              Every visible conversation has already been read. Return to all threads to review the full inbox.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setUnreadOnly(false)}
+                className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+              >
+                Show all threads
+              </button>
+            </div>
+          </div>
+        ) : reservationId ? (
+          <div className="mt-6 rounded-[24px] border border-dashed border-border-light bg-white/80 px-5 py-6">
+            <p className="text-[15px] font-semibold text-text-primary">No messages for this reservation yet</p>
+            <p className="mt-2 max-w-2xl text-[14px] leading-7 text-text-secondary">
+              This reservation does not have any guest conversation history yet. You can return to the booking detail and check again later.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link
+                href={`/host/reservations/${reservationId}`}
+                className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+              >
+                Back to reservation
+              </Link>
+              <Link
+                href="/host/messages"
+                className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+              >
+                Open full inbox
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="mt-6 rounded-[24px] border border-dashed border-border-light bg-white/80 px-5 py-6">

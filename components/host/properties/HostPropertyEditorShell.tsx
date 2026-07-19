@@ -45,7 +45,7 @@ export const HostPropertyEditorShell: React.FC<HostPropertyEditorShellProps> = (
       return "Open now";
     }
 
-    return isLinked ? "Open stage" : "Upcoming";
+    return "Upcoming";
   };
 
   return (
@@ -75,7 +75,7 @@ export const HostPropertyEditorShell: React.FC<HostPropertyEditorShellProps> = (
           {steps.map((step) =>
             step.href ? (
               <Link
-              key={step.key}
+                key={step.key}
                 href={step.href}
                 className={`rounded-[22px] border px-4 py-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft ${stepStateClasses[step.state]}`}
               >

@@ -87,3 +87,16 @@
 - Integrated operational handoffs into the host portal by making Reservations, Messages, Reviews, and Earnings live in the sidebar and by linking dashboard summary areas directly into the new pages.
 - Kept payout setup separate from finance history by adding a dedicated payout-history section inside `/host/payouts`, including payout selection and detailed payout record rendering.
 - Verified the new Chunk 9 host files with diagnostics and confirmed `npm.cmd run build` passes with `/host/reservations`, `/host/messages`, `/host/reviews`, and `/host/earnings` present in the route tree.
+
+## Host Portal Chunk 10
+
+- [completed] Audit the host portal for final polish gaps across shell, setup, property workflow, businesses, and operations pages.
+- [completed] Implement targeted consistency, copy, state, and responsive refinements without reopening earlier feature scope.
+- [completed] Run diagnostics and `npm.cmd run build`, then document the Chunk 10 review result.
+
+### Review
+
+- Unified more of the host shell finish-pass behavior by keeping dashboard loading and error states inside `HostShell`, trimming duplicated dashboard auth routing, and improving mobile drawer accessibility and sidebar semantics.
+- Removed stale implementation-era wording across onboarding, profile, payouts, businesses, and the property workflow so the host portal now speaks in present-tense product language instead of chunk-by-chunk rollout copy.
+- Improved operational polish by adding contextual filtered empty states, preserving reservation-scoped messaging handoffs, making reviews resilient to partial API failure, preventing payout-detail fetch issues from blanking payout history, and making dense earnings/message layouts safer on smaller screens.
+- Verified the final Chunk 10 portal polish with diagnostics and confirmed `npm.cmd run build` passes with the full host route family intact.

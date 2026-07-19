@@ -2,11 +2,8 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { HostShell } from "@/components/host/HostShell";
 import { HostSetupPromptCard } from "@/components/host/HostSetupPromptCard";
-import { Footer } from "@/components/layout/Footer";
-import { Navbar } from "@/components/layout/Navbar";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
@@ -156,37 +153,65 @@ const ReservationItem: React.FC<{ reservation: HostReservationPreview }> = ({ re
 };
 
 const DashboardSkeleton = () => (
-  <div className="min-h-screen bg-background">
-    <Navbar />
-    <main className="section-shell py-10 md:py-14">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="space-y-8">
-          <div className="surface-card rounded-panel h-36 animate-pulse bg-white/70" />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="surface-card rounded-panel h-40 animate-pulse bg-white/70"
-              />
-            ))}
-          </div>
-          <div className="grid gap-6 lg:grid-cols-[1.35fr_0.95fr]">
-            <div className="surface-card rounded-panel h-96 animate-pulse bg-white/70" />
-            <div className="space-y-6">
-              <div className="surface-card rounded-panel h-56 animate-pulse bg-white/70" />
-              <div className="surface-card rounded-panel h-56 animate-pulse bg-white/70" />
-            </div>
-          </div>
+  <HostShell
+    badge="Host Portal"
+    title="Host dashboard"
+    subtitle="We are preparing your latest host metrics, setup prompts, and operational handoffs."
+  >
+    <div className="space-y-8">
+      <div className="surface-card rounded-panel h-32 animate-pulse bg-white/75" />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="surface-card rounded-panel h-36 animate-pulse bg-white/75"
+          />
+        ))}
+      </div>
+      <div className="grid gap-6 lg:grid-cols-[1.35fr_0.95fr]">
+        <div className="surface-card rounded-panel h-96 animate-pulse bg-white/75" />
+        <div className="space-y-6">
+          <div className="surface-card rounded-panel h-56 animate-pulse bg-white/75" />
+          <div className="surface-card rounded-panel h-56 animate-pulse bg-white/75" />
         </div>
       </div>
-    </main>
-    <Footer />
-  </div>
+    </div>
+  </HostShell>
+);
+
+const DashboardErrorState: React.FC<{ message: string; onRetry: () => void }> = ({
+  message,
+  onRetry,
+}) => (
+  <HostShell
+    badge="Host Portal"
+    title="Dashboard unavailable"
+    subtitle="The workspace shell is ready, but the latest host overview could not be loaded yet."
+  >
+    <div className="surface-card rounded-panel p-6 md:p-8">
+      <p className="text-[15px] font-semibold text-text-primary">We couldn't load your host dashboard</p>
+      <p className="mt-3 max-w-2xl text-[14px] leading-7 text-text-secondary">{message}</p>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={onRetry}
+          className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+        >
+          Reload dashboard
+        </button>
+        <Link
+          href="/host/properties"
+          className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+        >
+          Open properties
+        </Link>
+      </div>
+    </div>
+  </HostShell>
 );
 
 export const HostDashboardShell: React.FC = () => {
-  const router = useRouter();
-  const { user, token, isHydrated, isAuthenticated } = useAuth();
+  const { user, token } = useAuth();
   const [data, setData] = useState<HostDashboardData | null>(null);
   const [profile, setProfile] = useState<HostProfile | null>(null);
   const [payoutProfile, setPayoutProfile] = useState<HostPayoutProfile | null>(null);
@@ -194,20 +219,8 @@ export const HostDashboardShell: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [retryKey, setRetryKey] = useState(0);
 
-  const hasHostRole = useMemo(() => user?.roles?.includes("host") ?? false, [user]);
-
   useEffect(() => {
-    if (!isHydrated) {
-      return;
-    }
-
-    if (!isAuthenticated || !user || !token) {
-      router.replace("/auth?mode=login&intent=host");
-      return;
-    }
-
-    if (!hasHostRole) {
-      setIsLoading(false);
+    if (!token || !user) {
       return;
     }
 
@@ -250,12 +263,11 @@ export const HostDashboardShell: React.FC = () => {
           return;
         }
 
-        if (requestError instanceof ApiError && [401, 403].includes(requestError.status)) {
-          setError("Your account does not currently have host dashboard access.");
-          return;
-        }
-
-        setError("We couldn't load your host dashboard right now. Please try again.");
+        setError(
+          requestError instanceof ApiError
+            ? requestError.message || "We couldn't load your host dashboard right now. Please try again."
+            : "We couldn't load your host dashboard right now. Please try again.",
+        );
       } finally {
         if (isActive) {
           setIsLoading(false);
@@ -268,54 +280,18 @@ export const HostDashboardShell: React.FC = () => {
     return () => {
       isActive = false;
     };
-  }, [hasHostRole, isAuthenticated, isHydrated, retryKey, router, token, user]);
+  }, [retryKey, token, user]);
 
-  if (!isHydrated || isLoading) {
+  if (!user || !token || isLoading) {
     return <DashboardSkeleton />;
-  }
-
-  if (!isAuthenticated || !user || !token) {
-    return null;
-  }
-
-  if (!hasHostRole) {
-    return null;
   }
 
   if (!data || error) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="section-shell py-12 md:py-16">
-          <div className="mx-auto max-w-3xl px-6">
-            <div className="surface-card-strong rounded-panel p-8 md:p-10">
-              <span className="section-badge">Host Portal</span>
-              <h1 className="mt-6 font-sora text-[34px] font-bold tracking-[-0.05em] text-text-primary md:text-[44px]">
-                Dashboard unavailable
-              </h1>
-              <p className="mt-4 max-w-2xl text-[15px] leading-7 text-text-secondary">
-                {error || "We couldn't load your host dashboard right now. Please try again."}
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => setRetryKey((current) => current + 1)}
-                  className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-                >
-                  Try again
-                </button>
-                <Link
-                  href="/"
-                  className="inline-flex items-center justify-center rounded-full border border-border bg-card px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:bg-surface"
-                >
-                  Back to homepage
-                </Link>
-              </div>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
+      <DashboardErrorState
+        message={error || "We couldn't load your host dashboard right now. Please try again."}
+        onRetry={() => setRetryKey((current) => current + 1)}
+      />
     );
   }
 
@@ -349,7 +325,7 @@ export const HostDashboardShell: React.FC = () => {
           key: "payouts",
           badge: "Payout setup",
           title: "Finish payout readiness",
-          description: `Add ${formatMissingFields(payoutSetupStatus.missingFields)} so future payout flows start from a ready profile.`,
+          description: `Add ${formatMissingFields(payoutSetupStatus.missingFields)} so earnings history and payout release records stay tied to a ready profile.`,
           href: "/host/payouts",
           ctaLabel: "Open payouts",
         }
@@ -405,8 +381,7 @@ export const HostDashboardShell: React.FC = () => {
               Turn your overview into active listings
             </h2>
             <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
-              Properties and add-property routes are now part of the portal, so you can move straight
-              from summary metrics into draft creation and listing management.
+              Move straight from summary metrics into draft creation, listing management, and the full submission workflow from the same portal.
             </p>
           </div>
 

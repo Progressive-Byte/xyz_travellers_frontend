@@ -51,7 +51,7 @@ export const HostBusinessDocumentsPanel: React.FC<HostBusinessDocumentsPanelProp
       </h2>
       <p className="mt-4 text-[14px] leading-7 text-text-secondary">
         These files are reusable business-level proof. Commercial properties can link back to this
-        library later, while property verification stays separate in the listing workflow.
+        library from the property editor, while property verification stays separate in the listing workflow.
       </p>
 
       {!business ? (

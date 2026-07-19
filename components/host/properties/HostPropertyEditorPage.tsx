@@ -479,14 +479,14 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
         currentStep="location"
         title={values.name || "Untitled property"}
         status={values.status}
-        description="This editor keeps the first property foundations clean with basics and location, then hands the workflow forward into media management."
+        description="This editor keeps the property foundations clean with basics and location, then hands the workflow forward into media, units, pricing, calendar, and verification."
         headerAside={
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
               Editability
             </p>
             <p className="mt-3 text-[16px] font-semibold text-text-primary">
-              {canEdit ? "Editable in this chunk" : "Read-only right now"}
+              {canEdit ? "Editable now" : "Read-only right now"}
             </p>
           </div>
         }
@@ -527,8 +527,8 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
               <div className="mt-5 space-y-3">
                 {[
                   "Use a clear guest-facing title from the start.",
-                  "Choose the right ownership type now so later steps stay aligned.",
-                  "Complete city, country, and address details before media and pricing stages land.",
+                  "Choose the right ownership type now so later workflow steps stay aligned.",
+                  "Complete city, country, and address details before moving into media, units, pricing, and calendar.",
                 ].map((item) => (
                   <div
                     key={item}
@@ -549,7 +549,7 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
                   {commissionInfo.rate || "Commission information available"}
                 </h2>
                 <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                  {commissionInfo.note || "Reference pricing and commission details will matter more once later listing stages open."}
+                  {commissionInfo.note || "Keep the commission reference nearby as you move into pricing and final submission readiness."}
                 </p>
               </div>
             ) : null}

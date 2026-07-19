@@ -26,7 +26,7 @@ import {
 type BusinessFormErrors = Partial<Record<keyof UpsertHostBusinessPayload | "form", string>>;
 
 const BusinessesSkeleton = () => (
-  <HostShell badge="Setup">
+  <HostShell badge="Businesses">
     <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
       <div className="space-y-6">
         <div className="surface-card rounded-panel h-[540px] animate-pulse bg-white/75" />
@@ -378,7 +378,7 @@ export const HostBusinessesPage: React.FC = () => {
 
   if (pageError && businesses.length === 0) {
     return (
-      <HostShell badge="Setup">
+      <HostShell badge="Businesses">
         <div className="surface-card rounded-panel p-6 md:p-8">
           <p className="text-[14px] leading-7 text-text-secondary">{pageError}</p>
           <div className="mt-6">
@@ -397,7 +397,7 @@ export const HostBusinessesPage: React.FC = () => {
 
   return (
     <HostShell
-      badge="Setup"
+      badge="Businesses"
       headerAside={
         <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">

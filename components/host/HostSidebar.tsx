@@ -182,26 +182,16 @@ export const HostSidebar: React.FC<HostSidebarProps> = ({ onNavigate }) => {
                               {item.label}
                             </span>
                             <span className="mt-0.5 block text-[12px] leading-5 text-text-secondary">
-                              {item.isLive ? "Available now" : "Coming soon"}
+                              {item.isLive ? item.description : "Coming soon"}
                             </span>
                           </span>
                         </span>
 
-                        {item.isLive ? (
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                              isActive
-                                ? "bg-white text-text-primary"
-                                : "bg-white text-text-secondary group-hover:bg-surface"
-                            }`}
-                          >
-                            Live
-                          </span>
-                        ) : (
+                        {!item.isLive ? (
                           <span className="rounded-full border border-border-light bg-white/80 px-2.5 py-1 text-[11px] font-semibold text-text-secondary">
                             Soon
                           </span>
-                        )}
+                        ) : null}
                       </>
                     );
 
@@ -220,7 +210,13 @@ export const HostSidebar: React.FC<HostSidebarProps> = ({ onNavigate }) => {
                     }
 
                     return (
-                      <Link key={item.label} href={item.href} onClick={onNavigate} className={itemClasses}>
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        onClick={onNavigate}
+                        className={itemClasses}
+                        aria-current={isActive ? "page" : undefined}
+                      >
                         {content}
                       </Link>
                     );

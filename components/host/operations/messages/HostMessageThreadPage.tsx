@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { HostShell } from "@/components/host/HostShell";
 import { HostConversationPanel } from "@/components/host/operations/messages/HostConversationPanel";
 import { formatHostDateTime } from "@/components/host/operations/hostOperations";
@@ -35,6 +36,7 @@ const DetailCard: React.FC<{ label: string; value: string }> = ({ label, value }
 );
 
 export const HostMessageThreadPage: React.FC<HostMessageThreadPageProps> = ({ threadId }) => {
+  const searchParams = useSearchParams();
   const { token } = useAuth();
   const [thread, setThread] = useState<HostMessageThreadDetail | null>(null);
   const [draft, setDraft] = useState("");
@@ -44,6 +46,8 @@ export const HostMessageThreadPage: React.FC<HostMessageThreadPageProps> = ({ th
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
+  const reservationId = searchParams.get("reservationId")?.trim() || "";
+  const backToMessagesHref = reservationId ? `/host/messages?reservationId=${reservationId}` : "/host/messages";
 
   useEffect(() => {
     if (!token) {
@@ -142,7 +146,7 @@ export const HostMessageThreadPage: React.FC<HostMessageThreadPageProps> = ({ th
               Reload thread
             </button>
             <Link
-              href="/host/messages"
+              href={backToMessagesHref}
               className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
             >
               Back to messages
@@ -181,7 +185,7 @@ export const HostMessageThreadPage: React.FC<HostMessageThreadPageProps> = ({ th
     >
       <div className="flex flex-wrap gap-3">
         <Link
-          href="/host/messages"
+          href={backToMessagesHref}
           className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
         >
           Back to messages

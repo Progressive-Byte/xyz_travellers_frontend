@@ -13,6 +13,7 @@ type HostPayoutHistorySectionProps = {
   selectedPayout: HostPayoutHistoryItem | null;
   isLoading: boolean;
   error: string;
+  detailError?: string;
   onRetry: () => void;
   onSelect: (payoutId: string) => void;
 };
@@ -29,6 +30,7 @@ export const HostPayoutHistorySection: React.FC<HostPayoutHistorySectionProps> =
   selectedPayout,
   isLoading,
   error,
+  detailError = "",
   onRetry,
   onSelect,
 }) => {
@@ -162,6 +164,12 @@ export const HostPayoutHistorySection: React.FC<HostPayoutHistorySectionProps> =
                     {selectedPayout.notes || "No extra payout note was returned for this record."}
                   </p>
                 </div>
+
+                {detailError ? (
+                  <div className="mt-5 rounded-[20px] border border-[rgba(184,82,82,0.18)] bg-[rgba(184,82,82,0.05)] px-4 py-4">
+                    <p className="text-[14px] leading-7 text-[rgb(140,50,50)]">{detailError}</p>
+                  </div>
+                ) : null}
               </>
             ) : (
               <div className="rounded-[20px] border border-dashed border-border-light bg-white/90 px-4 py-6 text-[14px] leading-7 text-text-secondary">
