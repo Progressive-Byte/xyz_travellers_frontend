@@ -61,6 +61,7 @@ const stepRouteKeys: HostPropertyEditorStepKey[] = [
   "units",
   "pricing",
   "calendar",
+  "verification",
 ];
 
 const getEditorStepHref = (propertyId: string, key: HostPropertyEditorStepKey) => {
@@ -82,6 +83,10 @@ const getEditorStepHref = (propertyId: string, key: HostPropertyEditorStepKey) =
 
   if (key === "calendar") {
     return `/host/properties/${propertyId}/calendar`;
+  }
+
+  if (key === "verification") {
+    return `/host/properties/${propertyId}/verification`;
   }
 
   return undefined;
@@ -107,7 +112,7 @@ export const getHostPropertyEditorSteps = (
     return {
       ...step,
       state,
-      href: state === "upcoming" ? undefined : getEditorStepHref(propertyId, step.key),
+      href: stepRouteKeys.includes(step.key) ? getEditorStepHref(propertyId, step.key) : undefined,
     };
   });
 };

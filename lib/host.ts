@@ -249,6 +249,68 @@ export type HostUnitAvailabilityPreview = {
   summary: string;
 };
 
+export type HostPropertyVerificationDocument = {
+  id: string;
+  propertyId: string;
+  fileUrl: string;
+  fileName: string;
+  documentType: string;
+  note: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export type HostPropertyVerification = {
+  propertyId: string;
+  note: string;
+  documents: HostPropertyVerificationDocument[];
+};
+
+export type UpdateHostPropertyVerificationPayload = {
+  files: File[];
+  note: string;
+};
+
+export type HostPropertySubmissionStatus = {
+  propertyId: string;
+  status: HostPropertyStatus;
+  rawStatus: string | null;
+  rejectionReason: string;
+  submittedAt: string | null;
+  updatedAt: string | null;
+};
+
+export type HostPropertySubmissionChecklistKey =
+  | "basics"
+  | "location"
+  | "cover-image"
+  | "media"
+  | "units"
+  | "pricing"
+  | "calendar"
+  | "verification";
+
+export type HostPropertySubmissionChecklistItem = {
+  key: HostPropertySubmissionChecklistKey;
+  label: string;
+  description: string;
+  isComplete: boolean;
+};
+
+export type HostPropertySubmissionChecklist = {
+  items: HostPropertySubmissionChecklistItem[];
+  isComplete: boolean;
+};
+
+export type HostPropertySubmissionChecklistInput = {
+  property: HostPropertyDetail;
+  mediaItems: HostPropertyMediaItem[];
+  units: HostPropertyUnit[];
+  pricings: HostUnitPricing[];
+  calendars: HostUnitCalendarRules[];
+  verification: HostPropertyVerification | null;
+};
+
 export type HostPropertyReferenceOption = {
   id: string;
   value: string;
@@ -353,6 +415,21 @@ const emptyHostUnitCalendarRules = (): HostUnitCalendarRules => ({
   maximumStay: "",
   note: "",
   blockedDates: [],
+});
+
+const emptyHostPropertyVerification = (): HostPropertyVerification => ({
+  propertyId: "",
+  note: "",
+  documents: [],
+});
+
+const emptyHostPropertySubmissionStatus = (): HostPropertySubmissionStatus => ({
+  propertyId: "",
+  status: "draft",
+  rawStatus: "draft",
+  rejectionReason: "",
+  submittedAt: null,
+  updatedAt: null,
 });
 
 const normalizeHostProfile = (payload: unknown): HostProfile => {
@@ -640,6 +717,96 @@ const normalizeHostUnitAvailabilityPreview = (
   };
 };
 
+const normalizeHostPropertyVerificationDocument = (
+  payload: unknown,
+): HostPropertyVerificationDocument => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id) || asString(source.documentId ?? source.document_id),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    fileUrl:
+      asString(source.fileUrl ?? source.file_url) ||
+      asString(source.url) ||
+      asString(source.path) ||
+      asString(source.src),
+    fileName:
+      asString(source.fileName ?? source.file_name) ||
+      asString(source.name) ||
+      asString(source.title) ||
+      asString(source.label),
+    documentType:
+      asString(source.documentType ?? source.document_type) ||
+      asString(source.type) ||
+      asString(source.category),
+    note: asString(source.note ?? source.description ?? source.comment),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
+  };
+};
+
+const normalizeHostPropertySubmissionStatus = (
+  payload: unknown,
+  propertyId = "",
+): HostPropertySubmissionStatus => {
+  const source = asRecord(payload);
+  const rawStatus =
+    asOptionalString(source.status) ??
+    asOptionalString(source.propertyStatus) ??
+    asOptionalString(source.property_status) ??
+    "draft";
+
+  return {
+    propertyId: asString(source.propertyId ?? source.property_id) || propertyId,
+    status: normalizeHostPropertyStatus(rawStatus),
+    rawStatus,
+    rejectionReason:
+      asString(source.rejectionReason ?? source.rejection_reason) ||
+      asString(source.rejectedReason ?? source.rejected_reason) ||
+      asString(source.reason) ||
+      asString(source.note),
+    submittedAt: asOptionalString(source.submittedAt ?? source.submitted_at),
+    updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
+  };
+};
+
+const normalizeHostPropertyVerification = (
+  payload: unknown,
+  propertyId = "",
+): HostPropertyVerification => {
+  if (Array.isArray(payload)) {
+    const documents = payload
+      .map((item) => normalizeHostPropertyVerificationDocument(item))
+      .filter((item) => item.fileUrl);
+
+    return {
+      propertyId: propertyId || documents[0]?.propertyId || "",
+      note: "",
+      documents,
+    };
+  }
+
+  const source = asRecord(payload);
+  const documents = extractHostPropertyVerificationDocumentsArray(
+    source.documents ??
+      source.verifications ??
+      source.files ??
+      source.attachments ??
+      source.items ??
+      source.results ??
+      source.data,
+  )
+    .map((item) => normalizeHostPropertyVerificationDocument(item))
+    .filter((item) => item.fileUrl);
+
+  return {
+    propertyId:
+      asString(source.propertyId ?? source.property_id) || propertyId || documents[0]?.propertyId || "",
+    note: asString(source.note ?? source.notes ?? source.description ?? source.comment),
+    documents,
+  };
+};
+
 const extractHostPropertyMediaArray = (payload: unknown) => {
   if (Array.isArray(payload)) {
     return payload;
@@ -721,6 +888,36 @@ const extractHostUnitBlockedDateArray = (payload: unknown) => {
 
   if (Array.isArray(source.blocks)) {
     return source.blocks;
+  }
+
+  return [];
+};
+
+const extractHostPropertyVerificationDocumentsArray = (payload: unknown) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  const source = asRecord(payload);
+
+  if (Array.isArray(source.items)) {
+    return source.items;
+  }
+
+  if (Array.isArray(source.results)) {
+    return source.results;
+  }
+
+  if (Array.isArray(source.documents)) {
+    return source.documents;
+  }
+
+  if (Array.isArray(source.files)) {
+    return source.files;
+  }
+
+  if (Array.isArray(source.attachments)) {
+    return source.attachments;
   }
 
   return [];
@@ -919,6 +1116,92 @@ export const getHostPayoutSetupStatus = (profile: HostPayoutProfile | null): Hos
   return {
     isComplete: missingFields.length === 0,
     missingFields,
+  };
+};
+
+export const getHostPropertySubmissionChecklist = ({
+  property,
+  mediaItems,
+  units,
+  pricings,
+  calendars,
+  verification,
+}: HostPropertySubmissionChecklistInput): HostPropertySubmissionChecklist => {
+  const hasBasics =
+    Boolean(property.name.trim()) &&
+    Boolean(property.description.trim()) &&
+    Boolean(property.propertyType.trim()) &&
+    Boolean(property.ownershipType.trim());
+  const hasLocation =
+    Boolean(property.address.trim()) &&
+    Boolean(property.city.trim()) &&
+    Boolean(property.country.trim());
+  const hasMedia = mediaItems.length > 0;
+  const hasCoverImage = mediaItems.some((item) => item.type === "image" && item.isCover);
+  const hasUnits = units.length > 0;
+  const hasPricing = pricings.some((item) => item.basePrice.trim() && item.currency.trim());
+  const hasCalendar = calendars.some(
+    (item) =>
+      item.minimumStay.trim() ||
+      item.maximumStay.trim() ||
+      item.blockedDates.length > 0,
+  );
+  const hasVerification = (verification?.documents.length ?? 0) > 0;
+
+  const items: HostPropertySubmissionChecklistItem[] = [
+    {
+      key: "basics",
+      label: "Basics complete",
+      description: "Property name, description, type, and ownership are all filled in.",
+      isComplete: hasBasics,
+    },
+    {
+      key: "location",
+      label: "Location complete",
+      description: "Address, city, and country are ready for review.",
+      isComplete: hasLocation,
+    },
+    {
+      key: "cover-image",
+      label: "Cover image selected",
+      description: "At least one uploaded image is marked as the listing cover.",
+      isComplete: hasCoverImage,
+    },
+    {
+      key: "media",
+      label: "Media uploaded",
+      description: "The property has guest-facing media attached.",
+      isComplete: hasMedia,
+    },
+    {
+      key: "units",
+      label: "Units created",
+      description: "At least one unit exists for the property.",
+      isComplete: hasUnits,
+    },
+    {
+      key: "pricing",
+      label: "Pricing configured",
+      description: "At least one unit has a base price and currency saved.",
+      isComplete: hasPricing,
+    },
+    {
+      key: "calendar",
+      label: "Calendar setup added",
+      description: "At least one unit has stay rules or blocked dates configured.",
+      isComplete: hasCalendar,
+    },
+    {
+      key: "verification",
+      label: "Verification proof attached",
+      description: "Property verification documents are uploaded for review.",
+      isComplete: hasVerification,
+    },
+  ];
+
+  return {
+    items,
+    isComplete: items.every((item) => item.isComplete),
   };
 };
 
@@ -1719,9 +2002,135 @@ export async function getHostUnitAvailabilityPreview(
   }
 }
 
+export async function getHostPropertyVerification(
+  token: string,
+  propertyId: string,
+): Promise<HostPropertyVerification> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/properties/${propertyId}/verification`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return normalizeHostPropertyVerification(response, propertyId);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return {
+        ...emptyHostPropertyVerification(),
+        propertyId,
+      };
+    }
+
+    throw error;
+  }
+}
+
+export async function updateHostPropertyVerification(
+  token: string,
+  propertyId: string,
+  payload: UpdateHostPropertyVerificationPayload,
+): Promise<HostPropertyVerification> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const formData = new FormData();
+
+  payload.files.forEach((file) => {
+    formData.append("files", file);
+  });
+
+  if (payload.note.trim()) {
+    formData.append("note", payload.note.trim());
+  }
+
+  const response = await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/verification`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+    cache: "no-store",
+  });
+
+  if (response) {
+    return normalizeHostPropertyVerification(response, propertyId);
+  }
+
+  return getHostPropertyVerification(token, propertyId);
+}
+
+export async function getHostPropertySubmissionStatus(
+  token: string,
+  propertyId: string,
+): Promise<HostPropertySubmissionStatus> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/properties/${propertyId}/status`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return normalizeHostPropertySubmissionStatus(response, propertyId);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      const property = await getHostProperty(token, propertyId);
+
+      return {
+        ...emptyHostPropertySubmissionStatus(),
+        propertyId,
+        status: property.status,
+        rawStatus: property.rawStatus,
+        updatedAt: property.updatedAt,
+      };
+    }
+
+    throw error;
+  }
+}
+
+export async function submitHostPropertyForReview(
+  token: string,
+  propertyId: string,
+): Promise<HostPropertySubmissionStatus> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/submit`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {},
+    cache: "no-store",
+  });
+
+  if (response) {
+    return normalizeHostPropertySubmissionStatus(response, propertyId);
+  }
+
+  return getHostPropertySubmissionStatus(token, propertyId);
+}
+
 export const createEmptyHostProfile = emptyHostProfile;
 export const createEmptyHostPayoutProfile = emptyHostPayoutProfile;
 export const createEmptyHostPropertyDetail = emptyHostPropertyDetail;
 export const createEmptyHostPropertyUnit = emptyHostPropertyUnit;
 export const createEmptyHostUnitPricing = emptyHostUnitPricing;
 export const createEmptyHostUnitCalendarRules = emptyHostUnitCalendarRules;
+export const createEmptyHostPropertyVerification = emptyHostPropertyVerification;
+export const createEmptyHostPropertySubmissionStatus = emptyHostPropertySubmissionStatus;

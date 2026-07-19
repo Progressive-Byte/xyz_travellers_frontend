@@ -456,8 +456,8 @@ export const HostPropertyCalendarPage: React.FC<HostPropertyCalendarPageProps> =
                   Ready for the next stage
                 </h2>
                 <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                  Pricing remains available in the previous step. Verification and review stay intentionally
-                  ahead as the next chunk.
+                  Pricing remains available in the previous step. The next stage is verification,
+                  checklist review, and final submission readiness.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link
@@ -467,10 +467,10 @@ export const HostPropertyCalendarPage: React.FC<HostPropertyCalendarPageProps> =
                     Back to pricing
                   </Link>
                   <Link
-                    href="/host/properties"
-                    className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                    href={`/host/properties/${propertyId}/verification`}
+                    className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
                   >
-                    View properties
+                    Open verification
                   </Link>
                 </div>
               </div>

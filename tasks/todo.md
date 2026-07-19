@@ -46,3 +46,16 @@
 - Added real unit-management, pricing, and calendar routes for approved hosts, with loading, empty, error, populated, and read-only states aligned to existing draft editability rules.
 - Extended `lib/host.ts` with normalized helpers for unit CRUD, pricing load/save, calendar rules, blocked-date updates, and optional availability preview handling.
 - Verified the new Chunk 6 host files with diagnostics and confirmed `npm.cmd run build` passes with `/host/properties/[propertyId]/units`, `/host/properties/[propertyId]/pricing`, and `/host/properties/[propertyId]/calendar` present in the route tree.
+
+## Host Portal Chunk 7
+
+- [completed] Extend the shared host data layer to support property verification documents, submission status, checklist computation, and submit-for-review helpers.
+- [completed] Build the `/host/properties/[propertyId]/verification` route and the verification, checklist, submit, and status components inside the shared host shell.
+- [completed] Update the property workflow stepper, calendar handoff, and host navigation matching so verification is the real final add-property stage.
+- [completed] Run diagnostics and `npm.cmd run build`, then document the Chunk 7 review result.
+
+### Review
+
+- Added the full verification workspace for approved hosts, including file upload, verification notes, current-proof listing, submission checklist, submit panel, and submission status treatment for draft, submitted, approved, and rejected listings.
+- Wired the final workflow stage into the add-property experience so `/host/properties/[propertyId]/verification` is reachable from the stepper, the calendar stage, and the shared Add Property navigation state.
+- Verified the new Chunk 7 host files with diagnostics and confirmed `npm.cmd run build` passes with `/host/properties/[propertyId]/verification` present in the route tree.
