@@ -608,7 +608,6 @@ export type UpdateHostPropertyPayload = {
   ownershipType: string;
   businessId: string;
   selectedBusinessDocumentIds: string[];
-  amenities: string[];
   address: string;
   city: string;
   country: string;
@@ -1866,7 +1865,12 @@ const normalizeReferenceOption = (payload: unknown): HostPropertyReferenceOption
     asString(source.title) ||
     asString(source.value) ||
     asString(source.id);
-  const value = asString(source.value) || asString(source.slug) || asString(source.code) || label;
+  const value =
+    asString(source.id) ||
+    asString(source.value) ||
+    asString(source.slug) ||
+    asString(source.code) ||
+    label;
 
   return {
     id: asString(source.id) || value || label,
@@ -3019,7 +3023,6 @@ export async function createHostProperty(
         payload.selectedBusinessDocumentIds.length > 0
           ? payload.selectedBusinessDocumentIds
           : undefined,
-      amenityIds: payload.amenities,
       address: payload.address.trim() || undefined,
       city: payload.city.trim() || undefined,
       country: payload.country.trim() || undefined,
@@ -3073,7 +3076,6 @@ export async function updateHostProperty(
         payload.selectedBusinessDocumentIds.length > 0
           ? payload.selectedBusinessDocumentIds
           : undefined,
-      amenityIds: payload.amenities,
       address: payload.address.trim() || undefined,
       city: payload.city.trim() || undefined,
       country: payload.country.trim() || undefined,

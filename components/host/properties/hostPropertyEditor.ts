@@ -30,7 +30,7 @@ const hostPropertyEditorStepDefinitions: Array<Omit<HostPropertyEditorStep, "sta
   {
     key: "basics",
     label: "Basics",
-    description: "Name, type, ownership, and amenities.",
+    description: "Name, type, and ownership.",
   },
   {
     key: "location",

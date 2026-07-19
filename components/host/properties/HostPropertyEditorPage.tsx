@@ -14,7 +14,6 @@ import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
   createEmptyHostPropertyDetail,
-  getHostAmenities,
   getHostBusinesses,
   getHostBusinessDocuments,
   getHostCommissionInfo,
@@ -43,6 +42,25 @@ type HostPropertyEditorPageProps = {
   propertyId: string;
 };
 
+const resolveReferenceId = (
+  value: string,
+  options: HostPropertyReferenceOption[],
+) => {
+  const normalized = value.trim().toLowerCase();
+
+  if (!normalized) {
+    return "";
+  }
+
+  return (
+    options.find((option) =>
+      [option.id, option.value, option.label].some(
+        (candidate) => candidate.trim().toLowerCase() === normalized,
+      ),
+    )?.id || value
+  );
+};
+
 const EditorSkeleton = () => (
   <HostShell badge="Add Property">
     <div className="space-y-6">
@@ -67,7 +85,6 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
   const { token } = useAuth();
   const [values, setValues] = useState<HostPropertyDetail>(createEmptyHostPropertyDetail());
   const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
-  const [amenities, setAmenities] = useState<HostPropertyReferenceOption[]>([]);
   const [commissionInfo, setCommissionInfo] = useState<HostPropertyCommissionInfo | null>(null);
   const [businesses, setBusinesses] = useState<HostBusiness[]>([]);
   const [businessDocuments, setBusinessDocuments] = useState<HostBusinessDocument[]>([]);
@@ -110,10 +127,9 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
       setCommercialNotice("");
 
       try {
-        const [property, propertyTypesResult, amenitiesResult, commissionResult] = await Promise.all([
+        const [property, propertyTypesResult, commissionResult] = await Promise.all([
           getHostProperty(token, propertyId),
           getHostPropertyTypes(token),
-          getHostAmenities(token),
           getHostCommissionInfo(token),
         ]);
 
@@ -121,9 +137,11 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
           return;
         }
 
-        setValues(property);
+        setValues({
+          ...property,
+          propertyType: resolveReferenceId(property.propertyType, propertyTypesResult),
+        });
         setPropertyTypes(propertyTypesResult);
-        setAmenities(amenitiesResult);
         setCommissionInfo(commissionResult);
 
         try {
@@ -322,7 +340,6 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
       ownershipType: values.ownershipType,
       businessId: values.businessId,
       selectedBusinessDocumentIds: values.selectedBusinessDocumentIds,
-      amenities: values.amenities,
       address: values.address,
       city: values.city,
       country: values.country,
@@ -484,7 +501,6 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
               <HostPropertyBasicsForm
                 values={values}
                 propertyTypes={propertyTypes}
-                amenities={amenities}
                 errors={basicsErrors}
                 isSubmitting={isSavingBasics}
                 successMessage={basicsSuccessMessage}

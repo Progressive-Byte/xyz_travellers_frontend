@@ -13,7 +13,6 @@ type HostPropertyBasicsFormErrors = Partial<
 type HostPropertyBasicsFormProps = {
   values: HostPropertyDetail;
   propertyTypes: HostPropertyReferenceOption[];
-  amenities: HostPropertyReferenceOption[];
   errors: HostPropertyBasicsFormErrors;
   isSubmitting: boolean;
   successMessage: string;
@@ -35,7 +34,6 @@ const ownershipOptions = [
 export const HostPropertyBasicsForm: React.FC<HostPropertyBasicsFormProps> = ({
   values,
   propertyTypes,
-  amenities,
   errors,
   isSubmitting,
   successMessage,
@@ -44,14 +42,6 @@ export const HostPropertyBasicsForm: React.FC<HostPropertyBasicsFormProps> = ({
   onChange,
   onSubmit,
 }) => {
-  const toggleAmenity = (value: string) => {
-    const nextAmenities = values.amenities.includes(value)
-      ? values.amenities.filter((item) => item !== value)
-      : [...values.amenities, value];
-
-    onChange("amenities", nextAmenities);
-  };
-
   return (
     <form className="surface-card rounded-panel p-6 md:p-7" onSubmit={onSubmit}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -92,7 +82,7 @@ export const HostPropertyBasicsForm: React.FC<HostPropertyBasicsFormProps> = ({
           >
             <option value="">Select property type</option>
             {propertyTypes.map((option) => (
-              <option key={option.id || option.value} value={option.value}>
+              <option key={option.id || option.value} value={option.id || option.value}>
                 {option.label}
               </option>
             ))}
@@ -132,35 +122,6 @@ export const HostPropertyBasicsForm: React.FC<HostPropertyBasicsFormProps> = ({
         />
         {errors.description ? <p className="mt-2 text-[13px] text-red-600">{errors.description}</p> : null}
       </label>
-
-      <div className="mt-4">
-        <span className="mb-2 block text-[13px] font-semibold text-text-primary">Amenities</span>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {amenities.map((option) => {
-            const checked = values.amenities.includes(option.value);
-
-            return (
-              <label
-                key={option.id || option.value}
-                className={`flex cursor-pointer items-start gap-3 rounded-[20px] border px-4 py-3 text-[14px] leading-6 transition-all ${
-                  checked
-                    ? "border-primary/35 bg-primary-light/80 text-text-primary"
-                    : "border-border-light bg-white/80 text-text-primary"
-                } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  disabled={disabled}
-                  onChange={() => toggleAmenity(option.value)}
-                  className="mt-1 h-4 w-4 rounded border-border-light text-primary"
-                />
-                <span>{option.label}</span>
-              </label>
-            );
-          })}
-        </div>
-      </div>
 
       {values.ownershipType === "commercial" ? (
         <div className="mt-5 rounded-[22px] border border-border-light bg-surface px-4 py-4 text-[14px] leading-6 text-text-secondary">
