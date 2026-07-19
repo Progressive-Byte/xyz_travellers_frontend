@@ -103,6 +103,18 @@ export const HostPropertiesPage: React.FC = () => {
     [properties],
   );
 
+  const statusTabs: Array<{
+    value: "all" | HostPropertySummary["status"];
+    label: string;
+    count: number;
+  }> = [
+    { value: "all", label: "All", count: counts.total },
+    { value: "draft", label: "Draft", count: counts.draft },
+    { value: "submitted", label: "Submitted", count: counts.submitted },
+    { value: "approved", label: "Approved", count: counts.approved },
+    { value: "rejected", label: "Rejected", count: counts.rejected },
+  ];
+
   const filteredProperties = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -192,24 +204,6 @@ export const HostPropertiesPage: React.FC = () => {
   return (
     <HostShell
       badge="Properties"
-      headerAside={
-        <>
-          <div className="rounded-[20px] border border-border-light bg-card px-4 py-3 shadow-soft">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Listings total
-            </p>
-            <p className="mt-2 text-[15px] font-semibold text-text-primary">{counts.total}</p>
-          </div>
-          <div className="rounded-[20px] border border-border-light bg-card px-4 py-3 shadow-soft">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Listings to continue
-            </p>
-            <p className="mt-2 text-[15px] font-semibold text-text-primary">
-              {counts.draft + counts.rejected}
-            </p>
-          </div>
-        </>
-      }
       topbarAction={
         <Link
           href="/host/properties/new"
@@ -219,24 +213,57 @@ export const HostPropertiesPage: React.FC = () => {
         </Link>
       }
     >
-      <div className="surface-card mb-5 rounded-panel p-5">
-        <div className="mb-4 flex flex-wrap justify-end gap-3">
-          <Link
-            href="/host/properties/new"
-            className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-          >
-            Add property
-          </Link>
-          <button
-            type="button"
-            onClick={() => setRetryKey((current) => current + 1)}
-            className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
-          >
-            Refresh list
-          </button>
+      <div className="surface-card mb-5 rounded-panel p-4">
+        <div className="flex flex-col gap-4 border-b border-border-light pb-4 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex flex-wrap gap-2">
+            {statusTabs.map((tab) => {
+              const isActive = statusFilter === tab.value;
+
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => setStatusFilter(tab.value)}
+                  className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] font-semibold transition-all duration-200 ${
+                    isActive
+                      ? "border-primary/45 bg-primary-light text-text-primary shadow-soft"
+                      : "border-border-light bg-white text-text-secondary hover:border-border hover:text-text-primary"
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[11px] ${
+                      isActive ? "bg-white text-text-primary" : "bg-surface text-text-secondary"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-[13px] text-text-secondary">
+              {filteredProperties.length} listing{filteredProperties.length === 1 ? "" : "s"}
+            </p>
+            <button
+              type="button"
+              onClick={() => setRetryKey((current) => current + 1)}
+              className="inline-flex items-center justify-center rounded-[16px] border border-border bg-white px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+            >
+              Refresh
+            </button>
+            <Link
+              href="/host/properties/new"
+              className="inline-flex items-center justify-center rounded-[16px] bg-primary px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+            >
+              Add property
+            </Link>
+          </div>
         </div>
 
-        <div className="grid gap-3 xl:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,0.7fr))]">
+        <div className="mt-4 grid gap-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(2,minmax(0,0.75fr))]">
           <label className="flex min-w-0 flex-col gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
               Search
@@ -248,25 +275,6 @@ export const HostPropertiesPage: React.FC = () => {
               placeholder="Search property, city, country, type"
               className="h-11 rounded-[16px] border border-border bg-white px-3.5 text-[14px] text-text-primary outline-none transition-all duration-200 placeholder:text-text-secondary/70 focus:border-primary/60"
             />
-          </label>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
-              Status
-            </span>
-            <select
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as "all" | HostPropertySummary["status"])
-              }
-              className="h-11 rounded-[16px] border border-border bg-white px-3.5 text-[14px] text-text-primary outline-none transition-all duration-200 focus:border-primary/60"
-            >
-              <option value="all">All statuses</option>
-              <option value="draft">Draft</option>
-              <option value="submitted">Submitted</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-            </select>
           </label>
 
           <label className="flex flex-col gap-2">
@@ -300,15 +308,6 @@ export const HostPropertiesPage: React.FC = () => {
               <option value={50}>50</option>
             </select>
           </label>
-
-          <div className="flex flex-col gap-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
-              Results
-            </span>
-            <div className="flex h-11 items-center rounded-[16px] border border-border-light bg-card px-3.5 text-[13px] text-text-secondary">
-              {filteredProperties.length} listing{filteredProperties.length === 1 ? "" : "s"}
-            </div>
-          </div>
         </div>
       </div>
 
