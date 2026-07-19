@@ -2,8 +2,10 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { HostShell } from "@/components/host/HostShell";
 import { HostPropertyBasicsForm } from "@/components/host/properties/HostPropertyBasicsForm";
+import { getHostPropertyEditorStepHref } from "@/components/host/properties/hostPropertyEditor";
 import { HostPropertyEditorShell } from "@/components/host/properties/HostPropertyEditorShell";
 import { HostPropertyLocationForm } from "@/components/host/properties/HostPropertyLocationForm";
 import { HostPropertyBusinessDocumentsSelector } from "@/components/host/properties/ownership/HostPropertyBusinessDocumentsSelector";
@@ -60,6 +62,8 @@ const EditorSkeleton = () => (
 );
 
 export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ propertyId }) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { token } = useAuth();
   const [values, setValues] = useState<HostPropertyDetail>(createEmptyHostPropertyDetail());
   const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
@@ -73,14 +77,20 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
   const [commercialErrors, setCommercialErrors] = useState<CommercialErrors>({});
   const [basicsSuccessMessage, setBasicsSuccessMessage] = useState("");
   const [locationSuccessMessage, setLocationSuccessMessage] = useState("");
-  const [commercialSuccessMessage, setCommercialSuccessMessage] = useState("");
   const [commercialNotice, setCommercialNotice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingBasics, setIsSavingBasics] = useState(false);
   const [isSavingLocation, setIsSavingLocation] = useState(false);
-  const [isSavingCommercial, setIsSavingCommercial] = useState(false);
   const [isLoadingBusinessDocuments, setIsLoadingBusinessDocuments] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
+  const requestedStep = searchParams.get("step");
+  const currentStep =
+    requestedStep === "location"
+      ? "location"
+      : "basics";
+  const locationStepHref =
+    getHostPropertyEditorStepHref(propertyId, "location") ??
+    `/host/properties/${propertyId}/edit?step=location`;
 
   useEffect(() => {
     if (!token) {
@@ -97,7 +107,6 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
       setCommercialErrors({});
       setBasicsSuccessMessage("");
       setLocationSuccessMessage("");
-      setCommercialSuccessMessage("");
       setCommercialNotice("");
 
       try {
@@ -241,7 +250,6 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
     }));
     setBasicsSuccessMessage("");
     setLocationSuccessMessage("");
-    setCommercialSuccessMessage("");
   };
 
   const validateBasics = () => {
@@ -292,6 +300,16 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
     return nextErrors;
   };
 
+  const validateCommercial = () => {
+    const nextErrors: CommercialErrors = {};
+
+    if (values.ownershipType.trim().toLowerCase() === "commercial" && !values.businessId.trim()) {
+      nextErrors.businessId = "Please select a business profile for this commercial property.";
+    }
+
+    return nextErrors;
+  };
+
   const saveProperty = async (onSuccess: (property: HostPropertyDetail) => void) => {
     if (!token) {
       return;
@@ -329,48 +347,6 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
       };
     });
     setCommercialErrors((current) => ({ ...current, selectedBusinessDocumentIds: undefined, form: undefined }));
-    setCommercialSuccessMessage("");
-  };
-
-  const handleCommercialSave = async () => {
-    if (!canEdit) {
-      return;
-    }
-
-    const nextErrors: CommercialErrors = {};
-
-    if (values.ownershipType.trim().toLowerCase() === "commercial" && !values.businessId.trim()) {
-      nextErrors.businessId = "Please select a business profile for this commercial property.";
-    }
-
-    if (Object.keys(nextErrors).length > 0) {
-      setCommercialErrors(nextErrors);
-      setCommercialSuccessMessage("");
-      return;
-    }
-
-    setIsSavingCommercial(true);
-    setCommercialErrors({});
-    setCommercialSuccessMessage("");
-
-    try {
-      await saveProperty((property) => {
-        setCommercialSuccessMessage(
-          property.ownershipType.trim().toLowerCase() === "commercial"
-            ? "Commercial business linkage updated successfully."
-            : "Ownership details updated successfully.",
-        );
-      });
-    } catch (requestError) {
-      setCommercialErrors({
-        form:
-          requestError instanceof ApiError
-            ? requestError.message || "We couldn't save the commercial linkage right now."
-            : "We couldn't save the commercial linkage right now.",
-      });
-    } finally {
-      setIsSavingCommercial(false);
-    }
   };
 
   const handleBasicsSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -381,20 +357,25 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
     }
 
     const nextErrors = validateBasics();
+    const nextCommercialErrors = validateCommercial();
 
-    if (Object.keys(nextErrors).length > 0) {
+    if (Object.keys(nextErrors).length > 0 || Object.keys(nextCommercialErrors).length > 0) {
       setBasicsErrors(nextErrors);
+      setCommercialErrors(nextCommercialErrors);
       setBasicsSuccessMessage("");
       return;
     }
 
     setIsSavingBasics(true);
     setBasicsErrors({});
+    setCommercialErrors({});
     setBasicsSuccessMessage("");
 
     try {
       await saveProperty(() => {
-        setBasicsSuccessMessage("Draft updated successfully.");
+        setBasicsSuccessMessage("Basics saved successfully.");
+        router.push(locationStepHref);
+        router.refresh();
       });
     } catch (requestError) {
       setBasicsErrors({
@@ -429,7 +410,9 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
 
     try {
       await saveProperty(() => {
-        setLocationSuccessMessage("Draft updated successfully.");
+        setLocationSuccessMessage("Location saved successfully.");
+        router.push(`/host/properties/${propertyId}/media`);
+        router.refresh();
       });
     } catch (requestError) {
       setLocationErrors({
@@ -476,10 +459,14 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
     <HostShell badge="Add Property">
       <HostPropertyEditorShell
         propertyId={propertyId}
-        currentStep="location"
+        currentStep={currentStep}
         title={values.name || "Untitled property"}
         status={values.status}
-        description="This editor keeps the property foundations clean with basics and location, then hands the workflow forward into media, units, pricing, calendar, and verification."
+        description={
+          currentStep === "basics"
+            ? "This step saves the property foundations first, including ownership and any required business linkage for commercial listings."
+            : "This step saves the address, map points, and house rules before the listing moves into media, units, pricing, calendar, and verification."
+        }
         headerAside={
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -493,43 +480,55 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
       >
         <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
           <div className="space-y-6">
-            <HostPropertyBasicsForm
-              values={values}
-              propertyTypes={propertyTypes}
-              amenities={amenities}
-              errors={basicsErrors}
-              isSubmitting={isSavingBasics}
-              successMessage={basicsSuccessMessage}
-              disabled={!canEdit}
-              onChange={handleChange}
-              onSubmit={handleBasicsSubmit}
-            />
-
-            <HostPropertyLocationForm
-              values={values}
-              errors={locationErrors}
-              isSubmitting={isSavingLocation}
-              successMessage={locationSuccessMessage}
-              disabled={!canEdit}
-              onChange={(field, value) => handleChange(field, value)}
-              onSubmit={handleLocationSubmit}
-            />
+            {currentStep === "basics" ? (
+              <HostPropertyBasicsForm
+                values={values}
+                propertyTypes={propertyTypes}
+                amenities={amenities}
+                errors={basicsErrors}
+                isSubmitting={isSavingBasics}
+                successMessage={basicsSuccessMessage}
+                disabled={!canEdit}
+                submitLabel="Save basics and continue"
+                onChange={handleChange}
+                onSubmit={handleBasicsSubmit}
+              />
+            ) : (
+              <HostPropertyLocationForm
+                values={values}
+                errors={locationErrors}
+                isSubmitting={isSavingLocation}
+                successMessage={locationSuccessMessage}
+                disabled={!canEdit}
+                submitLabel="Save location and continue"
+                onChange={(field, value) => handleChange(field, value)}
+                onSubmit={handleLocationSubmit}
+              />
+            )}
           </div>
 
           <div className="space-y-6">
             <div className="surface-card rounded-panel p-6">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                Current draft
+                Current step
               </p>
               <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-                Keep the first steps clean
+                {currentStep === "basics" ? "Save the property foundation" : "Save the location details"}
               </h2>
               <div className="mt-5 space-y-3">
-                {[
-                  "Use a clear guest-facing title from the start.",
-                  "Choose the right ownership type now so later workflow steps stay aligned.",
-                  "Complete city, country, and address details before moving into media, units, pricing, and calendar.",
-                ].map((item) => (
+                {(
+                  currentStep === "basics"
+                    ? [
+                        "Use a clear guest-facing title from the start.",
+                        "Choose the right ownership type now so later workflow steps stay aligned.",
+                        "For commercial listings, link the correct business before moving on.",
+                      ]
+                    : [
+                        "Complete address, city, and country before media uploads.",
+                        "Map points can stay optional, but valid coordinates save cleanly here.",
+                        "House rules belong here so later submission review sees the saved policy.",
+                      ]
+                ).map((item) => (
                   <div
                     key={item}
                     className="rounded-[20px] border border-border-light bg-white/80 px-4 py-3 text-[14px] leading-6 text-text-primary"
@@ -540,7 +539,67 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
               </div>
             </div>
 
-            {commissionInfo ? (
+            {currentStep === "basics" ? (
+              <div className="surface-card rounded-panel p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                  Commercial support
+                </p>
+                <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+                  Link the business when needed
+                </h2>
+                <p className="mt-4 text-[14px] leading-7 text-text-secondary">
+                  Personal listings can continue without business linkage. Commercial listings should
+                  point to one reusable business profile before the draft moves forward.
+                </p>
+
+                {commercialNotice ? (
+                  <div className="mt-5 rounded-[20px] border border-border-light bg-surface px-4 py-4 text-[14px] leading-6 text-text-secondary">
+                    {commercialNotice}
+                  </div>
+                ) : null}
+
+                <div className="mt-5 space-y-4">
+                  <HostPropertyBusinessSelector
+                    ownershipType={values.ownershipType}
+                    businesses={businesses}
+                    value={values.businessId}
+                    disabled={!canEdit}
+                    error={commercialErrors.businessId}
+                    onChange={(businessId) => handleChange("businessId", businessId)}
+                  />
+
+                  {isLoadingBusinessDocuments ? (
+                    <div className="rounded-[22px] border border-border-light bg-white/80 px-5 py-5">
+                      <div className="h-24 animate-pulse rounded-[18px] bg-surface" />
+                    </div>
+                  ) : (
+                    <HostPropertyBusinessDocumentsSelector
+                      ownershipType={values.ownershipType}
+                      documents={businessDocuments}
+                      selectedDocumentIds={values.selectedBusinessDocumentIds}
+                      disabled={!canEdit || !values.businessId}
+                      error={commercialErrors.selectedBusinessDocumentIds}
+                      onToggle={handleBusinessDocumentToggle}
+                    />
+                  )}
+                </div>
+
+                {commercialErrors.form ? (
+                  <div className="mt-5 rounded-[20px] border border-red-200 bg-red-50/80 px-4 py-4 text-[14px] leading-6 text-red-700">
+                    {commercialErrors.form}
+                  </div>
+                ) : null}
+
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Link
+                    href="/host/businesses"
+                    className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                  >
+                    Open businesses
+                  </Link>
+                </div>
+              </div>
+            ) : commissionInfo ? (
               <div className="surface-card rounded-panel p-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
                   Commission reference
@@ -553,83 +612,6 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
                 </p>
               </div>
             ) : null}
-
-            <div className="surface-card rounded-panel p-6">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                Commercial support
-              </p>
-              <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-                Keep ownership and business linkage aligned
-              </h2>
-              <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                Personal listings can continue without business linkage. Commercial listings should
-                point to one reusable business profile and, where available, selected business
-                documents.
-              </p>
-
-              {commercialNotice ? (
-                <div className="mt-5 rounded-[20px] border border-border-light bg-surface px-4 py-4 text-[14px] leading-6 text-text-secondary">
-                  {commercialNotice}
-                </div>
-              ) : null}
-
-              <div className="mt-5 space-y-4">
-                <HostPropertyBusinessSelector
-                  ownershipType={values.ownershipType}
-                  businesses={businesses}
-                  value={values.businessId}
-                  disabled={!canEdit}
-                  error={commercialErrors.businessId}
-                  onChange={(businessId) => handleChange("businessId", businessId)}
-                />
-
-                {isLoadingBusinessDocuments ? (
-                  <div className="rounded-[22px] border border-border-light bg-white/80 px-5 py-5">
-                    <div className="h-24 animate-pulse rounded-[18px] bg-surface" />
-                  </div>
-                ) : (
-                  <HostPropertyBusinessDocumentsSelector
-                    ownershipType={values.ownershipType}
-                    documents={businessDocuments}
-                    selectedDocumentIds={values.selectedBusinessDocumentIds}
-                    disabled={!canEdit || !values.businessId}
-                    error={commercialErrors.selectedBusinessDocumentIds}
-                    onToggle={handleBusinessDocumentToggle}
-                  />
-                )}
-              </div>
-
-              {commercialErrors.form ? (
-                <div className="mt-5 rounded-[20px] border border-red-200 bg-red-50/80 px-4 py-4 text-[14px] leading-6 text-red-700">
-                  {commercialErrors.form}
-                </div>
-              ) : null}
-
-              {commercialSuccessMessage ? (
-                <div className="mt-5 rounded-[20px] border border-primary/35 bg-primary-light/80 px-4 py-4 text-[14px] leading-6 text-text-primary">
-                  {commercialSuccessMessage}
-                </div>
-              ) : null}
-
-              {values.ownershipType.trim().toLowerCase() === "commercial" ? (
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={handleCommercialSave}
-                    disabled={!canEdit || isSavingCommercial}
-                    className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:opacity-70"
-                  >
-                    {isSavingCommercial ? "Saving commercial linkage..." : "Save commercial linkage"}
-                  </button>
-                  <Link
-                    href="/host/businesses"
-                    className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
-                  >
-                    Open businesses
-                  </Link>
-                </div>
-              ) : null}
-            </div>
 
             {!canEdit ? (
               <div className="surface-card rounded-panel p-6">
@@ -650,18 +632,23 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
                   Next step
                 </p>
                 <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-                  Continue into property media
+                  {currentStep === "basics" ? "Location saves next" : "Media opens next"}
                 </h2>
                 <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                  Once the basics and location feel right, move into gallery uploads, cover-image
-                  selection, optional video links, and later commercial-readiness steps for this listing.
+                  {currentStep === "basics"
+                    ? "Saving this step moves the workflow into address, city, country, coordinates, and house rules."
+                    : "After location saves, the listing continues into gallery uploads, cover-image selection, and video links."}
                 </p>
                 <div className="mt-6">
                   <Link
-                    href={`/host/properties/${propertyId}/media`}
-                    className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+                    href={
+                      currentStep === "basics"
+                        ? locationStepHref
+                        : `/host/properties/${propertyId}/media`
+                    }
+                    className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
                   >
-                    Open media manager
+                    {currentStep === "basics" ? "Open location step" : "Open media manager"}
                   </Link>
                 </div>
               </div>

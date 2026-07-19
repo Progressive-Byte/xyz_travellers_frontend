@@ -7,7 +7,13 @@ import {
 } from "@/lib/host";
 
 type HostPropertyUnitFormErrors = Partial<
-  Record<keyof Pick<UpsertHostPropertyUnitPayload, "name" | "capacity" | "bedrooms" | "bathrooms" | "beds"> | "form", string>
+  Record<
+    keyof Pick<
+      UpsertHostPropertyUnitPayload,
+      "name" | "unitNumber" | "unitType" | "capacity" | "bedrooms" | "bathrooms" | "beds"
+    > | "form",
+    string
+  >
 >;
 
 type HostPropertyUnitFormProps = {
@@ -63,7 +69,7 @@ export const HostPropertyUnitForm: React.FC<HostPropertyUnitFormProps> = ({
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <label className="sm:col-span-2">
+        <label>
           <span className="mb-2 block text-[13px] font-semibold text-text-primary">Unit name</span>
           <input
             type="text"
@@ -74,6 +80,32 @@ export const HostPropertyUnitForm: React.FC<HostPropertyUnitFormProps> = ({
             className={`${inputClassName} ${errors.name ? "border-red-300 focus:border-red-400" : ""}`}
           />
           {errors.name ? <p className="mt-2 text-[13px] text-red-600">{errors.name}</p> : null}
+        </label>
+
+        <label>
+          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Unit number</span>
+          <input
+            type="text"
+            value={values.unitNumber}
+            onChange={(event) => onChange("unitNumber", event.target.value)}
+            placeholder="201"
+            disabled={disabled}
+            className={`${inputClassName} ${errors.unitNumber ? "border-red-300 focus:border-red-400" : ""}`}
+          />
+          {errors.unitNumber ? <p className="mt-2 text-[13px] text-red-600">{errors.unitNumber}</p> : null}
+        </label>
+
+        <label>
+          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Unit type</span>
+          <input
+            type="text"
+            value={values.unitType}
+            onChange={(event) => onChange("unitType", event.target.value)}
+            placeholder="deluxe_room"
+            disabled={disabled}
+            className={`${inputClassName} ${errors.unitType ? "border-red-300 focus:border-red-400" : ""}`}
+          />
+          {errors.unitType ? <p className="mt-2 text-[13px] text-red-600">{errors.unitType}</p> : null}
         </label>
 
         <label>

@@ -114,3 +114,18 @@
 - Added missing listing lifecycle parity by wiring property delete into the properties workspace, extending verification uploads to require aligned document types, and surfacing richer verification proof metadata returned by the backend.
 - Finished the remaining operational parity by regrouping sidebar IA into Main, Operations, and Setup, adding reservation-scoped guest-review creation from completed stays, and exposing rating, earnings, and payout-history filters directly in the host workspace.
 - Verified the final Chunk 11 workflow-closure pass with diagnostics and confirmed `npm.cmd run build` passes with the host onboarding, property, reviews, earnings, and payouts routes intact.
+
+## Host Property Wizard Alignment
+
+- [completed] Audit the staged property, media, units, pricing, calendar, and verification APIs against the current add-property flow.
+- [completed] Refactor the property draft entry so `/host/properties/new` saves only the first step, then hands off into the next saved stage.
+- [completed] Add draft resume routing so property list actions reopen the first incomplete saved step instead of always restarting at the editor front.
+- [completed] Align the shared host helpers with the property API contracts for media uploads, video URLs, unit payloads, and availability preview requests.
+- [completed] Run diagnostics and `npm.cmd run build`, then document the property-wizard review result.
+
+### Review
+
+- Refactored the add-property flow into a saved staged wizard: draft creation now saves only the basics step, `/edit` works as a real basics/location stage, and later routes continue the workflow through media, units, pricing, calendar, and verification.
+- Added a dedicated `/host/properties/[propertyId]/continue` resume route so property list actions reopen the first incomplete saved step based on already persisted API data instead of always restarting from the editor front.
+- Corrected property helper contracts in `lib/host.ts` for media uploads, video URLs, unit payload field names, calendar block/unblock payloads, and required availability preview query parameters.
+- Verified the property wizard refactor with file diagnostics and a successful `npm.cmd run build`.

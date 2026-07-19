@@ -28,7 +28,13 @@ type HostPropertyUnitsPageProps = {
 };
 
 type UnitFormErrors = Partial<
-  Record<keyof Pick<UpsertHostPropertyUnitPayload, "name" | "capacity" | "bedrooms" | "bathrooms" | "beds"> | "form", string>
+  Record<
+    keyof Pick<
+      UpsertHostPropertyUnitPayload,
+      "name" | "unitNumber" | "unitType" | "capacity" | "bedrooms" | "bathrooms" | "beds"
+    > | "form",
+    string
+  >
 >;
 
 const UnitsPageSkeleton = () => (
@@ -54,6 +60,8 @@ const toUnitFormValues = (unit?: HostPropertyUnit): UpsertHostPropertyUnitPayloa
 
   return {
     name: unit?.name ?? emptyUnit.name,
+    unitNumber: unit?.unitNumber ?? emptyUnit.unitNumber,
+    unitType: unit?.unitType ?? emptyUnit.unitType,
     capacity: unit?.capacity ?? emptyUnit.capacity,
     bedrooms: unit?.bedrooms ?? emptyUnit.bedrooms,
     bathrooms: unit?.bathrooms ?? emptyUnit.bathrooms,
@@ -149,6 +157,10 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
 
     if (!values.name.trim()) {
       nextErrors.name = "Please enter a unit name.";
+    }
+
+    if (values.unitNumber.trim() && values.unitNumber.trim().length > 60) {
+      nextErrors.unitNumber = "Unit number should stay concise.";
     }
 
     if (!values.capacity.trim()) {
@@ -405,8 +417,8 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
                 Keep moving through setup
               </h2>
               <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                Media remains available in the previous step. Once at least one unit exists, continue into
-                pricing and then calendar rules.
+                Media remains available in the previous step. Create or update units here, then continue
+                into pricing for the inventory you want to publish first.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
@@ -415,12 +427,22 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
                 >
                   Back to media
                 </Link>
-                <Link
-                  href={`/host/properties/${propertyId}/pricing`}
-                  className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-                >
-                  Open pricing
-                </Link>
+                {units.length === 0 ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="inline-flex cursor-not-allowed items-center justify-center rounded-[18px] border border-border-light bg-white px-5 py-3 text-[14px] font-semibold text-text-secondary opacity-70"
+                  >
+                    Next: Pricing
+                  </button>
+                ) : (
+                  <Link
+                    href={`/host/properties/${propertyId}/pricing`}
+                    className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+                  >
+                    Next: Pricing
+                  </Link>
+                )}
               </div>
             </div>
           </div>
