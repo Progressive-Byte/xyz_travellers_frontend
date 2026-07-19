@@ -37,6 +37,33 @@ type UnitFormErrors = Partial<
   >
 >;
 
+const resolveReferenceId = (
+  value: string,
+  options: HostPropertyReferenceOption[],
+) => {
+  const normalized = value.trim().toLowerCase();
+
+  if (!normalized) {
+    return "";
+  }
+
+  return (
+    options.find((option) =>
+      [option.id, option.value, option.label].some(
+        (candidate) => candidate.trim().toLowerCase() === normalized,
+      ),
+    )?.id || value
+  );
+};
+
+const resolveReferenceIds = (
+  values: string[],
+  options: HostPropertyReferenceOption[],
+) =>
+  Array.from(
+    new Set(values.map((value) => resolveReferenceId(value, options)).filter(Boolean)),
+  );
+
 const UnitsPageSkeleton = () => (
   <HostShell badge="Add Property">
     <div className="space-y-6">
@@ -55,7 +82,10 @@ const UnitsPageSkeleton = () => (
   </HostShell>
 );
 
-const toUnitFormValues = (unit?: HostPropertyUnit): UpsertHostPropertyUnitPayload => {
+const toUnitFormValues = (
+  unit?: HostPropertyUnit,
+  amenityOptions: HostPropertyReferenceOption[] = [],
+): UpsertHostPropertyUnitPayload => {
   const emptyUnit = createEmptyHostPropertyUnit();
 
   return {
@@ -66,7 +96,7 @@ const toUnitFormValues = (unit?: HostPropertyUnit): UpsertHostPropertyUnitPayloa
     bedrooms: unit?.bedrooms ?? emptyUnit.bedrooms,
     bathrooms: unit?.bathrooms ?? emptyUnit.bathrooms,
     beds: unit?.beds ?? emptyUnit.beds,
-    amenities: unit?.amenities ?? emptyUnit.amenities,
+    amenities: resolveReferenceIds(unit?.amenities ?? emptyUnit.amenities, amenityOptions),
     isActive: unit?.isActive ?? emptyUnit.isActive,
   };
 };
@@ -185,7 +215,7 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
   };
 
   const resetForm = () => {
-    setValues(toUnitFormValues());
+    setValues(toUnitFormValues(undefined, amenities));
     setEditingUnitId(null);
     setErrors({});
   };
@@ -198,7 +228,7 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
 
   const handleEdit = (unit: HostPropertyUnit) => {
     setEditingUnitId(unit.id);
-    setValues(toUnitFormValues(unit));
+    setValues(toUnitFormValues(unit, amenities));
     setErrors({});
     setSuccessMessage("");
   };
@@ -260,12 +290,12 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
       if (editingUnitId) {
         const updatedUnit = await updateHostPropertyUnit(token, propertyId, editingUnitId, values);
         await refreshUnits();
-        setValues(toUnitFormValues(updatedUnit));
+        setValues(toUnitFormValues(updatedUnit, amenities));
         setSuccessMessage("Unit updated successfully.");
       } else {
         await createHostPropertyUnit(token, propertyId, values);
         await refreshUnits();
-        setValues(toUnitFormValues());
+        setValues(toUnitFormValues(undefined, amenities));
         setSuccessMessage("Unit created successfully.");
       }
     } catch (requestError) {

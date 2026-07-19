@@ -183,7 +183,8 @@ export const HostPropertyUnitForm: React.FC<HostPropertyUnitFormProps> = ({
         <span className="mb-2 block text-[13px] font-semibold text-text-primary">Unit amenities</span>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {amenities.map((option) => {
-            const checked = values.amenities.includes(option.value);
+            const amenityId = option.id || option.value;
+            const checked = values.amenities.includes(amenityId);
 
             return (
               <label
@@ -198,7 +199,7 @@ export const HostPropertyUnitForm: React.FC<HostPropertyUnitFormProps> = ({
                   type="checkbox"
                   checked={checked}
                   disabled={disabled}
-                  onChange={() => toggleAmenity(option.value)}
+                  onChange={() => toggleAmenity(amenityId)}
                   className="mt-1 h-4 w-4 rounded border-border-light text-primary"
                 />
                 <span>{option.label}</span>

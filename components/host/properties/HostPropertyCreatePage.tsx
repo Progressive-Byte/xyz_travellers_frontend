@@ -10,7 +10,6 @@ import { ApiError } from "@/lib/api";
 import {
   createEmptyHostPropertyDetail,
   createHostProperty,
-  getHostAmenities,
   getHostBusinesses,
   getHostBusinessDocuments,
   getHostPropertyTypes,
@@ -41,7 +40,6 @@ export const HostPropertyCreatePage: React.FC = () => {
   const { token } = useAuth();
   const [values, setValues] = useState<HostPropertyDetail>(createEmptyHostPropertyDetail());
   const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
-  const [amenities, setAmenities] = useState<HostPropertyReferenceOption[]>([]);
   const [businesses, setBusinesses] = useState<HostBusiness[]>([]);
   const [businessDocuments, setBusinessDocuments] = useState<HostBusinessDocument[]>([]);
   const [errors, setErrors] = useState<CreatePropertyErrors>({});
@@ -65,9 +63,8 @@ export const HostPropertyCreatePage: React.FC = () => {
       setBusinessNotice("");
 
       try {
-        const [propertyTypesResult, amenitiesResult, businessesResult] = await Promise.all([
+        const [propertyTypesResult, businessesResult] = await Promise.all([
           getHostPropertyTypes(token),
-          getHostAmenities(token),
           getHostBusinesses(token).catch(() => [] as HostBusiness[]),
         ]);
 
@@ -76,7 +73,6 @@ export const HostPropertyCreatePage: React.FC = () => {
         }
 
         setPropertyTypes(propertyTypesResult);
-        setAmenities(amenitiesResult);
         setBusinesses(businessesResult);
       } catch (error) {
         if (!isActive) {
@@ -182,15 +178,6 @@ export const HostPropertyCreatePage: React.FC = () => {
     setErrors((current) => ({ ...current, [field]: undefined, form: undefined }));
   };
 
-  const toggleAmenity = (amenityId: string) => {
-    setValues((current) => ({
-      ...current,
-      amenities: current.amenities.includes(amenityId)
-        ? current.amenities.filter((item) => item !== amenityId)
-        : [...current.amenities, amenityId],
-    }));
-  };
-
   const toggleBusinessDocument = (documentId: string) => {
     setValues((current) => ({
       ...current,
@@ -251,7 +238,6 @@ export const HostPropertyCreatePage: React.FC = () => {
         ownershipType: values.ownershipType,
         businessId: values.businessId,
         selectedBusinessDocumentIds: values.selectedBusinessDocumentIds,
-        amenities: values.amenities,
         address: "",
         city: "",
         country: "",
@@ -361,7 +347,7 @@ export const HostPropertyCreatePage: React.FC = () => {
                   >
                     <option value="">Select property type</option>
                     {propertyTypes.map((option) => (
-                      <option key={option.id || option.value} value={option.value}>
+                      <option key={option.id || option.value} value={option.id || option.value}>
                         {option.label}
                       </option>
                     ))}
@@ -398,33 +384,6 @@ export const HostPropertyCreatePage: React.FC = () => {
                 {errors.description ? <p className="mt-2 text-[13px] text-red-600">{errors.description}</p> : null}
               </label>
 
-              <div className="mt-4">
-                <span className="mb-2 block text-[13px] font-semibold text-text-primary">Amenities</span>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {amenities.map((option) => {
-                    const checked = values.amenities.includes(option.value);
-
-                    return (
-                      <label
-                        key={option.id || option.value}
-                        className={`flex cursor-pointer items-start gap-3 rounded-[20px] border px-4 py-3 text-[14px] leading-6 transition-all ${
-                          checked
-                            ? "border-primary/35 bg-primary-light/80 text-text-primary"
-                            : "border-border-light bg-white/80 text-text-primary"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => toggleAmenity(option.value)}
-                          className="mt-1 h-4 w-4 rounded border-border-light text-primary"
-                        />
-                        <span>{option.label}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
 
             <div className="surface-card rounded-panel p-6 md:p-7">
