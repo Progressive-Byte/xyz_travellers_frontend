@@ -7,6 +7,7 @@ export type HostNavIcon =
   | "reviews"
   | "earnings"
   | "businesses"
+  | "verification"
   | "profile"
   | "payouts";
 
@@ -93,6 +94,14 @@ export const hostNavigationItems: HostNavItem[] = [
     group: "Setup",
     isLive: true,
     description: "Manage reusable business profiles and business documents for commercial properties.",
+  },
+  {
+    label: "Verification Status",
+    href: "/host/verification",
+    icon: "verification",
+    group: "Setup",
+    isLive: true,
+    description: "Track host approval, listing reviews, rejection reasons, and next steps in one place.",
   },
   {
     label: "Payouts",
