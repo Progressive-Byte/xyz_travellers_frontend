@@ -17,6 +17,10 @@ const getChecklistHref = (propertyId: string, item: HostPropertySubmissionCheckl
     return `/host/properties/${propertyId}/edit`;
   }
 
+  if (item.key === "business") {
+    return `/host/businesses`;
+  }
+
   if (item.key === "cover-image" || item.key === "media") {
     return `/host/properties/${propertyId}/media`;
   }
@@ -54,7 +58,7 @@ export const HostPropertyReviewChecklist: React.FC<HostPropertyReviewChecklistPr
           </h2>
           <p className="mt-4 text-[14px] leading-7 text-text-secondary">
             This checklist only marks requirements the page can actually confirm from the current
-            property, media, units, pricing, calendar, and verification data.
+            property, business linkage, media, units, pricing, calendar, and verification data.
           </p>
         </div>
 

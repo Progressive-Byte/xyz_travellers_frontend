@@ -6,16 +6,22 @@ import { HostShell } from "@/components/host/HostShell";
 import { HostPropertyBasicsForm } from "@/components/host/properties/HostPropertyBasicsForm";
 import { HostPropertyEditorShell } from "@/components/host/properties/HostPropertyEditorShell";
 import { HostPropertyLocationForm } from "@/components/host/properties/HostPropertyLocationForm";
+import { HostPropertyBusinessDocumentsSelector } from "@/components/host/properties/ownership/HostPropertyBusinessDocumentsSelector";
+import { HostPropertyBusinessSelector } from "@/components/host/properties/ownership/HostPropertyBusinessSelector";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
   createEmptyHostPropertyDetail,
   getHostAmenities,
+  getHostBusinesses,
+  getHostBusinessDocuments,
   getHostCommissionInfo,
   getHostProperty,
   getHostPropertyTypes,
   isHostPropertyEditable,
   updateHostProperty,
+  type HostBusiness,
+  type HostBusinessDocument,
   type HostPropertyCommissionInfo,
   type HostPropertyDetail,
   type HostPropertyReferenceOption,
@@ -28,6 +34,8 @@ type BasicsErrors = Partial<
 type LocationErrors = Partial<
   Record<keyof Pick<HostPropertyDetail, "address" | "city" | "country" | "lat" | "lng" | "houseRules"> | "form", string>
 >;
+
+type CommercialErrors = Partial<Record<"businessId" | "selectedBusinessDocumentIds" | "form", string>>;
 
 type HostPropertyEditorPageProps = {
   propertyId: string;
@@ -57,14 +65,21 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
   const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
   const [amenities, setAmenities] = useState<HostPropertyReferenceOption[]>([]);
   const [commissionInfo, setCommissionInfo] = useState<HostPropertyCommissionInfo | null>(null);
+  const [businesses, setBusinesses] = useState<HostBusiness[]>([]);
+  const [businessDocuments, setBusinessDocuments] = useState<HostBusinessDocument[]>([]);
   const [error, setError] = useState("");
   const [basicsErrors, setBasicsErrors] = useState<BasicsErrors>({});
   const [locationErrors, setLocationErrors] = useState<LocationErrors>({});
+  const [commercialErrors, setCommercialErrors] = useState<CommercialErrors>({});
   const [basicsSuccessMessage, setBasicsSuccessMessage] = useState("");
   const [locationSuccessMessage, setLocationSuccessMessage] = useState("");
+  const [commercialSuccessMessage, setCommercialSuccessMessage] = useState("");
+  const [commercialNotice, setCommercialNotice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingBasics, setIsSavingBasics] = useState(false);
   const [isSavingLocation, setIsSavingLocation] = useState(false);
+  const [isSavingCommercial, setIsSavingCommercial] = useState(false);
+  const [isLoadingBusinessDocuments, setIsLoadingBusinessDocuments] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
@@ -79,8 +94,11 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
       setError("");
       setBasicsErrors({});
       setLocationErrors({});
+      setCommercialErrors({});
       setBasicsSuccessMessage("");
       setLocationSuccessMessage("");
+      setCommercialSuccessMessage("");
+      setCommercialNotice("");
 
       try {
         const [property, propertyTypesResult, amenitiesResult, commissionResult] = await Promise.all([
@@ -98,6 +116,33 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
         setPropertyTypes(propertyTypesResult);
         setAmenities(amenitiesResult);
         setCommissionInfo(commissionResult);
+
+        try {
+          const businessesResult = await getHostBusinesses(token);
+
+          if (!isActive) {
+            return;
+          }
+
+          setBusinesses(businessesResult);
+          setCommercialNotice(
+            property.ownershipType.trim().toLowerCase() === "commercial" && businessesResult.length === 0
+              ? "Commercial ownership is selected, but no reusable business profile exists yet. Create one in the Businesses workspace, then come back here to link it."
+              : "",
+          );
+        } catch (businessError) {
+          if (!isActive) {
+            return;
+          }
+
+          setBusinesses([]);
+          setCommercialNotice(
+            businessError instanceof ApiError
+              ? businessError.message ||
+                  "We couldn't load reusable business records right now, so the commercial linkage section may be incomplete."
+              : "We couldn't load reusable business records right now, so the commercial linkage section may be incomplete.",
+          );
+        }
       } catch (requestError) {
         if (!isActive) {
           return;
@@ -122,14 +167,81 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
     };
   }, [propertyId, retryKey, token]);
 
+  useEffect(() => {
+    if (!token || values.ownershipType.trim().toLowerCase() !== "commercial" || !values.businessId.trim()) {
+      setBusinessDocuments([]);
+      setCommercialErrors((current) => ({
+        ...current,
+        businessId: undefined,
+        selectedBusinessDocumentIds: undefined,
+      }));
+      return;
+    }
+
+    let isActive = true;
+
+    const loadBusinessDocuments = async () => {
+      setIsLoadingBusinessDocuments(true);
+
+      try {
+        const documents = await getHostBusinessDocuments(token, values.businessId);
+
+        if (!isActive) {
+          return;
+        }
+
+        setBusinessDocuments(documents);
+      } catch (requestError) {
+        if (!isActive) {
+          return;
+        }
+
+        setBusinessDocuments([]);
+        setCommercialNotice(
+          requestError instanceof ApiError
+            ? requestError.message ||
+                "We couldn't load reusable business documents for the selected business right now."
+            : "We couldn't load reusable business documents for the selected business right now.",
+        );
+      } finally {
+        if (isActive) {
+          setIsLoadingBusinessDocuments(false);
+        }
+      }
+    };
+
+    void loadBusinessDocuments();
+
+    return () => {
+      isActive = false;
+    };
+  }, [token, values.businessId, values.ownershipType]);
+
   const canEdit = useMemo(() => isHostPropertyEditable(values.status), [values.status]);
 
   const handleChange = (field: keyof HostPropertyDetail, value: string | string[]) => {
-    setValues((current) => ({ ...current, [field]: value } as HostPropertyDetail));
+    setValues((current) => {
+      if (field === "businessId") {
+        return {
+          ...current,
+          businessId: typeof value === "string" ? value : "",
+          selectedBusinessDocumentIds: [],
+        };
+      }
+
+      return { ...current, [field]: value } as HostPropertyDetail;
+    });
     setBasicsErrors((current) => ({ ...current, [field]: undefined, form: undefined }));
     setLocationErrors((current) => ({ ...current, [field]: undefined, form: undefined }));
+    setCommercialErrors((current) => ({
+      ...current,
+      businessId: undefined,
+      selectedBusinessDocumentIds: undefined,
+      form: undefined,
+    }));
     setBasicsSuccessMessage("");
     setLocationSuccessMessage("");
+    setCommercialSuccessMessage("");
   };
 
   const validateBasics = () => {
@@ -190,6 +302,8 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
       description: values.description,
       propertyType: values.propertyType,
       ownershipType: values.ownershipType,
+      businessId: values.businessId,
+      selectedBusinessDocumentIds: values.selectedBusinessDocumentIds,
       amenities: values.amenities,
       address: values.address,
       city: values.city,
@@ -201,6 +315,62 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
 
     setValues(property);
     onSuccess(property);
+  };
+
+  const handleBusinessDocumentToggle = (documentId: string) => {
+    setValues((current) => {
+      const exists = current.selectedBusinessDocumentIds.includes(documentId);
+
+      return {
+        ...current,
+        selectedBusinessDocumentIds: exists
+          ? current.selectedBusinessDocumentIds.filter((item) => item !== documentId)
+          : [...current.selectedBusinessDocumentIds, documentId],
+      };
+    });
+    setCommercialErrors((current) => ({ ...current, selectedBusinessDocumentIds: undefined, form: undefined }));
+    setCommercialSuccessMessage("");
+  };
+
+  const handleCommercialSave = async () => {
+    if (!canEdit) {
+      return;
+    }
+
+    const nextErrors: CommercialErrors = {};
+
+    if (values.ownershipType.trim().toLowerCase() === "commercial" && !values.businessId.trim()) {
+      nextErrors.businessId = "Please select a business profile for this commercial property.";
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
+      setCommercialErrors(nextErrors);
+      setCommercialSuccessMessage("");
+      return;
+    }
+
+    setIsSavingCommercial(true);
+    setCommercialErrors({});
+    setCommercialSuccessMessage("");
+
+    try {
+      await saveProperty((property) => {
+        setCommercialSuccessMessage(
+          property.ownershipType.trim().toLowerCase() === "commercial"
+            ? "Commercial business linkage updated successfully."
+            : "Ownership details updated successfully.",
+        );
+      });
+    } catch (requestError) {
+      setCommercialErrors({
+        form:
+          requestError instanceof ApiError
+            ? requestError.message || "We couldn't save the commercial linkage right now."
+            : "We couldn't save the commercial linkage right now.",
+      });
+    } finally {
+      setIsSavingCommercial(false);
+    }
   };
 
   const handleBasicsSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -384,6 +554,83 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
               </div>
             ) : null}
 
+            <div className="surface-card rounded-panel p-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                Commercial support
+              </p>
+              <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+                Keep ownership and business linkage aligned
+              </h2>
+              <p className="mt-4 text-[14px] leading-7 text-text-secondary">
+                Personal listings can continue without business linkage. Commercial listings should
+                point to one reusable business profile and, where available, selected business
+                documents.
+              </p>
+
+              {commercialNotice ? (
+                <div className="mt-5 rounded-[20px] border border-border-light bg-surface px-4 py-4 text-[14px] leading-6 text-text-secondary">
+                  {commercialNotice}
+                </div>
+              ) : null}
+
+              <div className="mt-5 space-y-4">
+                <HostPropertyBusinessSelector
+                  ownershipType={values.ownershipType}
+                  businesses={businesses}
+                  value={values.businessId}
+                  disabled={!canEdit}
+                  error={commercialErrors.businessId}
+                  onChange={(businessId) => handleChange("businessId", businessId)}
+                />
+
+                {isLoadingBusinessDocuments ? (
+                  <div className="rounded-[22px] border border-border-light bg-white/80 px-5 py-5">
+                    <div className="h-24 animate-pulse rounded-[18px] bg-surface" />
+                  </div>
+                ) : (
+                  <HostPropertyBusinessDocumentsSelector
+                    ownershipType={values.ownershipType}
+                    documents={businessDocuments}
+                    selectedDocumentIds={values.selectedBusinessDocumentIds}
+                    disabled={!canEdit || !values.businessId}
+                    error={commercialErrors.selectedBusinessDocumentIds}
+                    onToggle={handleBusinessDocumentToggle}
+                  />
+                )}
+              </div>
+
+              {commercialErrors.form ? (
+                <div className="mt-5 rounded-[20px] border border-red-200 bg-red-50/80 px-4 py-4 text-[14px] leading-6 text-red-700">
+                  {commercialErrors.form}
+                </div>
+              ) : null}
+
+              {commercialSuccessMessage ? (
+                <div className="mt-5 rounded-[20px] border border-primary/35 bg-primary-light/80 px-4 py-4 text-[14px] leading-6 text-text-primary">
+                  {commercialSuccessMessage}
+                </div>
+              ) : null}
+
+              {values.ownershipType.trim().toLowerCase() === "commercial" ? (
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={handleCommercialSave}
+                    disabled={!canEdit || isSavingCommercial}
+                    className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:opacity-70"
+                  >
+                    {isSavingCommercial ? "Saving commercial linkage..." : "Save commercial linkage"}
+                  </button>
+                  <Link
+                    href="/host/businesses"
+                    className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                  >
+                    Open businesses
+                  </Link>
+                </div>
+              ) : null}
+            </div>
+
             {!canEdit ? (
               <div className="surface-card rounded-panel p-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -407,7 +654,7 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
                 </h2>
                 <p className="mt-4 text-[14px] leading-7 text-text-secondary">
                   Once the basics and location feel right, move into gallery uploads, cover-image
-                  selection, and optional video links for this listing.
+                  selection, optional video links, and later commercial-readiness steps for this listing.
                 </p>
                 <div className="mt-6">
                   <Link

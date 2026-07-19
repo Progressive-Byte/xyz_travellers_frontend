@@ -59,3 +59,17 @@
 - Added the full verification workspace for approved hosts, including file upload, verification notes, current-proof listing, submission checklist, submit panel, and submission status treatment for draft, submitted, approved, and rejected listings.
 - Wired the final workflow stage into the add-property experience so `/host/properties/[propertyId]/verification` is reachable from the stepper, the calendar stage, and the shared Add Property navigation state.
 - Verified the new Chunk 7 host files with diagnostics and confirmed `npm.cmd run build` passes with `/host/properties/[propertyId]/verification` present in the route tree.
+
+## Host Portal Chunk 8
+
+- [completed] Extend the shared host data layer to support businesses, reusable business documents, and commercial property linkage.
+- [completed] Build the `/host/businesses` route and the business/document management components inside the shared host shell.
+- [completed] Integrate commercial business selection and commercial-readiness handling into the property editor and submission checklist flow.
+- [completed] Run diagnostics and `npm.cmd run build`, then document the Chunk 8 review result.
+
+### Review
+
+- Added a live businesses workspace at `/host/businesses` with business profile create/edit/delete flows, reusable business document upload and maintenance, and shared host-shell navigation support.
+- Extended `lib/host.ts` with normalized business models, business document helpers, commercial property linkage fields, and a submission-checklist rule that now treats commercial business support as a first-class readiness requirement.
+- Wired commercial ownership into the property editor and verification flow so commercial listings can link one business, select reusable business documents, and surface missing business readiness honestly before submission.
+- Verified the new Chunk 8 host files with diagnostics and confirmed `npm.cmd run build` passes with `/host/businesses` present in the route tree.
