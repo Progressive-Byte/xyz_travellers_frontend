@@ -447,65 +447,6 @@ export const HostDashboardShell: React.FC = () => {
         </>
       }
     >
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <SurfacePanel
-          badge="Priority actions"
-          title="Handle what matters today"
-          description="Keep this page focused on the next few actions instead of full workspace previews."
-          action={
-            <Link
-              href="/host/properties/new"
-              className="inline-flex items-center justify-center rounded-[16px] bg-primary px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-            >
-              Add property
-            </Link>
-          }
-        >
-          {topActions.length > 0 ? (
-            <div className="grid gap-3 md:grid-cols-2">
-              {topActions.map((action) => (
-                <PriorityActionCard key={action.key} action={action} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-[20px] border border-border-light bg-card px-4 py-4">
-              <p className="text-[14px] font-semibold text-text-primary">Nothing urgent right now.</p>
-              <p className="mt-2 text-[13px] leading-6 text-text-secondary">
-                Your setup looks healthy and there are no draft, rejected, or unread items demanding immediate attention.
-              </p>
-            </div>
-          )}
-        </SurfacePanel>
-
-        <SurfacePanel
-          badge="Quick links"
-          title="Open a workspace"
-          description="Jump into the right host area without scrolling through previews."
-        >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-            <QuickLinkCard
-              title="Properties"
-              href="/host/properties"
-              helper="Continue drafts, review statuses, and add new listings."
-            />
-            <QuickLinkCard
-              title="Reservations"
-              href="/host/reservations"
-              helper="Track arrivals, guest stays, and reservation decisions."
-            />
-            <QuickLinkCard
-              title="Messages"
-              href="/host/messages"
-              helper="Reply to guest conversations and unread threads."
-            />
-            <QuickLinkCard
-              title="Verification status"
-              href="/host/verification"
-              helper="Check approvals, rejections, and review progress."
-            />
-          </div>
-        </SurfacePanel>
-      </div>
 
       <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         <CompactMetricCard
@@ -536,66 +477,6 @@ export const HostDashboardShell: React.FC = () => {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-6">
-          <SurfacePanel
-            badge="Attention queues"
-            title="Start with the shortest path"
-            description="Open the next workspace directly from the queue that needs attention."
-          >
-            <div className="space-y-3">
-              <QueueRow
-                title="Property pipeline"
-                helper={`${data.properties.draft} drafts and ${data.properties.rejected} rejected listings still need work.`}
-                value={`${data.properties.draft + data.properties.rejected}`}
-                href="/host/properties"
-              />
-              <QueueRow
-                title="Review queue"
-                helper={`${data.properties.submitted} submitted listing${data.properties.submitted === 1 ? "" : "s"} are waiting on approval.`}
-                value={`${data.properties.submitted}`}
-                href="/host/verification"
-              />
-              <QueueRow
-                title="Unread inbox"
-                helper={`${data.messages.unreadThreads} thread${data.messages.unreadThreads === 1 ? "" : "s"} are waiting for your reply.`}
-                value={`${data.messages.unreadThreads}`}
-                href="/host/messages"
-              />
-              <QueueRow
-                title="Upcoming arrivals"
-                helper={`${data.reservations.upcomingCount} reservation${data.reservations.upcomingCount === 1 ? "" : "s"} are approaching check-in.`}
-                value={`${data.reservations.upcomingCount}`}
-                href="/host/reservations"
-              />
-            </div>
-          </SurfacePanel>
-
-          <SurfacePanel
-            badge="Upcoming stays"
-            title="Next arrivals"
-            description="Keep this section short and operational so you can review arrivals without opening the full reservations workspace first."
-            action={
-              <Link
-                href="/host/reservations"
-                className="inline-flex items-center justify-center rounded-[16px] border border-border bg-white px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
-              >
-                Open reservations
-              </Link>
-            }
-          >
-            {data.reservations.upcoming.length > 0 ? (
-              <div className="space-y-3">
-                {data.reservations.upcoming.slice(0, 3).map((reservation) => (
-                  <ReservationItem key={reservation.id} reservation={reservation} />
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-[20px] border border-dashed border-border bg-card px-4 py-4 text-[13px] leading-6 text-text-secondary">
-                No upcoming reservations right now.
-              </div>
-            )}
-          </SurfacePanel>
-        </div>
 
         <div className="space-y-6">
           <SurfacePanel
@@ -638,34 +519,6 @@ export const HostDashboardShell: React.FC = () => {
             </div>
           </SurfacePanel>
 
-          <SurfacePanel
-            badge="Workspace links"
-            title="Go straight to the next area"
-            description="Use these quick links when you already know which host workspace needs your attention."
-          >
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-              <QuickLinkCard
-                title="Host profile"
-                href="/host/profile"
-                helper="Update host identity, contact details, and bio."
-              />
-              <QuickLinkCard
-                title="Payout setup"
-                href="/host/payouts"
-                helper="Complete payout details and keep your release profile ready."
-              />
-              <QuickLinkCard
-                title="Businesses"
-                href="/host/businesses"
-                helper="Manage reusable business profiles for commercial listings."
-              />
-              <QuickLinkCard
-                title="Reviews"
-                href="/host/reviews"
-                helper="Track feedback and guest review opportunities."
-              />
-            </div>
-          </SurfacePanel>
         </div>
       </div>
     </HostShell>
