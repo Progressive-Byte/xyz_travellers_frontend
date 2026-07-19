@@ -75,6 +75,13 @@ const HostNavIconMark: React.FC<{ icon: HostNavIcon; isActive: boolean }> = ({ i
           <path d="M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01" strokeLinecap="round" />
         </svg>
       );
+    case "verification":
+      return (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">
+          <path d="M12 4 6 6.5v5.3c0 3.5 2.1 6.7 6 8.2 3.9-1.5 6-4.7 6-8.2V6.5L12 4Z" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="m9.4 12.1 1.7 1.7 3.7-3.9" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
     case "profile":
       return (
         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">

@@ -393,6 +393,12 @@ export const HostDashboardShell: React.FC = () => {
               Add property
             </Link>
             <Link
+              href="/host/verification"
+              className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+            >
+              Verification status
+            </Link>
+            <Link
               href="/host/properties"
               className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
             >
