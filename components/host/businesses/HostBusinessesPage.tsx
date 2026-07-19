@@ -439,29 +439,6 @@ export const HostBusinessesPage: React.FC = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="surface-card rounded-panel p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Why this matters
-            </p>
-            <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Keep commercial ownership reusable
-            </h2>
-            <div className="mt-5 space-y-3">
-              {[
-                "Use one reusable business record instead of repeating the same setup across every commercial property.",
-                "Store reusable business proof here so listing-specific verification can stay focused on the property itself.",
-                "Commercial property readiness stays more honest when the business and document layer is visible up front.",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[20px] border border-border-light bg-white/80 px-4 py-3 text-[14px] leading-6 text-text-primary"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-
           <HostBusinessDocumentsPanel
             business={selectedBusiness}
             documents={documents}

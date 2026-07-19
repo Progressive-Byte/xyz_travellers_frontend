@@ -165,20 +165,7 @@ export const HostReservationsPage: React.FC = () => {
       </div>
 
       <div className="mt-8 surface-card rounded-panel p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Stay queue
-            </p>
-            <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-              Booking activity
-            </h2>
-            <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
-              Filter by status to focus on requests that need review or inspect every reservation in one stream.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
             {reservationFilters.map((filter) => {
               const isActive = selectedFilter === filter.value;
 
@@ -197,7 +184,6 @@ export const HostReservationsPage: React.FC = () => {
                 </button>
               );
             })}
-          </div>
         </div>
 
         {error ? (

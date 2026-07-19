@@ -220,38 +220,22 @@ export const HostPropertiesPage: React.FC = () => {
       }
     >
       <div className="surface-card mb-5 rounded-panel p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Listings workspace
-            </p>
-            <h2 className="mt-2.5 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Manage listings from one compact index
-            </h2>
-            <p className="mt-2 max-w-3xl text-[13px] leading-6 text-text-secondary">
-              Search, filter, sort, and continue the right listing without bouncing through oversized overview sections.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/host/properties/new"
-              className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-            >
-              Add property
-            </Link>
-            <button
-              type="button"
-              onClick={() => setRetryKey((current) => current + 1)}
-              className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
-            >
-              Refresh list
-            </button>
-          </div>
+        <div className="mb-4 flex flex-wrap justify-end gap-3">
+          <Link
+            href="/host/properties/new"
+            className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+          >
+            Add property
+          </Link>
+          <button
+            type="button"
+            onClick={() => setRetryKey((current) => current + 1)}
+            className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+          >
+            Refresh list
+          </button>
         </div>
-      </div>
 
-      <div className="surface-card mb-5 rounded-panel p-5">
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,0.7fr))]">
           <label className="flex min-w-0 flex-col gap-2">
             <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">

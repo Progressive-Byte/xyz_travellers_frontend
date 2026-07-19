@@ -167,19 +167,7 @@ export const HostEarningsPage: React.FC = () => {
       </div>
 
       <div className="mt-8 surface-card rounded-panel p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Finance filters
-            </p>
-            <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Focus the transaction history
-            </h2>
-            <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
-              Filter by settlement status, finance event type, and a date range when you need a narrower operational view.
-            </p>
-          </div>
-
+        <div className="flex justify-end">
           <button
             type="button"
             onClick={() => {
@@ -257,19 +245,7 @@ export const HostEarningsPage: React.FC = () => {
       </div>
 
       <div className="mt-8 surface-card rounded-panel p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Finance history
-            </p>
-            <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-              Recent transactions
-            </h2>
-            <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
-              Keep the current revenue picture readable, then drill into payout setup for historical disbursements and payout profile changes.
-            </p>
-          </div>
-
+        <div className="flex justify-end">
           <Link
             href="/host/payouts"
             className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"

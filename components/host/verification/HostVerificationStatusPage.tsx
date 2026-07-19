@@ -487,29 +487,20 @@ export const HostVerificationStatusPage: React.FC = () => {
         </Link>
       }
     >
-      <div className="surface-card mb-6 rounded-panel p-6">
-        <SectionHeading
-          badge="Status hub"
-          title={`Keep the next host step clear, ${user?.firstName ?? "host"}`}
-          description="This page centralizes host approval and property-review signals so you can see what needs work, what is waiting on review, and what has already cleared without checking each listing one by one."
-          action={
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => setRetryKey((current) => current + 1)}
-                className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
-              >
-                Refresh status
-              </button>
-              <Link
-                href="/host/properties/new"
-                className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-              >
-                Add property
-              </Link>
-            </div>
-          }
-        />
+      <div className="mb-6 flex flex-wrap justify-end gap-3">
+        <button
+          type="button"
+          onClick={() => setRetryKey((current) => current + 1)}
+          className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+        >
+          Refresh status
+        </button>
+        <Link
+          href="/host/properties/new"
+          className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+        >
+          Add property
+        </Link>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">

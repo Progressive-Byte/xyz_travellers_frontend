@@ -9,7 +9,7 @@ type HostTopbarProps = {
 
 export const HostTopbar: React.FC<HostTopbarProps> = ({
   title,
-  subtitle,
+  subtitle: _subtitle,
   onMenuToggle,
   quickAction,
 }) => {
@@ -38,9 +38,6 @@ export const HostTopbar: React.FC<HostTopbarProps> = ({
             <p className="truncate font-sora text-[18px] font-bold tracking-[-0.04em] text-text-primary">
               {title}
             </p>
-            {subtitle ? (
-              <p className="mt-0.5 truncate text-[11px] font-medium text-text-secondary">{subtitle}</p>
-            ) : null}
           </div>
         </div>
 

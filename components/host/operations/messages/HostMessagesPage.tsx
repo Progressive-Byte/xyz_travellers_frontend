@@ -150,20 +150,7 @@ export const HostMessagesPage: React.FC = () => {
       </div>
 
       <div className="mt-8 surface-card rounded-panel p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Inbox workspace
-            </p>
-            <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-              Guest communication
-            </h2>
-            <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
-              Open any thread to continue the conversation with context from the related reservation.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => setUnreadOnly(false)}
@@ -186,7 +173,6 @@ export const HostMessagesPage: React.FC = () => {
             >
               Unread only
             </button>
-          </div>
         </div>
 
         {reservationId ? (
