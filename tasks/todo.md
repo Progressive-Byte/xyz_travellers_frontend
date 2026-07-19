@@ -13,3 +13,10 @@
 
 - Implemented the homepage redesign across the shared theme layer, navbar, hero, listings, mid-page sections, and footer alignment.
 - `npm.cmd run build` passed successfully after the redesign pass.
+
+## Hero And Listing Tabs
+
+- [completed] Remove the Hero intro badge, heading, subtitle, and stats so only the search box and tab row remain.
+- [completed] Lift the active category tab state into `app/page.tsx` so the Hero controls content below it.
+- [completed] Update `sections/Listings.tsx` so listings and section copy respond to the active Hero tab.
+- [completed] Run `npm.cmd run build` and verify the Hero tabs and Listings work together cleanly.

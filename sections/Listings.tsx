@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import { ListingCard } from "@/components/ui/ListingCard";
-import { getPropertiesByRail } from "@/data/properties";
+import { properties, type Property } from "@/data/properties";
+import type { HomeCategory } from "@/data/homeCategories";
 
 type ListingRailProps = {
   title: string;
   subtitle: string;
-  listings: ReturnType<typeof getPropertiesByRail>;
+  listings: Property[];
   railRef: React.RefObject<HTMLDivElement | null>;
   onScrollLeft: () => void;
   onScrollRight: () => void;
@@ -80,11 +81,78 @@ const ListingRail: React.FC<ListingRailProps> = ({
   </div>
 );
 
-export const Listings: React.FC = () => {
-  const newArrivalsRef = useRef<HTMLDivElement>(null);
-  const bangladeshRef = useRef<HTMLDivElement>(null);
-  const newArrivals = getPropertiesByRail("new-arrivals");
-  const bangladeshGetaways = getPropertiesByRail("bangladesh-getaways");
+type ListingsProps = {
+  activeCategory: HomeCategory;
+};
+
+const dedupeProperties = (items: Property[]) => {
+  const seen = new Set<string>();
+
+  return items.filter((item) => {
+    if (seen.has(item.slug)) return false;
+    seen.add(item.slug);
+    return true;
+  });
+};
+
+const buildCategoryListings = (activeCategory: HomeCategory) => {
+  const apartmentMatches = dedupeProperties(
+    properties.filter(
+      (property) =>
+        /apartment/i.test(property.title) ||
+        /apartment|serviced stay|residence/i.test(property.propertyType),
+    ),
+  ).slice(0, 6);
+
+  const roomMatches = dedupeProperties(
+    properties.filter(
+      (property) =>
+        property.guestCount <= 5 ||
+        property.bedroomCount <= 2 ||
+        property.pricePerNight <= 7000,
+    ),
+  ).slice(0, 6);
+
+  const hotelMatches = dedupeProperties(
+    properties.filter(
+      (property) =>
+        property.pricePerNight >= 7000 ||
+        property.rating === 5 ||
+        /premium|executive|triplex/i.test(property.propertyType),
+    ),
+  ).slice(0, 6);
+
+  const content = {
+    Apartments: {
+      railTitle: "Popular apartments",
+      railSubtitle:
+        "A tighter apartment-focused mix for city stays, family visits, and short residential bookings.",
+      listings: apartmentMatches,
+    },
+    Rooms: {
+      railTitle: "Popular room-style stays",
+      railSubtitle:
+        "A compact mix of lighter stays that keeps the booking flow simple and fast.",
+      listings: roomMatches,
+    },
+    Hotels: {
+      railTitle: "Popular hotel-style stays",
+      railSubtitle:
+        "A more elevated set of stays selected for stronger finish, comfort, and premium booking appeal.",
+      listings: hotelMatches,
+    },
+  } satisfies Record<HomeCategory, {
+    railTitle: string;
+    railSubtitle: string;
+    listings: Property[];
+  }>;
+
+  return content[activeCategory];
+};
+
+export const Listings: React.FC<ListingsProps> = ({ activeCategory }) => {
+  const listingsRef = useRef<HTMLDivElement>(null);
+  const listingContent = useMemo(() => buildCategoryListings(activeCategory), [activeCategory]);
 
   const scrollByAmount = (element: HTMLDivElement | null, direction: "left" | "right") => {
     if (!element) return;
@@ -93,37 +161,16 @@ export const Listings: React.FC = () => {
   };
 
   return (
-    <section className="bg-card py-16 md:py-20">
+    <section className="bg-card pb-16 pt-5 md:pb-20 md:pt-10">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="section-badge">Featured Stays</span>
-          <h2 className="section-heading mt-6">Handpicked places worth booking next</h2>
-          <p className="section-subtitle mx-auto mt-5">
-            Browse fresh arrivals and guest-loved stays curated to feel reliable,
-            polished, and easy to compare at a glance.
-          </p>
-          <div className="section-divider mx-auto mt-6" />
-        </div>
-
-        <div className="mt-12 space-y-8">
-          <ListingRail
-            title="New Arrivals"
-            subtitle="Freshly listed properties with strong visuals, clean interiors, and flexible stay options."
-            listings={newArrivals}
-            railRef={newArrivalsRef}
-            onScrollLeft={() => scrollByAmount(newArrivalsRef.current, "left")}
-            onScrollRight={() => scrollByAmount(newArrivalsRef.current, "right")}
-          />
-
-          <ListingRail
-            title="Bangladesh Getaways"
-            subtitle="A wider mix of city stays, family-ready homes, and destination-focused escapes across the country."
-            listings={bangladeshGetaways}
-            railRef={bangladeshRef}
-            onScrollLeft={() => scrollByAmount(bangladeshRef.current, "left")}
-            onScrollRight={() => scrollByAmount(bangladeshRef.current, "right")}
-          />
-        </div>
+        <ListingRail
+          title={listingContent.railTitle}
+          subtitle={listingContent.railSubtitle}
+          listings={listingContent.listings}
+          railRef={listingsRef}
+          onScrollLeft={() => scrollByAmount(listingsRef.current, "left")}
+          onScrollRight={() => scrollByAmount(listingsRef.current, "right")}
+        />
       </div>
     </section>
   );
