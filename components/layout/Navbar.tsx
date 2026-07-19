@@ -21,7 +21,7 @@ export const Navbar: React.FC = () => {
             { label: "Browse stays", href: "/", emphasis: true },
             hasHostAccess
               ? { label: "Host dashboard", href: "/host/dashboard" }
-              : { label: "Become a host", href: "/auth?mode=register&intent=host" },
+              : { label: "Host onboarding", href: "/host/onboarding" },
             { label: "Help Center", href: "/help" },
           ]
         : [
@@ -119,10 +119,16 @@ export const Navbar: React.FC = () => {
 
           <div className="flex items-center gap-3 sm:gap-4">
             <Link
-              href={hasHostAccess ? "/host/dashboard" : "/auth?mode=register&intent=host"}
+              href={
+                isAuthenticated
+                  ? hasHostAccess
+                    ? "/host/dashboard"
+                    : "/host/onboarding"
+                  : "/auth?mode=register&intent=host"
+              }
               className="hidden rounded-full border border-border bg-card px-4 py-2 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium md:inline-flex"
             >
-              {hasHostAccess ? "Host dashboard" : "Become a host"}
+              {hasHostAccess ? "Host dashboard" : isAuthenticated ? "Host onboarding" : "Become a host"}
             </Link>
 
             <div className="relative" ref={dropdownRef}>

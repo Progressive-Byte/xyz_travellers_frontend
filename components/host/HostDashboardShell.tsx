@@ -4,11 +4,22 @@ import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { HostShell } from "@/components/host/HostShell";
+import { HostSetupPromptCard } from "@/components/host/HostSetupPromptCard";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
-import { getHostDashboard, type HostDashboardData, type HostReservationPreview } from "@/lib/host";
+import {
+  getHostDashboard,
+  getHostPayoutProfile,
+  getHostPayoutSetupStatus,
+  getHostProfile,
+  getHostProfileSetupStatus,
+  type HostDashboardData,
+  type HostPayoutProfile,
+  type HostProfile,
+  type HostReservationPreview,
+} from "@/lib/host";
 
 const formatCurrency = (value: number, currency: string) =>
   new Intl.NumberFormat("en-BD", {
@@ -23,6 +34,22 @@ const formatDate = (value: string) =>
     month: "short",
     year: "numeric",
   });
+
+const formatMissingFields = (fields: string[]) => {
+  if (fields.length === 0) {
+    return "";
+  }
+
+  if (fields.length === 1) {
+    return fields[0];
+  }
+
+  if (fields.length === 2) {
+    return `${fields[0]} and ${fields[1]}`;
+  }
+
+  return `${fields.slice(0, -1).join(", ")}, and ${fields[fields.length - 1]}`;
+};
 
 const MetricCard: React.FC<{
   label: string;
@@ -143,6 +170,8 @@ export const HostDashboardShell: React.FC = () => {
   const router = useRouter();
   const { user, token, isHydrated, isAuthenticated } = useAuth();
   const [data, setData] = useState<HostDashboardData | null>(null);
+  const [profile, setProfile] = useState<HostProfile | null>(null);
+  const [payoutProfile, setPayoutProfile] = useState<HostPayoutProfile | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [retryKey, setRetryKey] = useState(0);
@@ -173,11 +202,31 @@ export const HostDashboardShell: React.FC = () => {
       try {
         const dashboard = await getHostDashboard(token);
 
+        const [profileResult, payoutResult] = await Promise.allSettled([
+          getHostProfile(token),
+          getHostPayoutProfile(token),
+        ]);
+
         if (!isActive) {
           return;
         }
 
         setData(dashboard);
+        setProfile(
+          profileResult.status === "fulfilled"
+            ? profileResult.value
+            : {
+                id: user.id,
+                firstName: user.firstName ?? "",
+                lastName: user.lastName ?? "",
+                email: user.email ?? "",
+                phone: user.phone ?? "",
+                address: user.address ?? "",
+                profilePhoto: user.profilePhoto ?? "",
+                bio: user.bio ?? "",
+              },
+        );
+        setPayoutProfile(payoutResult.status === "fulfilled" ? payoutResult.value : null);
       } catch (requestError) {
         if (!isActive) {
           return;
@@ -212,40 +261,7 @@ export const HostDashboardShell: React.FC = () => {
   }
 
   if (!hasHostRole) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="section-shell py-12 md:py-16">
-          <div className="mx-auto max-w-3xl px-6">
-            <div className="surface-card-strong rounded-panel p-8 md:p-10">
-              <span className="section-badge">Host Portal</span>
-              <h1 className="mt-6 font-sora text-[34px] font-bold tracking-[-0.05em] text-text-primary md:text-[44px]">
-                Host access required
-              </h1>
-              <p className="mt-4 max-w-2xl text-[15px] leading-7 text-text-secondary">
-                This dashboard is only available to approved hosts. Your current account is signed
-                in, but it does not have host access yet.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  href="/"
-                  className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-                >
-                  Back to homepage
-                </Link>
-                <Link
-                  href="/auth?mode=login&intent=host"
-                  className="inline-flex items-center justify-center rounded-full border border-border bg-card px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:bg-surface"
-                >
-                  Host sign in
-                </Link>
-              </div>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    return null;
   }
 
   if (!data || error) {
@@ -286,6 +302,41 @@ export const HostDashboardShell: React.FC = () => {
   }
 
   const currency = data.earnings.currency || data.payouts.currency || "BDT";
+  const profileSetupStatus = getHostProfileSetupStatus(
+    profile ?? {
+      id: user.id,
+      firstName: user.firstName ?? "",
+      lastName: user.lastName ?? "",
+      email: user.email ?? "",
+      phone: user.phone ?? "",
+      address: user.address ?? "",
+      profilePhoto: user.profilePhoto ?? "",
+      bio: user.bio ?? "",
+    },
+  );
+  const payoutSetupStatus = getHostPayoutSetupStatus(payoutProfile);
+  const setupPrompts = [
+    !profileSetupStatus.isComplete
+      ? {
+          key: "profile",
+          badge: "Profile setup",
+          title: "Complete your host profile",
+          description: `Add ${formatMissingFields(profileSetupStatus.missingFields)} so your host identity feels complete across the portal.`,
+          href: "/host/profile",
+          ctaLabel: "Open profile",
+        }
+      : null,
+    !payoutSetupStatus.isComplete
+      ? {
+          key: "payouts",
+          badge: "Payout setup",
+          title: "Finish payout readiness",
+          description: `Add ${formatMissingFields(payoutSetupStatus.missingFields)} so future payout flows start from a ready profile.`,
+          href: "/host/payouts",
+          ctaLabel: "Open payouts",
+        }
+      : null,
+  ].filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   return (
     <HostShell
@@ -311,6 +362,21 @@ export const HostDashboardShell: React.FC = () => {
         </>
       }
     >
+      {setupPrompts.length > 0 ? (
+        <div className="mb-6 grid gap-4 lg:grid-cols-2">
+          {setupPrompts.map((prompt) => (
+            <HostSetupPromptCard
+              key={prompt.key}
+              badge={prompt.badge}
+              title={prompt.title}
+              description={prompt.description}
+              href={prompt.href}
+              ctaLabel={prompt.ctaLabel}
+            />
+          ))}
+        </div>
+      ) : null}
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard
               label="Total properties"
@@ -466,26 +532,6 @@ export const HostDashboardShell: React.FC = () => {
               },
             ]}
           />
-
-          <div className="surface-card rounded-panel p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Next steps
-            </p>
-            <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              More host tools later
-            </h2>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-              {["Reservations", "Messages", "Earnings", "Properties"].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[22px] border border-border-light bg-card px-4 py-4 text-[14px] font-medium text-text-primary shadow-soft"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </HostShell>
