@@ -63,3 +63,5 @@
 
 - When a host portal workflow stage is implemented as a real route, expose it through the visible stepper UI from earlier property-edit stages as well; do not leave a finished stage reachable only from one narrow handoff point.
 - Final review pages like property verification must degrade gracefully when some downstream unit-level data is still incomplete or partially unavailable; show the page with honest checklist gaps instead of collapsing the whole workspace into a generic load failure.
+- For host business document uploads, match the backend field contract exactly: use multipart field name `file` for each upload and map UI fields to API fields `label`, `notes`, `issuedAt`, `expiresAt`, and `isActive` instead of assuming generic names like `title`, `note`, or `files`.
+- For host business records, use the API contract from `api/host/host-businesses.md`: required create/update fields are `businessName`, `businessAddress`, `contactName`, `contactEmail`, and `contactPhone`, with optional `registrationNumber`, `taxVatNumber`, and `isActive`; do not send legacy frontend aliases like `name`, `country`, `address`, or `note`.

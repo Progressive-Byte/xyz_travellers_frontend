@@ -1,11 +1,18 @@
 "use client";
 
 import React, { useRef, useState } from "react";
+import {
+  businessDocumentTypeOptions,
+  type BusinessDocumentType,
+} from "@/components/host/businesses/documents/businessDocumentTypes";
 
 type HostBusinessDocumentUploaderProps = {
   disabled: boolean;
   isUploading: boolean;
-  onUpload: (files: File[], metadata: { title: string; documentType: string; note: string }) => Promise<void>;
+  onUpload: (
+    files: File[],
+    metadata: { title: string; documentType: BusinessDocumentType; note: string },
+  ) => Promise<void>;
 };
 
 export const HostBusinessDocumentUploader: React.FC<HostBusinessDocumentUploaderProps> = ({
@@ -16,7 +23,7 @@ export const HostBusinessDocumentUploader: React.FC<HostBusinessDocumentUploader
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [title, setTitle] = useState("");
-  const [documentType, setDocumentType] = useState("");
+  const [documentType, setDocumentType] = useState<BusinessDocumentType>("trade_license");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -33,7 +40,7 @@ export const HostBusinessDocumentUploader: React.FC<HostBusinessDocumentUploader
       await onUpload(selectedFiles, { title, documentType, note });
       setSelectedFiles([]);
       setTitle("");
-      setDocumentType("");
+      setDocumentType("trade_license");
       setNote("");
       if (inputRef.current) {
         inputRef.current.value = "";
@@ -78,14 +85,18 @@ export const HostBusinessDocumentUploader: React.FC<HostBusinessDocumentUploader
           <span className="mb-2 block text-[13px] font-semibold text-text-primary">
             Document type
           </span>
-          <input
-            type="text"
+          <select
             value={documentType}
-            onChange={(event) => setDocumentType(event.target.value)}
+            onChange={(event) => setDocumentType(event.target.value as BusinessDocumentType)}
             disabled={disabled || isUploading}
-            placeholder="Example: registration"
             className="w-full rounded-[18px] border border-border bg-card px-4 py-3 text-[14px] text-text-primary outline-none transition-all duration-200 placeholder:text-text-secondary focus:border-text-primary/20 disabled:opacity-70"
-          />
+          >
+            {businessDocumentTypeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
 
