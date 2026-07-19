@@ -51,3 +51,10 @@
 ## Listing Card Notes
 
 - Do not show the property address as a pill overlay on the listing thumbnail; keep location details in the card body only and reserve the image overlay for badges like `New`.
+
+## Planning Notes
+
+- For host portal planning, treat `plans/HOST_PORTAL_CHUNKED_PLAN.md` as the source of truth for official chunk numbering; do not renumber chunks based on what feels next in the full plan.
+- Create one detailed `HOST_PORTAL_CHUNK_X_PLAN.md` per official chunk by default, and only introduce sub-chunk plan files when a single official chunk is clearly too wide for one safe implementation pass.
+- If sub-chunks are needed, keep the parent official chunk number and split under it consistently, for example `CHUNK_6A`, `CHUNK_6B`, or `CHUNK_6_STEP_1`, instead of inventing a new top-level chunk order.
+- Before creating a new chunk plan or re-implementing a chunk, check the repo state first; if that official chunk already appears fully implemented, call that out instead of silently recreating it.

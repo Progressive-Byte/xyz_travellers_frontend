@@ -1,4 +1,4 @@
-import { apiRequest, ApiError } from "@/lib/api";
+import { apiRequest, apiRequestOptional, ApiError } from "@/lib/api";
 
 export type HostReservationPreview = {
   id: string;
@@ -50,6 +50,43 @@ const asRecord = (value: unknown): UnknownRecord => (value && typeof value === "
 const asString = (value: unknown) => (typeof value === "string" ? value : "");
 const asOptionalString = (value: unknown) => (typeof value === "string" ? value : null);
 const asArray = (value: unknown) => (Array.isArray(value) ? value : []);
+const asNumber = (value: unknown) => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+
+    if (!trimmed) {
+      return null;
+    }
+
+    const parsed = Number(trimmed);
+
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
+};
+const asBoolean = (value: unknown) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "number") {
+    return value === 1;
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    return normalized === "true" || normalized === "1" || normalized === "yes";
+  }
+
+  return false;
+};
 
 export type HostProfile = {
   id?: string;
@@ -119,6 +156,21 @@ export type HostPropertyDetail = HostPropertySummary & {
   houseRules: string;
 };
 
+export type HostPropertyMediaType = "image" | "video";
+
+export type HostPropertyMediaItem = {
+  id: string;
+  propertyId: string;
+  type: HostPropertyMediaType;
+  url: string;
+  thumbnailUrl: string;
+  caption: string;
+  sortOrder: number | null;
+  isCover: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
 export type HostPropertyReferenceOption = {
   id: string;
   value: string;
@@ -142,6 +194,12 @@ export type UpdateHostPropertyPayload = {
   lat: string;
   lng: string;
   houseRules: string;
+};
+
+export type UpdateHostPropertyMediaPayload = {
+  caption: string;
+  sortOrder: string;
+  isCover?: boolean;
 };
 
 const emptyHostProfile = (): HostProfile => ({
@@ -317,6 +375,87 @@ const normalizeHostPropertyDetail = (payload: unknown): HostPropertyDetail => {
     lng: asString(source.lng ?? source.longitude ?? locationSource.lng ?? locationSource.longitude),
     houseRules: asString(source.houseRules ?? source.house_rules ?? source.rules),
   };
+};
+
+const normalizeHostPropertyMediaType = (value: unknown): HostPropertyMediaType => {
+  const normalized = asString(value).trim().toLowerCase();
+
+  if (normalized.includes("video")) {
+    return "video";
+  }
+
+  return "image";
+};
+
+const normalizeHostPropertyMediaItem = (payload: unknown): HostPropertyMediaItem => {
+  const source = asRecord(payload);
+  const rawType =
+    source.mediaType ??
+    source.media_type ??
+    source.type ??
+    source.kind ??
+    (source.videoUrl ?? source.video_url ? "video" : "image");
+  const url =
+    asString(source.url) ||
+    asString(source.fileUrl ?? source.file_url) ||
+    asString(source.mediaUrl ?? source.media_url) ||
+    asString(source.src) ||
+    asString(source.path) ||
+    asString(source.videoUrl ?? source.video_url);
+
+  return {
+    id: asString(source.id) || asString(source.mediaId ?? source.media_id),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    type: normalizeHostPropertyMediaType(rawType),
+    url,
+    thumbnailUrl:
+      asString(source.thumbnailUrl ?? source.thumbnail_url) ||
+      asString(source.previewUrl ?? source.preview_url) ||
+      url,
+    caption: asString(source.caption ?? source.altText ?? source.alt_text ?? source.title),
+    sortOrder: asNumber(source.sortOrder ?? source.sort_order ?? source.order ?? source.position ?? source.index),
+    isCover: asBoolean(
+      source.isCover ??
+        source.is_cover ??
+        source.cover ??
+        source.isPrimary ??
+        source.is_primary ??
+        source.isFeatured ??
+        source.is_featured,
+    ),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
+  };
+};
+
+const extractHostPropertyMediaArray = (payload: unknown) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  const source = asRecord(payload);
+
+  if (Array.isArray(source.items)) {
+    return source.items;
+  }
+
+  if (Array.isArray(source.results)) {
+    return source.results;
+  }
+
+  if (Array.isArray(source.media)) {
+    return source.media;
+  }
+
+  if (Array.isArray(source.gallery)) {
+    return source.gallery;
+  }
+
+  if (Array.isArray(source.images)) {
+    return source.images;
+  }
+
+  return [];
 };
 
 const extractReferenceArray = (payload: unknown) => {
@@ -896,6 +1035,130 @@ export async function getHostCommissionInfo(token: string): Promise<HostProperty
 
     throw error;
   }
+}
+
+export async function getHostPropertyMedia(
+  token: string,
+  propertyId: string,
+): Promise<HostPropertyMediaItem[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/properties/${propertyId}/media`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return extractHostPropertyMediaArray(response)
+    .map((item) => normalizeHostPropertyMediaItem(item))
+    .filter((item) => item.id && item.url)
+    .sort((left, right) => {
+      const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
+      const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
+
+      if (leftOrder !== rightOrder) {
+        return leftOrder - rightOrder;
+      }
+
+      return (left.createdAt ?? "").localeCompare(right.createdAt ?? "");
+    });
+}
+
+export async function uploadHostPropertyImage(
+  token: string,
+  propertyId: string,
+  file: File,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("type", "image");
+
+  await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/media`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+    cache: "no-store",
+  });
+}
+
+export async function createHostPropertyVideoUrl(
+  token: string,
+  propertyId: string,
+  videoUrl: string,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const normalizedUrl = videoUrl.trim();
+
+  await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/media`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      type: "video",
+      mediaType: "video",
+      videoUrl: normalizedUrl,
+      url: normalizedUrl,
+    },
+    cache: "no-store",
+  });
+}
+
+export async function updateHostPropertyMedia(
+  token: string,
+  propertyId: string,
+  mediaId: string,
+  payload: UpdateHostPropertyMediaPayload,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const normalizedSortOrder = payload.sortOrder.trim();
+
+  await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/media/${mediaId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      caption: payload.caption.trim() || undefined,
+      sortOrder: normalizedSortOrder ? Number(normalizedSortOrder) : undefined,
+      isCover: payload.isCover,
+    },
+    cache: "no-store",
+  });
+}
+
+export async function deleteHostPropertyMedia(
+  token: string,
+  propertyId: string,
+  mediaId: string,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/media/${mediaId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
 }
 
 export const createEmptyHostProfile = emptyHostProfile;

@@ -94,7 +94,7 @@ export const isHostNavItemActive = (pathname: string, href: string) => {
   }
 
   if (href === "/host/properties/new") {
-    return pathname === href || /^\/host\/properties\/[^/]+\/edit$/.test(pathname);
+    return pathname === href || /^\/host\/properties\/[^/]+\/(edit|media)$/.test(pathname);
   }
 
   return pathname === href || pathname.startsWith(`${href}/`);
