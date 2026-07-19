@@ -73,3 +73,17 @@
 - Extended `lib/host.ts` with normalized business models, business document helpers, commercial property linkage fields, and a submission-checklist rule that now treats commercial business support as a first-class readiness requirement.
 - Wired commercial ownership into the property editor and verification flow so commercial listings can link one business, select reusable business documents, and surface missing business readiness honestly before submission.
 - Verified the new Chunk 8 host files with diagnostics and confirmed `npm.cmd run build` passes with `/host/businesses` present in the route tree.
+
+## Host Portal Chunk 9
+
+- [completed] Extend the shared host data layer to support reservations, messages, reviews, earnings transactions, and payout history.
+- [completed] Build the `/host/reservations`, `/host/reservations/[reservationId]`, `/host/messages`, `/host/messages/[threadId]`, `/host/reviews`, and `/host/earnings` routes inside the shared host shell.
+- [completed] Wire the sidebar live states, dashboard handoffs, and payout-history placement into the new operations workspace.
+- [completed] Run diagnostics and `npm.cmd run build`, then document the Chunk 9 review result.
+
+### Review
+
+- Added the live operations workspace for approved hosts with reservations list/detail flows, guest-message inbox and thread detail pages, a reviews workspace, and an earnings screen.
+- Integrated operational handoffs into the host portal by making Reservations, Messages, Reviews, and Earnings live in the sidebar and by linking dashboard summary areas directly into the new pages.
+- Kept payout setup separate from finance history by adding a dedicated payout-history section inside `/host/payouts`, including payout selection and detailed payout record rendering.
+- Verified the new Chunk 9 host files with diagnostics and confirmed `npm.cmd run build` passes with `/host/reservations`, `/host/messages`, `/host/reviews`, and `/host/earnings` present in the route tree.

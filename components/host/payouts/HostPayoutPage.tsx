@@ -1,15 +1,19 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { HostPayoutHistorySection } from "@/components/host/operations/payouts/HostPayoutHistorySection";
 import { HostShell } from "@/components/host/HostShell";
 import { HostPayoutForm } from "@/components/host/payouts/HostPayoutForm";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
   createEmptyHostPayoutProfile,
+  getHostPayoutHistory,
+  getHostPayoutHistoryDetail,
   getHostPayoutProfile,
   getHostPayoutSetupStatus,
   updateHostPayoutProfile,
+  type HostPayoutHistoryItem,
   type HostPayoutProfile,
 } from "@/lib/host";
 
@@ -34,7 +38,13 @@ export const HostPayoutPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
+  const [historyRetryKey, setHistoryRetryKey] = useState(0);
   const [successMessage, setSuccessMessage] = useState("");
+  const [payoutHistory, setPayoutHistory] = useState<HostPayoutHistoryItem[]>([]);
+  const [selectedPayoutId, setSelectedPayoutId] = useState("");
+  const [selectedPayout, setSelectedPayout] = useState<HostPayoutHistoryItem | null>(null);
+  const [historyError, setHistoryError] = useState("");
+  const [isHistoryLoading, setIsHistoryLoading] = useState(true);
 
   useEffect(() => {
     if (!token) {
@@ -81,6 +91,97 @@ export const HostPayoutPage: React.FC = () => {
       isActive = false;
     };
   }, [retryKey, token]);
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+
+    let isActive = true;
+
+    const loadPayoutHistory = async () => {
+      setIsHistoryLoading(true);
+      setHistoryError("");
+
+      try {
+        const history = await getHostPayoutHistory(token);
+
+        if (!isActive) {
+          return;
+        }
+
+        setPayoutHistory(history);
+        setSelectedPayoutId((current) => {
+          if (current && history.some((item) => item.id === current)) {
+            return current;
+          }
+
+          return history[0]?.id ?? "";
+        });
+      } catch (error) {
+        if (!isActive) {
+          return;
+        }
+
+        setPayoutHistory([]);
+        setSelectedPayoutId("");
+        setSelectedPayout(null);
+        setHistoryError(
+          error instanceof ApiError
+            ? error.message || "We couldn't load payout history right now."
+            : "We couldn't load payout history right now.",
+        );
+      } finally {
+        if (isActive) {
+          setIsHistoryLoading(false);
+        }
+      }
+    };
+
+    void loadPayoutHistory();
+
+    return () => {
+      isActive = false;
+    };
+  }, [historyRetryKey, token]);
+
+  useEffect(() => {
+    if (!token || !selectedPayoutId) {
+      setSelectedPayout(null);
+      return;
+    }
+
+    let isActive = true;
+
+    const loadSelectedPayout = async () => {
+      try {
+        const payout = await getHostPayoutHistoryDetail(token, selectedPayoutId);
+
+        if (!isActive) {
+          return;
+        }
+
+        setSelectedPayout(payout);
+      } catch (error) {
+        if (!isActive) {
+          return;
+        }
+
+        const fallback = payoutHistory.find((item) => item.id === selectedPayoutId) ?? null;
+        setSelectedPayout(fallback);
+
+        if (error instanceof ApiError && !historyError) {
+          setHistoryError(error.message || "We couldn't load one payout detail right now.");
+        }
+      }
+    };
+
+    void loadSelectedPayout();
+
+    return () => {
+      isActive = false;
+    };
+  }, [historyError, payoutHistory, selectedPayoutId, token]);
 
   const setupStatus = useMemo(() => getHostPayoutSetupStatus(values), [values]);
 
@@ -232,10 +333,10 @@ export const HostPayoutPage: React.FC = () => {
         <div className="space-y-6">
           <div className="surface-card rounded-panel p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              How payouts work
+              Payout setup
             </p>
             <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Set the details before operations expand
+              Keep payout instructions ready
             </h2>
             <div className="mt-5 space-y-3">
               {[
@@ -296,6 +397,17 @@ export const HostPayoutPage: React.FC = () => {
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <HostPayoutHistorySection
+          items={payoutHistory}
+          selectedPayout={selectedPayout}
+          isLoading={isHistoryLoading}
+          error={historyError}
+          onRetry={() => setHistoryRetryKey((current) => current + 1)}
+          onSelect={setSelectedPayoutId}
+        />
       </div>
     </HostShell>
   );

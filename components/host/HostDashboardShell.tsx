@@ -70,7 +70,9 @@ const MetricCard: React.FC<{
 const MoneyCard: React.FC<{
   title: string;
   rows: Array<{ label: string; value: string }>;
-}> = ({ title, rows }) => (
+  actionHref?: string;
+  actionLabel?: string;
+}> = ({ title, rows, actionHref, actionLabel }) => (
   <div className="surface-card rounded-panel p-6">
     <div className="flex items-center justify-between gap-3">
       <div>
@@ -97,6 +99,15 @@ const MoneyCard: React.FC<{
         </div>
       ))}
     </div>
+
+    {actionHref && actionLabel ? (
+      <Link
+        href={actionHref}
+        className="mt-5 inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+      >
+        {actionLabel}
+      </Link>
+    ) : null}
   </div>
 );
 
@@ -133,6 +144,13 @@ const ReservationItem: React.FC<{ reservation: HostReservationPreview }> = ({ re
           </p>
         </div>
       </div>
+
+      <Link
+        href={`/host/reservations/${reservation.id}`}
+        className="mt-4 inline-flex items-center justify-center rounded-[16px] border border-border bg-white px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+      >
+        Open reservation
+      </Link>
     </div>
   );
 };
@@ -486,6 +504,21 @@ export const HostDashboardShell: React.FC = () => {
               </span>
             </div>
 
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link
+                href="/host/reservations"
+                className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+              >
+                Open reservations
+              </Link>
+              <Link
+                href="/host/messages"
+                className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+              >
+                Open messages
+              </Link>
+            </div>
+
             {data.reservations.upcoming.length > 0 ? (
               <div className="mt-6 space-y-4">
                 {data.reservations.upcoming.map((reservation) => (
@@ -502,12 +535,22 @@ export const HostDashboardShell: React.FC = () => {
 
         <div className="space-y-6">
           <div className="surface-card rounded-panel p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Messages
-            </p>
-            <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-              Inbox snapshot
-            </h2>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                  Messages
+                </p>
+                <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
+                  Inbox snapshot
+                </h2>
+              </div>
+              <Link
+                href="/host/messages"
+                className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+              >
+                View inbox
+              </Link>
+            </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
               <div className="rounded-[22px] border border-border-light bg-card px-4 py-4 shadow-soft">
@@ -549,6 +592,8 @@ export const HostDashboardShell: React.FC = () => {
                 value: formatCurrency(data.earnings.refundTotal, currency),
               },
             ]}
+            actionHref="/host/earnings"
+            actionLabel="Open earnings"
           />
 
           <MoneyCard
@@ -563,7 +608,27 @@ export const HostDashboardShell: React.FC = () => {
                 value: formatCurrency(data.payouts.paidOut, currency),
               },
             ]}
+            actionHref="/host/payouts"
+            actionLabel="Open payouts"
           />
+
+          <div className="surface-card rounded-panel p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+              Reviews
+            </p>
+            <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+              Guest feedback workspace
+            </h2>
+            <p className="mt-4 text-[14px] leading-7 text-text-secondary">
+              Property reviews and guest-review history now live in the host operations layer.
+            </p>
+            <Link
+              href="/host/reviews"
+              className="mt-5 inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+            >
+              Open reviews
+            </Link>
+          </div>
         </div>
       </div>
     </HostShell>
