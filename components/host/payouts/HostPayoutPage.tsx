@@ -344,29 +344,6 @@ export const HostPayoutPage: React.FC = () => {
         />
 
         <div className="space-y-6">
-          <div className="surface-card rounded-panel p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Payout setup
-            </p>
-            <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Keep payout instructions ready
-            </h2>
-            <div className="mt-5 space-y-3">
-              {[
-                "Use bank transfer for traditional account payouts.",
-                "Use mobile wallet if your payout flow depends on wallet settlement.",
-                "Billing, country, and currency keep your payout profile consistent.",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[20px] border border-border-light bg-white/80 px-4 py-3 text-[14px] leading-6 text-text-primary"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-
           {!setupStatus.isComplete ? (
             <div className="surface-card rounded-panel p-6">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -414,19 +391,7 @@ export const HostPayoutPage: React.FC = () => {
 
       <div className="mt-8">
         <div className="mb-6 surface-card rounded-panel p-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                History filters
-              </p>
-              <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-                Narrow payout records
-              </h2>
-              <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
-                Filter payout history by release status or period dates when reconciling recent host disbursements.
-              </p>
-            </div>
-
+          <div className="flex justify-end">
             <button
               type="button"
               onClick={() => {

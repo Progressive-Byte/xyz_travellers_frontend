@@ -214,29 +214,6 @@ export const HostProfilePage: React.FC = () => {
         />
 
         <div className="space-y-6">
-          <div className="surface-card rounded-panel p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Why this matters
-            </p>
-            <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Keep your host identity polished
-            </h2>
-            <div className="mt-5 space-y-3">
-              {[
-                "Guests and listing workflows rely on clear host identity details.",
-                "A short bio helps your profile feel complete and trustworthy.",
-                "Contact and address data help the rest of the host portal stay consistent.",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[20px] border border-border-light bg-white/80 px-4 py-3 text-[14px] leading-6 text-text-primary"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-
           {!setupStatus.isComplete ? (
             <div className="surface-card rounded-panel p-6">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">

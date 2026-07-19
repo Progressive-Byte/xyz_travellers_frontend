@@ -134,25 +134,7 @@ export const HostShell: React.FC<HostShellProps> = ({
                 </div>
               </div>
 
-              <div className="surface-card-strong rounded-panel p-5 md:p-6">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                  <div>
-                    <span className="section-badge">{badge}</span>
-                    <h1 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.05em] text-text-primary md:text-[34px]">
-                      {resolvedTitle}
-                    </h1>
-                    {resolvedSubtitle ? (
-                      <p className="mt-2.5 max-w-2xl text-[14px] leading-6 text-text-secondary">
-                        {resolvedSubtitle}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  {headerAside ? <div className="grid gap-2.5 sm:grid-cols-2">{headerAside}</div> : null}
-                </div>
-              </div>
-
-              <div className="mt-6">{children}</div>
+              <div>{children}</div>
             </div>
           </main>
         </div>

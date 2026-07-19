@@ -215,20 +215,11 @@ export const HostReviewsPage: React.FC = () => {
       }
     >
       {reservationId ? (
-        <div className="surface-card rounded-panel p-6">
+        <div className="surface-card rounded-panel p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                Reservation context
-              </p>
-              <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-                Review workspace for reservation #{reservationId.slice(-6).toUpperCase()}
-              </h2>
-              <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
-                This reviews view is scoped to one stay so you can inspect existing feedback and write a guest review from the correct reservation context.
-              </p>
-            </div>
-
+            <p className="max-w-3xl text-[14px] leading-6 text-text-secondary">
+              Showing reviews for reservation #{reservationId.slice(-6).toUpperCase()}.
+            </p>
             <Link
               href={`/host/reservations/${reservationId}`}
               className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
@@ -240,17 +231,7 @@ export const HostReviewsPage: React.FC = () => {
       ) : null}
 
       <div className="mt-6 surface-card rounded-panel p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Filters
-            </p>
-            <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Narrow the review history
-            </h2>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap justify-end gap-3">
             <label className="block">
               <span className="sr-only">Filter by rating</span>
               <select
@@ -276,7 +257,6 @@ export const HostReviewsPage: React.FC = () => {
             >
               Clear filters
             </button>
-          </div>
         </div>
       </div>
 
