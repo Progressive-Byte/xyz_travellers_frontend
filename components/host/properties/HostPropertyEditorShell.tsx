@@ -52,7 +52,7 @@ export const HostPropertyEditorShell: React.FC<HostPropertyEditorShellProps> = (
             </div>
             <p className="mt-4 max-w-3xl text-[14px] leading-7 text-text-secondary">
               {description ||
-                "This editor starts the add-property flow with basics and location. Later media, units, pricing, and verification steps can plug into the same structure next."}
+                "This workflow now carries the listing through basics, location, media, units, pricing, and calendar setup before verification lands next."}
             </p>
           </div>
 

@@ -314,8 +314,8 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
                 Move through the listing workflow
               </h2>
               <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                Basics and location stay editable in the previous step. Units, pricing, and verification
-                remain intentionally upcoming until the next chunks land.
+                Basics and location stay editable in the previous step. Units now open next, followed by
+                pricing and calendar controls before verification lands.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
@@ -323,6 +323,12 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
                   className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
                 >
                   Back to editor
+                </Link>
+                <Link
+                  href={`/host/properties/${propertyId}/units`}
+                  className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+                >
+                  Open units
                 </Link>
                 <Link
                   href="/host/properties"
