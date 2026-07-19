@@ -305,8 +305,11 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
   return (
     <HostShell badge="Add Property">
       <HostPropertyEditorShell
+        propertyId={propertyId}
+        currentStep="location"
         title={values.name || "Untitled property"}
         status={values.status}
+        description="This editor keeps the first property foundations clean with basics and location, then hands the workflow forward into media management."
         headerAside={
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -390,11 +393,32 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
                   Editing is limited for this property
                 </h2>
                 <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                  This first Chunk 4 editor focuses on draft and rejected listings. Submitted and approved
-                  states can stay visible without pretending full post-submission editing is already ready.
+                  This editor focuses on draft and rejected listings. Submitted and approved states can
+                  stay visible without pretending full post-submission editing is already ready.
                 </p>
               </div>
-            ) : null}
+            ) : (
+              <div className="surface-card rounded-panel p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                  Next step
+                </p>
+                <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+                  Continue into property media
+                </h2>
+                <p className="mt-4 text-[14px] leading-7 text-text-secondary">
+                  Once the basics and location feel right, move into gallery uploads, cover-image
+                  selection, and optional video links for this listing.
+                </p>
+                <div className="mt-6">
+                  <Link
+                    href={`/host/properties/${propertyId}/media`}
+                    className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+                  >
+                    Open media manager
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </HostPropertyEditorShell>

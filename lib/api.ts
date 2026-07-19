@@ -24,25 +24,37 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
-  const { body, headers, ...rest } = options;
+const parseApiResponse = async <T>(response: Response): Promise<ApiEnvelope<T> | null> => {
+  try {
+    return (await response.json()) as ApiEnvelope<T>;
+  } catch {
+    return null;
+  }
+};
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+const buildRequestInit = (options: ApiRequestOptions = {}): RequestInit => {
+  const { body, headers, ...rest } = options;
+  const isFormDataBody = typeof FormData !== "undefined" && body instanceof FormData;
+
+  return {
     ...rest,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormDataBody ? {} : { "Content-Type": "application/json" }),
       ...(headers ?? {}),
     },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+    body:
+      body === undefined
+        ? undefined
+        : isFormDataBody
+          ? body
+          : JSON.stringify(body),
+  };
+};
 
-  let payload: ApiEnvelope<T> | null = null;
+export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, buildRequestInit(options));
 
-  try {
-    payload = (await response.json()) as ApiEnvelope<T>;
-  } catch {
-    payload = null;
-  }
+  const payload = await parseApiResponse<T>(response);
 
   if (!response.ok) {
     throw new ApiError(
@@ -53,6 +65,28 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
 
   if (!payload || typeof payload !== "object" || payload.data === undefined) {
     throw new ApiError("Unexpected API response. Please try again.", response.status);
+  }
+
+  return payload.data;
+}
+
+export async function apiRequestOptional<T>(
+  path: string,
+  options: ApiRequestOptions = {},
+): Promise<T | null> {
+  const response = await fetch(`${API_BASE_URL}${path}`, buildRequestInit(options));
+
+  const payload = await parseApiResponse<T>(response);
+
+  if (!response.ok) {
+    throw new ApiError(
+      payload?.message || "Something went wrong. Please try again.",
+      response.status,
+    );
+  }
+
+  if (!payload || typeof payload !== "object" || payload.data === undefined) {
+    return null;
   }
 
   return payload.data;
