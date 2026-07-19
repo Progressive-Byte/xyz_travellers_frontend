@@ -12,7 +12,7 @@ type HostBusinessFormProps = {
   isSubmitting: boolean;
   disabled?: boolean;
   mode: "create" | "edit";
-  onChange: (field: keyof UpsertHostBusinessPayload, value: string) => void;
+  onChange: (field: keyof UpsertHostBusinessPayload, value: string | boolean) => void;
   onCancel?: () => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 };
@@ -52,13 +52,13 @@ export const HostBusinessForm: React.FC<HostBusinessFormProps> = ({
           <span className="mb-2 block text-[13px] font-semibold text-text-primary">Business name</span>
           <input
             type="text"
-            value={values.name}
-            onChange={(event) => onChange("name", event.target.value)}
+            value={values.businessName}
+            onChange={(event) => onChange("businessName", event.target.value)}
             disabled={disabled}
             placeholder="Example: XYZ Travellers Hospitality Ltd."
-            className={`${inputClassName} ${errors.name ? "border-red-300 focus:border-red-400" : ""}`}
+            className={`${inputClassName} ${errors.businessName ? "border-red-300 focus:border-red-400" : ""}`}
           />
-          {errors.name ? <p className="mt-2 text-[13px] text-red-600">{errors.name}</p> : null}
+          {errors.businessName ? <p className="mt-2 text-[13px] text-red-600">{errors.businessName}</p> : null}
         </label>
 
         <label>
@@ -79,44 +79,86 @@ export const HostBusinessForm: React.FC<HostBusinessFormProps> = ({
         </label>
 
         <label>
-          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Country</span>
+          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Tax/VAT number</span>
           <input
             type="text"
-            value={values.country}
-            onChange={(event) => onChange("country", event.target.value)}
+            value={values.taxVatNumber}
+            onChange={(event) => onChange("taxVatNumber", event.target.value)}
             disabled={disabled}
-            placeholder="Business country"
-            className={`${inputClassName} ${errors.country ? "border-red-300 focus:border-red-400" : ""}`}
+            placeholder="Optional tax or VAT number"
+            className={`${inputClassName} ${errors.taxVatNumber ? "border-red-300 focus:border-red-400" : ""}`}
           />
-          {errors.country ? <p className="mt-2 text-[13px] text-red-600">{errors.country}</p> : null}
+          {errors.taxVatNumber ? <p className="mt-2 text-[13px] text-red-600">{errors.taxVatNumber}</p> : null}
+        </label>
+
+        <label className="sm:col-span-2">
+          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Business address</span>
+          <textarea
+            value={values.businessAddress}
+            onChange={(event) => onChange("businessAddress", event.target.value)}
+            rows={4}
+            disabled={disabled}
+            placeholder="Registered business address"
+            className={`${inputClassName} min-h-[120px] resize-y ${errors.businessAddress ? "border-red-300 focus:border-red-400" : ""}`}
+          />
+          {errors.businessAddress ? <p className="mt-2 text-[13px] text-red-600">{errors.businessAddress}</p> : null}
+        </label>
+
+        <label>
+          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Contact name</span>
+          <input
+            type="text"
+            value={values.contactName}
+            onChange={(event) => onChange("contactName", event.target.value)}
+            disabled={disabled}
+            placeholder="Primary business contact"
+            className={`${inputClassName} ${errors.contactName ? "border-red-300 focus:border-red-400" : ""}`}
+          />
+          {errors.contactName ? <p className="mt-2 text-[13px] text-red-600">{errors.contactName}</p> : null}
+        </label>
+
+        <label>
+          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Contact email</span>
+          <input
+            type="email"
+            value={values.contactEmail}
+            onChange={(event) => onChange("contactEmail", event.target.value)}
+            disabled={disabled}
+            placeholder="business@example.com"
+            className={`${inputClassName} ${errors.contactEmail ? "border-red-300 focus:border-red-400" : ""}`}
+          />
+          {errors.contactEmail ? <p className="mt-2 text-[13px] text-red-600">{errors.contactEmail}</p> : null}
+        </label>
+
+        <label>
+          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Contact phone</span>
+          <input
+            type="text"
+            value={values.contactPhone}
+            onChange={(event) => onChange("contactPhone", event.target.value)}
+            disabled={disabled}
+            placeholder="+8801700000000"
+            className={`${inputClassName} ${errors.contactPhone ? "border-red-300 focus:border-red-400" : ""}`}
+          />
+          {errors.contactPhone ? <p className="mt-2 text-[13px] text-red-600">{errors.contactPhone}</p> : null}
+        </label>
+
+        <label className="flex items-center gap-3 rounded-[22px] border border-border bg-card px-4 py-3.5 shadow-soft sm:col-span-2">
+          <input
+            type="checkbox"
+            checked={values.isActive}
+            onChange={(event) => onChange("isActive", event.target.checked)}
+            disabled={disabled}
+            className="h-4 w-4 rounded border-border text-text-primary"
+          />
+          <div>
+            <span className="block text-[13px] font-semibold text-text-primary">Active business</span>
+            <span className="text-[12px] text-text-secondary">
+              Keep this business available for future commercial property linkage.
+            </span>
+          </div>
         </label>
       </div>
-
-      <label className="mt-4 block">
-        <span className="mb-2 block text-[13px] font-semibold text-text-primary">Address</span>
-        <textarea
-          value={values.address}
-          onChange={(event) => onChange("address", event.target.value)}
-          rows={4}
-          disabled={disabled}
-          placeholder="Registered business address"
-          className={`${inputClassName} min-h-[120px] resize-y ${errors.address ? "border-red-300 focus:border-red-400" : ""}`}
-        />
-        {errors.address ? <p className="mt-2 text-[13px] text-red-600">{errors.address}</p> : null}
-      </label>
-
-      <label className="mt-4 block">
-        <span className="mb-2 block text-[13px] font-semibold text-text-primary">Internal note</span>
-        <textarea
-          value={values.note}
-          onChange={(event) => onChange("note", event.target.value)}
-          rows={4}
-          disabled={disabled}
-          placeholder="Optional note about this business profile or its reusable documents."
-          className={`${inputClassName} min-h-[120px] resize-y ${errors.note ? "border-red-300 focus:border-red-400" : ""}`}
-        />
-        {errors.note ? <p className="mt-2 text-[13px] text-red-600">{errors.note}</p> : null}
-      </label>
 
       {errors.form ? (
         <div className="mt-5 rounded-[22px] border border-red-200 bg-red-50/80 px-4 py-4 text-[14px] leading-6 text-red-700">

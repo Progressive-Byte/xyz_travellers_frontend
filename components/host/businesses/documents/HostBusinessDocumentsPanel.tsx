@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { type BusinessDocumentType } from "@/components/host/businesses/documents/businessDocumentTypes";
 import { HostBusinessDocumentUploader } from "@/components/host/businesses/documents/HostBusinessDocumentUploader";
 import { HostBusinessDocumentsList } from "@/components/host/businesses/documents/HostBusinessDocumentsList";
 import {
@@ -18,7 +19,10 @@ type HostBusinessDocumentsPanelProps = {
   deletingDocumentId: string;
   error: string;
   disabled?: boolean;
-  onUpload: (files: File[], metadata: { title: string; documentType: string; note: string }) => Promise<void>;
+  onUpload: (
+    files: File[],
+    metadata: { title: string; documentType: BusinessDocumentType; note: string },
+  ) => Promise<void>;
   onSaveDocument: (
     documentId: string,
     payload: UpdateHostBusinessDocumentPayload,
@@ -49,6 +53,11 @@ export const HostBusinessDocumentsPanel: React.FC<HostBusinessDocumentsPanelProp
       <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
         {business ? `Documents for ${business.name}` : "Choose a business to manage its documents"}
       </h2>
+      {business?.contactName || business?.contactEmail ? (
+        <p className="mt-3 text-[13px] text-text-secondary">
+          {[business?.contactName, business?.contactEmail].filter(Boolean).join(" · ")}
+        </p>
+      ) : null}
       <p className="mt-4 text-[14px] leading-7 text-text-secondary">
         These files are reusable business-level proof. Commercial properties can link back to this
         library from the property editor, while property verification stays separate in the listing workflow.

@@ -2,6 +2,11 @@
 
 import React, { useMemo, useState } from "react";
 import {
+  businessDocumentTypeOptions,
+  getBusinessDocumentTypeLabel,
+  type BusinessDocumentType,
+} from "@/components/host/businesses/documents/businessDocumentTypes";
+import {
   type HostBusinessDocument,
   type UpdateHostBusinessDocumentPayload,
 } from "@/lib/host";
@@ -56,6 +61,9 @@ export const HostBusinessDocumentsList: React.FC<HostBusinessDocumentsListProps>
         title: document.title,
         documentType: document.documentType,
         note: document.note,
+        issuedAt: document.issuedAt ?? "",
+        expiresAt: document.expiresAt ?? "",
+        isActive: document.isActive,
       },
     }));
   };
@@ -68,6 +76,9 @@ export const HostBusinessDocumentsList: React.FC<HostBusinessDocumentsListProps>
           title: document.title,
           documentType: document.documentType,
           note: document.note,
+          issuedAt: document.issuedAt ?? "",
+          expiresAt: document.expiresAt ?? "",
+          isActive: document.isActive,
         };
 
         return (
@@ -81,7 +92,7 @@ export const HostBusinessDocumentsList: React.FC<HostBusinessDocumentsListProps>
                   {document.title || document.fileName || "Business document"}
                 </p>
                 <p className="mt-2 text-[13px] leading-6 text-text-secondary">
-                  {document.documentType || "No document type set"}
+                  {getBusinessDocumentTypeLabel(document.documentType)}
                 </p>
                 {document.note ? (
                   <p className="mt-2 text-[13px] leading-6 text-text-secondary">{document.note}</p>
@@ -150,20 +161,25 @@ export const HostBusinessDocumentsList: React.FC<HostBusinessDocumentsListProps>
                     <span className="mb-2 block text-[13px] font-semibold text-text-primary">
                       Document type
                     </span>
-                    <input
-                      type="text"
+                    <select
                       value={draft.documentType}
                       onChange={(event) =>
                         setDrafts((current) => ({
                           ...current,
                           [document.id]: {
                             ...draft,
-                            documentType: event.target.value,
+                            documentType: event.target.value as BusinessDocumentType,
                           },
                         }))
                       }
                       className="w-full rounded-[16px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-all duration-200 focus:border-text-primary/20"
-                    />
+                    >
+                      {businessDocumentTypeOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                 </div>
 

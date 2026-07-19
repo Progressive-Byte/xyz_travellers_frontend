@@ -213,110 +213,6 @@ export const HostPropertiesPage: React.FC = () => {
         </Link>
       }
     >
-      <div className="surface-card mb-5 rounded-panel p-4">
-        <div className="flex flex-col gap-4 border-b border-border-light pb-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-wrap gap-2">
-            {statusTabs.map((tab) => {
-              const isActive = statusFilter === tab.value;
-
-              return (
-                <button
-                  key={tab.value}
-                  type="button"
-                  onClick={() => setStatusFilter(tab.value)}
-                  className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] font-semibold transition-all duration-200 ${
-                    isActive
-                      ? "border-primary/45 bg-primary-light text-text-primary shadow-soft"
-                      : "border-border-light bg-white text-text-secondary hover:border-border hover:text-text-primary"
-                  }`}
-                >
-                  <span>{tab.label}</span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[11px] ${
-                      isActive ? "bg-white text-text-primary" : "bg-surface text-text-secondary"
-                    }`}
-                  >
-                    {tab.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-[13px] text-text-secondary">
-              {filteredProperties.length} listing{filteredProperties.length === 1 ? "" : "s"}
-            </p>
-            <button
-              type="button"
-              onClick={() => setRetryKey((current) => current + 1)}
-              className="inline-flex items-center justify-center rounded-[16px] border border-border bg-white px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
-            >
-              Refresh
-            </button>
-            <Link
-              href="/host/properties/new"
-              className="inline-flex items-center justify-center rounded-[16px] bg-primary px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-            >
-              Add property
-            </Link>
-          </div>
-        </div>
-
-        <div className="mt-4 grid gap-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(2,minmax(0,0.75fr))]">
-          <label className="flex min-w-0 flex-col gap-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
-              Search
-            </span>
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search property, city, country, type"
-              className="h-11 rounded-[16px] border border-border bg-white px-3.5 text-[14px] text-text-primary outline-none transition-all duration-200 placeholder:text-text-secondary/70 focus:border-primary/60"
-            />
-          </label>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
-              Sort
-            </span>
-            <select
-              value={sortOrder}
-              onChange={(event) =>
-                setSortOrder(event.target.value as "updated-desc" | "updated-asc" | "name-asc")
-              }
-              className="h-11 rounded-[16px] border border-border bg-white px-3.5 text-[14px] text-text-primary outline-none transition-all duration-200 focus:border-primary/60"
-            >
-              <option value="updated-desc">Last updated</option>
-              <option value="updated-asc">Oldest updated</option>
-              <option value="name-asc">Name A-Z</option>
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-2">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
-              Page size
-            </span>
-            <select
-              value={pageSize}
-              onChange={(event) => setPageSize(Number(event.target.value))}
-              className="h-11 rounded-[16px] border border-border bg-white px-3.5 text-[14px] text-text-primary outline-none transition-all duration-200 focus:border-primary/60"
-            >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
-          </label>
-        </div>
-      </div>
-
-      {successMessage ? (
-        <div className="surface-card mb-5 rounded-panel p-4">
-          <p className="text-[13px] leading-6 text-[rgb(35,92,69)]">{successMessage}</p>
-        </div>
-      ) : null}
-
       {error ? (
         <div className="surface-card rounded-panel p-5">
           <p className="text-[13px] leading-6 text-text-secondary">{error}</p>
@@ -369,14 +265,118 @@ export const HostPropertiesPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="surface-card overflow-hidden rounded-panel">
+          <div className="border-b border-border-light px-4 py-4">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div className="flex flex-wrap gap-2">
+                {statusTabs.map((tab) => {
+                  const isActive = statusFilter === tab.value;
+
+                  return (
+                    <button
+                      key={tab.value}
+                      type="button"
+                      onClick={() => setStatusFilter(tab.value)}
+                      className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] font-semibold transition-all duration-200 ${
+                        isActive
+                          ? "border-primary/45 bg-primary-light text-text-primary shadow-soft"
+                          : "border-border-light bg-white text-text-secondary hover:border-border hover:text-text-primary"
+                      }`}
+                    >
+                      <span>{tab.label}</span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] ${
+                          isActive ? "bg-white text-text-primary" : "bg-surface text-text-secondary"
+                        }`}
+                      >
+                        {tab.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-[13px] text-text-secondary">
+                  {filteredProperties.length} listing{filteredProperties.length === 1 ? "" : "s"}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setRetryKey((current) => current + 1)}
+                  className="inline-flex items-center justify-center rounded-[16px] border border-border bg-white px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                >
+                  Refresh
+                </button>
+                <Link
+                  href="/host/properties/new"
+                  className="inline-flex items-center justify-center rounded-[16px] bg-primary px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+                >
+                  Add property
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(2,minmax(0,0.75fr))]">
+              <label className="flex min-w-0 flex-col gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                  Search
+                </span>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search property, city, country, type"
+                  className="h-11 rounded-[16px] border border-border bg-white px-3.5 text-[14px] text-text-primary outline-none transition-all duration-200 placeholder:text-text-secondary/70 focus:border-primary/60"
+                />
+              </label>
+
+              <label className="flex flex-col gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                  Sort
+                </span>
+                <select
+                  value={sortOrder}
+                  onChange={(event) =>
+                    setSortOrder(event.target.value as "updated-desc" | "updated-asc" | "name-asc")
+                  }
+                  className="h-11 rounded-[16px] border border-border bg-white px-3.5 text-[14px] text-text-primary outline-none transition-all duration-200 focus:border-primary/60"
+                >
+                  <option value="updated-desc">Last updated</option>
+                  <option value="updated-asc">Oldest updated</option>
+                  <option value="name-asc">Name A-Z</option>
+                </select>
+              </label>
+
+              <label className="flex flex-col gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                  Page size
+                </span>
+                <select
+                  value={pageSize}
+                  onChange={(event) => setPageSize(Number(event.target.value))}
+                  className="h-11 rounded-[16px] border border-border bg-white px-3.5 text-[14px] text-text-primary outline-none transition-all duration-200 focus:border-primary/60"
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+              </label>
+            </div>
+
+            {successMessage ? (
+              <div className="mt-4 rounded-[18px] border border-primary/25 bg-primary-light/60 px-4 py-3">
+                <p className="text-[13px] leading-6 text-[rgb(35,92,69)]">{successMessage}</p>
+              </div>
+            ) : null}
+          </div>
+
           <HostPropertiesList
             properties={pagedProperties}
             deletingPropertyId={deletingPropertyId}
             onDelete={handleDelete}
           />
 
-          <div className="surface-card rounded-panel p-4">
+          <div className="border-t border-border-light px-4 py-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-[13px] text-text-secondary">
                 Showing {(page - 1) * pageSize + 1}-

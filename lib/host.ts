@@ -342,20 +342,28 @@ export type HostBusiness = {
   id: string;
   name: string;
   registrationNumber: string;
+  taxVatNumber: string;
   country: string;
   address: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
   status: string;
   note: string;
+  isActive: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 };
 
 export type UpsertHostBusinessPayload = {
-  name: string;
+  businessName: string;
   registrationNumber: string;
-  country: string;
-  address: string;
-  note: string;
+  taxVatNumber: string;
+  businessAddress: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  isActive: boolean;
 };
 
 export type HostBusinessDocument = {
@@ -366,6 +374,9 @@ export type HostBusinessDocument = {
   title: string;
   documentType: string;
   note: string;
+  issuedAt: string | null;
+  expiresAt: string | null;
+  isActive: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 };
@@ -375,12 +386,18 @@ export type UploadHostBusinessDocumentsPayload = {
   title: string;
   documentType: string;
   note: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  isActive?: boolean;
 };
 
 export type UpdateHostBusinessDocumentPayload = {
   title: string;
   documentType: string;
   note: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  isActive?: boolean;
 };
 
 export type HostPropertyStatus = "draft" | "submitted" | "approved" | "rejected";
@@ -627,10 +644,15 @@ const emptyHostBusiness = (): HostBusiness => ({
   id: "",
   name: "",
   registrationNumber: "",
+  taxVatNumber: "",
   country: "",
   address: "",
+  contactName: "",
+  contactEmail: "",
+  contactPhone: "",
   status: "",
   note: "",
+  isActive: true,
   createdAt: null,
   updatedAt: null,
 });
@@ -643,6 +665,9 @@ const emptyHostBusinessDocument = (): HostBusinessDocument => ({
   title: "",
   documentType: "",
   note: "",
+  issuedAt: null,
+  expiresAt: null,
+  isActive: true,
   createdAt: null,
   updatedAt: null,
 });
@@ -1061,6 +1086,19 @@ const normalizeHostPayoutHistoryItem = (payload: unknown): HostPayoutHistoryItem
 const normalizeHostBusiness = (payload: unknown): HostBusiness => {
   const source = asRecord(payload);
   const addressSource = asRecord(source.addressInfo ?? source.address_info ?? source.location);
+  const businessAddress =
+    asString(source.businessAddress ?? source.business_address) ||
+    asString(source.address) ||
+    asString(addressSource.address ?? addressSource.line1 ?? addressSource.line_1);
+  const country =
+    asString(source.country ?? addressSource.country) ||
+    businessAddress
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .at(-1) ||
+    "";
+  const isActive = normalizeHostUnitActive(source.isActive ?? source.is_active ?? true);
 
   return {
     id: asString(source.id) || asString(source.businessId ?? source.business_id),
@@ -1072,12 +1110,17 @@ const normalizeHostBusiness = (payload: unknown): HostBusiness => {
       asString(source.registrationNumber ?? source.registration_number) ||
       asString(source.tradeLicenseNumber ?? source.trade_license_number) ||
       asString(source.licenseNumber ?? source.license_number),
-    country: asString(source.country ?? addressSource.country),
-    address:
-      asString(source.address) ||
-      asString(addressSource.address ?? addressSource.line1 ?? addressSource.line_1),
-    status: asString(source.status ?? source.state ?? source.businessStatus ?? source.business_status),
+    taxVatNumber: asString(source.taxVatNumber ?? source.tax_vat_number ?? source.vatNumber ?? source.vat_number),
+    country,
+    address: businessAddress,
+    contactName: asString(source.contactName ?? source.contact_name),
+    contactEmail: asString(source.contactEmail ?? source.contact_email),
+    contactPhone: asString(source.contactPhone ?? source.contact_phone),
+    status:
+      asString(source.status ?? source.state ?? source.businessStatus ?? source.business_status) ||
+      (isActive ? "active" : "inactive"),
     note: asString(source.note ?? source.description ?? source.comment),
+    isActive,
     createdAt: asOptionalString(source.createdAt ?? source.created_at),
     updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
   };
@@ -1108,7 +1151,10 @@ const normalizeHostBusinessDocument = (payload: unknown): HostBusinessDocument =
       asString(source.documentType ?? source.document_type) ||
       asString(source.type) ||
       asString(source.category),
-    note: asString(source.note ?? source.description ?? source.comment),
+    note: asString(source.note ?? source.notes ?? source.description ?? source.comment),
+    issuedAt: asOptionalString(source.issuedAt ?? source.issued_at),
+    expiresAt: asOptionalString(source.expiresAt ?? source.expires_at),
+    isActive: normalizeHostUnitActive(source.isActive ?? source.is_active ?? true),
     createdAt: asOptionalString(source.createdAt ?? source.created_at),
     updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
   };
@@ -3033,11 +3079,14 @@ export async function createHostBusiness(
       Authorization: `Bearer ${token}`,
     },
     body: {
-      name: payload.name.trim() || undefined,
+      businessName: payload.businessName.trim() || undefined,
       registrationNumber: payload.registrationNumber.trim() || undefined,
-      country: payload.country.trim() || undefined,
-      address: payload.address.trim() || undefined,
-      note: payload.note.trim() || undefined,
+      taxVatNumber: payload.taxVatNumber.trim() || undefined,
+      businessAddress: payload.businessAddress.trim() || undefined,
+      contactName: payload.contactName.trim() || undefined,
+      contactEmail: payload.contactEmail.trim() || undefined,
+      contactPhone: payload.contactPhone.trim() || undefined,
+      isActive: payload.isActive,
     },
     cache: "no-store",
   });
@@ -3060,11 +3109,14 @@ export async function updateHostBusiness(
       Authorization: `Bearer ${token}`,
     },
     body: {
-      name: payload.name.trim() || undefined,
+      businessName: payload.businessName.trim() || undefined,
       registrationNumber: payload.registrationNumber.trim() || undefined,
-      country: payload.country.trim() || undefined,
-      address: payload.address.trim() || undefined,
-      note: payload.note.trim() || undefined,
+      taxVatNumber: payload.taxVatNumber.trim() || undefined,
+      businessAddress: payload.businessAddress.trim() || undefined,
+      contactName: payload.contactName.trim() || undefined,
+      contactEmail: payload.contactEmail.trim() || undefined,
+      contactPhone: payload.contactPhone.trim() || undefined,
+      isActive: payload.isActive,
     },
     cache: "no-store",
   });
@@ -3127,11 +3179,11 @@ export async function uploadHostBusinessDocuments(
   const formData = new FormData();
 
   payload.files.forEach((file) => {
-    formData.append("files", file);
+    formData.append("file", file);
   });
 
   if (payload.title.trim()) {
-    formData.append("title", payload.title.trim());
+    formData.append("label", payload.title.trim());
   }
 
   if (payload.documentType.trim()) {
@@ -3139,7 +3191,17 @@ export async function uploadHostBusinessDocuments(
   }
 
   if (payload.note.trim()) {
-    formData.append("note", payload.note.trim());
+    formData.append("notes", payload.note.trim());
+  }
+
+  formData.append("isActive", String(payload.isActive ?? true));
+
+  if (payload.issuedAt?.trim()) {
+    formData.append("issuedAt", payload.issuedAt.trim());
+  }
+
+  if (payload.expiresAt?.trim()) {
+    formData.append("expiresAt", payload.expiresAt.trim());
   }
 
   const response = await apiRequestOptional<unknown>(
@@ -3185,9 +3247,12 @@ export async function updateHostBusinessDocument(
         Authorization: `Bearer ${token}`,
       },
       body: {
-        title: payload.title.trim() || undefined,
+        label: payload.title.trim() || undefined,
         documentType: payload.documentType.trim() || undefined,
-        note: payload.note.trim() || undefined,
+        notes: payload.note.trim() || undefined,
+        issuedAt: payload.issuedAt?.trim() || undefined,
+        expiresAt: payload.expiresAt?.trim() || undefined,
+        isActive: payload.isActive ?? true,
       },
       cache: "no-store",
     },
@@ -3826,7 +3891,16 @@ export async function submitHostPropertyForReview(
 
 export const createEmptyHostProfile = emptyHostProfile;
 export const createEmptyHostPayoutProfile = emptyHostPayoutProfile;
-export const createEmptyHostBusiness = emptyHostBusiness;
+export const createEmptyHostBusiness = (): UpsertHostBusinessPayload => ({
+  businessName: "",
+  registrationNumber: "",
+  taxVatNumber: "",
+  businessAddress: "",
+  contactName: "",
+  contactEmail: "",
+  contactPhone: "",
+  isActive: true,
+});
 export const createEmptyHostBusinessDocument = emptyHostBusinessDocument;
 export const createEmptyHostPropertyDetail = emptyHostPropertyDetail;
 export const createEmptyHostPropertyUnit = emptyHostPropertyUnit;
