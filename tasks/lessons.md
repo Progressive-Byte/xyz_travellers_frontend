@@ -58,3 +58,8 @@
 - Create one detailed `HOST_PORTAL_CHUNK_X_PLAN.md` per official chunk by default, and only introduce sub-chunk plan files when a single official chunk is clearly too wide for one safe implementation pass.
 - If sub-chunks are needed, keep the parent official chunk number and split under it consistently, for example `CHUNK_6A`, `CHUNK_6B`, or `CHUNK_6_STEP_1`, instead of inventing a new top-level chunk order.
 - Before creating a new chunk plan or re-implementing a chunk, check the repo state first; if that official chunk already appears fully implemented, call that out instead of silently recreating it.
+
+## Host Portal Workflow Notes
+
+- When a host portal workflow stage is implemented as a real route, expose it through the visible stepper UI from earlier property-edit stages as well; do not leave a finished stage reachable only from one narrow handoff point.
+- Final review pages like property verification must degrade gracefully when some downstream unit-level data is still incomplete or partially unavailable; show the page with honest checklist gaps instead of collapsing the whole workspace into a generic load failure.

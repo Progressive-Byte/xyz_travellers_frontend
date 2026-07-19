@@ -5,6 +5,7 @@ import React from "react";
 import { HostPropertyStatusPill } from "@/components/host/properties/HostPropertyStatusPill";
 import {
   getHostPropertyEditorSteps,
+  type HostPropertyEditorStep,
   type HostPropertyEditorStepKey,
 } from "@/components/host/properties/hostPropertyEditor";
 import { type HostPropertyStatus } from "@/lib/host";
@@ -22,7 +23,7 @@ type HostPropertyEditorShellProps = {
 const stepStateClasses = {
   active: "border-primary/35 bg-primary-light/80",
   available: "border-border-light bg-card",
-  upcoming: "border-border-light bg-white/75 opacity-80",
+  upcoming: "border-border-light bg-white/75",
 };
 
 export const HostPropertyEditorShell: React.FC<HostPropertyEditorShellProps> = ({
@@ -35,6 +36,17 @@ export const HostPropertyEditorShell: React.FC<HostPropertyEditorShellProps> = (
   description,
 }) => {
   const steps = getHostPropertyEditorSteps(propertyId, currentStep);
+  const getStepLabel = (state: HostPropertyEditorStep["state"], isLinked: boolean) => {
+    if (state === "active") {
+      return "Current";
+    }
+
+    if (state === "available") {
+      return "Open now";
+    }
+
+    return isLinked ? "Open stage" : "Upcoming";
+  };
 
   return (
     <div className="space-y-6">
@@ -52,7 +64,7 @@ export const HostPropertyEditorShell: React.FC<HostPropertyEditorShellProps> = (
             </div>
             <p className="mt-4 max-w-3xl text-[14px] leading-7 text-text-secondary">
               {description ||
-                "This workflow now carries the listing through basics, location, media, units, pricing, and calendar setup before verification lands next."}
+                "This workflow now carries the listing through basics, location, media, units, pricing, calendar, and final verification before submission."}
             </p>
           </div>
 
@@ -68,11 +80,7 @@ export const HostPropertyEditorShell: React.FC<HostPropertyEditorShellProps> = (
                 className={`rounded-[22px] border px-4 py-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft ${stepStateClasses[step.state]}`}
               >
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
-                  {step.state === "upcoming"
-                    ? "Upcoming"
-                    : step.state === "available"
-                      ? "Open now"
-                      : "Current"}
+                  {getStepLabel(step.state, true)}
                 </p>
                 <h3 className="mt-3 text-[16px] font-semibold text-text-primary">{step.label}</h3>
                 <p className="mt-2 text-[13px] leading-6 text-text-secondary">{step.description}</p>
@@ -83,11 +91,7 @@ export const HostPropertyEditorShell: React.FC<HostPropertyEditorShellProps> = (
                 className={`rounded-[22px] border px-4 py-4 ${stepStateClasses[step.state]}`}
               >
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
-                  {step.state === "upcoming"
-                    ? "Upcoming"
-                    : step.state === "available"
-                      ? "Open now"
-                      : "Current"}
+                  {getStepLabel(step.state, false)}
                 </p>
                 <h3 className="mt-3 text-[16px] font-semibold text-text-primary">{step.label}</h3>
                 <p className="mt-2 text-[13px] leading-6 text-text-secondary">{step.description}</p>
