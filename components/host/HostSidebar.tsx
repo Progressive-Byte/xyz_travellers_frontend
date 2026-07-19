@@ -53,6 +53,12 @@ const HostNavIconMark: React.FC<{ icon: HostNavIcon; isActive: boolean }> = ({ i
           <path d="M8 11h8M8 14h5" strokeLinecap="round" />
         </svg>
       );
+    case "reviews":
+      return (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">
+          <path d="M12 4.5l1.9 3.85 4.25.62-3.08 3 0.73 4.23L12 14.2 8.2 16.2l0.73-4.23-3.08-3 4.25-.62L12 4.5Z" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
     case "earnings":
       return (
         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">

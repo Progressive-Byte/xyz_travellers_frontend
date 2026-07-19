@@ -4,6 +4,7 @@ export type HostNavIcon =
   | "properties"
   | "reservations"
   | "messages"
+  | "reviews"
   | "earnings"
   | "businesses"
   | "profile"
@@ -42,7 +43,7 @@ export const hostNavigationItems: HostNavItem[] = [
     href: "/host/reservations",
     icon: "reservations",
     group: "Main",
-    isLive: false,
+    isLive: true,
     description: "Review upcoming stays, guest details, and calendar activity.",
   },
   {
@@ -50,15 +51,23 @@ export const hostNavigationItems: HostNavItem[] = [
     href: "/host/messages",
     icon: "messages",
     group: "Main",
-    isLive: false,
+    isLive: true,
     description: "Keep guest conversations and replies organized.",
+  },
+  {
+    label: "Reviews",
+    href: "/host/reviews",
+    icon: "reviews",
+    group: "Main",
+    isLive: true,
+    description: "Track property feedback and guest-review history from completed stays.",
   },
   {
     label: "Earnings",
     href: "/host/earnings",
     icon: "earnings",
     group: "Main",
-    isLive: false,
+    isLive: true,
     description: "Track revenue, commissions, and payout history.",
   },
   {

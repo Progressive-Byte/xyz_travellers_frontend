@@ -44,6 +44,205 @@ export type HostDashboardData = {
   };
 };
 
+export type HostReservationStatus =
+  | ""
+  | "pending"
+  | "accepted"
+  | "rejected"
+  | "cancelled"
+  | "completed";
+
+export type HostReservationPricingSnapshot = {
+  currency: string;
+  basePrice: number | null;
+  discountedPrice: number | null;
+  pricePerNightApplied: number | null;
+  nights: number | null;
+  subtotal: number | null;
+};
+
+export type HostReservation = {
+  id: string;
+  status: HostReservationStatus;
+  propertyId: string;
+  propertyName: string;
+  unitId: string;
+  unitName: string;
+  guestId: string;
+  guestName: string;
+  checkInDate: string;
+  checkOutDate: string;
+  adultGuests: number;
+  childGuests: number;
+  createdAt: string | null;
+  respondedAt: string | null;
+  responseReason: string;
+  cancelledAt: string | null;
+  completedAt: string | null;
+  statusReason: string;
+  pricingSnapshot: HostReservationPricingSnapshot;
+};
+
+export type HostReservationFilters = {
+  status?: HostReservationStatus;
+  propertyId?: string;
+  unitId?: string;
+  fromDate?: string;
+  toDate?: string;
+};
+
+export type RespondHostReservationPayload = {
+  action: "accept" | "reject";
+  reason: string;
+};
+
+export type UpdateHostReservationStatusPayload = {
+  status: "cancelled" | "completed";
+  reason: string;
+};
+
+export type HostMessage = {
+  id: string;
+  threadId: string;
+  reservationId: string;
+  senderId: string;
+  senderRole: string;
+  body: string;
+  readByHostAt: string | null;
+  readByGuestAt: string | null;
+  createdAt: string | null;
+};
+
+export type HostMessageThreadSummary = {
+  id: string;
+  reservationId: string;
+  propertyId: string;
+  propertyName: string;
+  unitId: string;
+  unitName: string;
+  guestId: string;
+  guestName: string;
+  lastMessagePreview: string;
+  lastMessageAt: string | null;
+  hostUnreadCount: number;
+  guestUnreadCount: number;
+};
+
+export type HostMessageThreadDetail = HostMessageThreadSummary & {
+  messages: HostMessage[];
+};
+
+export type HostMessageThreadFilters = {
+  reservationId?: string;
+  propertyId?: string;
+  unitId?: string;
+  hasUnread?: boolean;
+};
+
+export type SendHostMessagePayload = {
+  body: string;
+};
+
+export type HostReview = {
+  id: string;
+  reviewType: string;
+  reservationId: string;
+  propertyId: string;
+  propertyName: string;
+  unitId: string;
+  unitName: string;
+  hostId: string;
+  guestId: string;
+  guestName: string;
+  reviewerId: string;
+  reviewerRole: string;
+  targetUserId: string;
+  rating: number | null;
+  title: string;
+  comment: string;
+  createdAt: string | null;
+};
+
+export type HostPropertyReviewsFilters = {
+  propertyId?: string;
+  unitId?: string;
+  reservationId?: string;
+  rating?: string;
+};
+
+export type HostGuestReviewsFilters = {
+  guestId?: string;
+  reservationId?: string;
+  rating?: string;
+};
+
+export type CreateHostGuestReviewPayload = {
+  reservationId: string;
+  rating: string;
+  title: string;
+  comment: string;
+};
+
+export type HostEarningsSummary = {
+  grossRevenue: number;
+  commissionTotal: number;
+  refundTotal: number;
+  netEarnings: number;
+  pendingPayout: number;
+  paidOut: number;
+  currency: string;
+};
+
+export type HostEarningsTransaction = {
+  id: string;
+  reservationId: string;
+  propertyId: string;
+  propertyName: string;
+  unitId: string;
+  unitName: string;
+  transactionType: string;
+  status: string;
+  currency: string;
+  grossAmount: number | null;
+  commissionAmount: number | null;
+  refundAmount: number | null;
+  netAmount: number | null;
+  processedAt: string | null;
+  createdAt: string | null;
+};
+
+export type HostEarningsTransactionFilters = {
+  status?: string;
+  transactionType?: string;
+  reservationId?: string;
+  propertyId?: string;
+  fromDate?: string;
+  toDate?: string;
+};
+
+export type HostPayoutHistoryItem = {
+  id: string;
+  currency: string;
+  grossAmount: number | null;
+  commissionAmount: number | null;
+  refundAmount: number | null;
+  netAmount: number | null;
+  status: string;
+  periodStart: string;
+  periodEnd: string;
+  paidAt: string | null;
+  createdAt: string | null;
+  payoutProfileId: string;
+  reference: string;
+  notes: string;
+};
+
+export type HostPayoutHistoryFilters = {
+  status?: string;
+  fromDate?: string;
+  toDate?: string;
+};
+
 type UnknownRecord = Record<string, unknown>;
 
 const asRecord = (value: unknown): UnknownRecord => (value && typeof value === "object" ? (value as UnknownRecord) : {});
@@ -444,6 +643,80 @@ const emptyHostBusinessDocument = (): HostBusinessDocument => ({
   updatedAt: null,
 });
 
+const emptyHostReservationPricingSnapshot = (): HostReservationPricingSnapshot => ({
+  currency: "",
+  basePrice: null,
+  discountedPrice: null,
+  pricePerNightApplied: null,
+  nights: null,
+  subtotal: null,
+});
+
+const emptyHostReservation = (): HostReservation => ({
+  id: "",
+  status: "",
+  propertyId: "",
+  propertyName: "",
+  unitId: "",
+  unitName: "",
+  guestId: "",
+  guestName: "",
+  checkInDate: "",
+  checkOutDate: "",
+  adultGuests: 0,
+  childGuests: 0,
+  createdAt: null,
+  respondedAt: null,
+  responseReason: "",
+  cancelledAt: null,
+  completedAt: null,
+  statusReason: "",
+  pricingSnapshot: emptyHostReservationPricingSnapshot(),
+});
+
+const emptyHostMessageThreadDetail = (): HostMessageThreadDetail => ({
+  id: "",
+  reservationId: "",
+  propertyId: "",
+  propertyName: "",
+  unitId: "",
+  unitName: "",
+  guestId: "",
+  guestName: "",
+  lastMessagePreview: "",
+  lastMessageAt: null,
+  hostUnreadCount: 0,
+  guestUnreadCount: 0,
+  messages: [],
+});
+
+const emptyHostEarningsSummary = (): HostEarningsSummary => ({
+  grossRevenue: 0,
+  commissionTotal: 0,
+  refundTotal: 0,
+  netEarnings: 0,
+  pendingPayout: 0,
+  paidOut: 0,
+  currency: "",
+});
+
+const emptyHostPayoutHistoryItem = (): HostPayoutHistoryItem => ({
+  id: "",
+  currency: "",
+  grossAmount: null,
+  commissionAmount: null,
+  refundAmount: null,
+  netAmount: null,
+  status: "",
+  periodStart: "",
+  periodEnd: "",
+  paidAt: null,
+  createdAt: null,
+  payoutProfileId: "",
+  reference: "",
+  notes: "",
+});
+
 const emptyHostPropertyDetail = (): HostPropertyDetail => ({
   id: "",
   name: "",
@@ -547,6 +820,227 @@ const normalizePayoutMethod = (value: unknown): HostPayoutMethod => {
   }
 
   return "";
+};
+
+const normalizeHostReservationStatus = (value: unknown): HostReservationStatus => {
+  const normalized = asString(value).trim().toLowerCase();
+
+  if (
+    normalized === "pending" ||
+    normalized === "accepted" ||
+    normalized === "rejected" ||
+    normalized === "cancelled" ||
+    normalized === "completed"
+  ) {
+    return normalized;
+  }
+
+  return "";
+};
+
+const normalizeHostReservationPricingSnapshot = (
+  payload: unknown,
+): HostReservationPricingSnapshot => {
+  const source = asRecord(payload);
+
+  return {
+    currency: asString(source.currency ?? source.currencyCode ?? source.currency_code),
+    basePrice: asNumber(source.basePrice ?? source.base_price),
+    discountedPrice: asNumber(source.discountedPrice ?? source.discounted_price),
+    pricePerNightApplied: asNumber(source.pricePerNightApplied ?? source.price_per_night_applied),
+    nights: asNumber(source.nights),
+    subtotal: asNumber(source.subtotal),
+  };
+};
+
+const normalizeHostReservation = (payload: unknown): HostReservation => {
+  const source = asRecord(payload);
+  const propertySource = asRecord(source.property);
+  const unitSource = asRecord(source.unit);
+  const guestSource = asRecord(source.guest);
+
+  return {
+    id: asString(source.id) || asString(source.reservationId ?? source.reservation_id),
+    status: normalizeHostReservationStatus(source.status),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    propertyName:
+      asString(source.propertyName ?? source.property_name) ||
+      asString(propertySource.name ?? propertySource.propertyName ?? propertySource.property_name),
+    unitId: asString(source.unitId ?? source.unit_id),
+    unitName:
+      asString(source.unitName ?? source.unit_name) ||
+      asString(unitSource.name ?? unitSource.unitName ?? unitSource.unit_name),
+    guestId: asString(source.guestId ?? source.guest_id),
+    guestName:
+      asString(source.guestName ?? source.guest_name) ||
+      asString(guestSource.name ?? guestSource.fullName ?? guestSource.full_name),
+    checkInDate: asString(source.checkInDate ?? source.check_in_date),
+    checkOutDate: asString(source.checkOutDate ?? source.check_out_date),
+    adultGuests: asNumber(source.adultGuests ?? source.adult_guests) ?? 0,
+    childGuests: asNumber(source.childGuests ?? source.child_guests) ?? 0,
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    respondedAt: asOptionalString(source.respondedAt ?? source.responded_at),
+    responseReason: asString(source.responseReason ?? source.response_reason),
+    cancelledAt: asOptionalString(source.cancelledAt ?? source.cancelled_at),
+    completedAt: asOptionalString(source.completedAt ?? source.completed_at),
+    statusReason: asString(source.statusReason ?? source.status_reason),
+    pricingSnapshot: normalizeHostReservationPricingSnapshot(
+      source.pricingSnapshot ?? source.pricing_snapshot,
+    ),
+  };
+};
+
+const normalizeHostMessage = (payload: unknown): HostMessage => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id) || asString(source.messageId ?? source.message_id),
+    threadId: asString(source.threadId ?? source.thread_id),
+    reservationId: asString(source.reservationId ?? source.reservation_id),
+    senderId: asString(source.senderId ?? source.sender_id),
+    senderRole: asString(source.senderRole ?? source.sender_role),
+    body: asString(source.body ?? source.message ?? source.text),
+    readByHostAt: asOptionalString(source.readByHostAt ?? source.read_by_host_at),
+    readByGuestAt: asOptionalString(source.readByGuestAt ?? source.read_by_guest_at),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+  };
+};
+
+const normalizeHostMessageThreadSummary = (payload: unknown): HostMessageThreadSummary => {
+  const source = asRecord(payload);
+  const propertySource = asRecord(source.property);
+  const unitSource = asRecord(source.unit);
+  const guestSource = asRecord(source.guest);
+
+  return {
+    id: asString(source.id) || asString(source.threadId ?? source.thread_id),
+    reservationId: asString(source.reservationId ?? source.reservation_id),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    propertyName:
+      asString(source.propertyName ?? source.property_name) ||
+      asString(propertySource.name ?? propertySource.propertyName ?? propertySource.property_name),
+    unitId: asString(source.unitId ?? source.unit_id),
+    unitName:
+      asString(source.unitName ?? source.unit_name) ||
+      asString(unitSource.name ?? unitSource.unitName ?? unitSource.unit_name),
+    guestId: asString(source.guestId ?? source.guest_id),
+    guestName:
+      asString(source.guestName ?? source.guest_name) ||
+      asString(guestSource.name ?? guestSource.fullName ?? guestSource.full_name),
+    lastMessagePreview: asString(
+      source.lastMessagePreview ?? source.last_message_preview ?? source.preview,
+    ),
+    lastMessageAt: asOptionalString(source.lastMessageAt ?? source.last_message_at),
+    hostUnreadCount: asNumber(source.hostUnreadCount ?? source.host_unread_count) ?? 0,
+    guestUnreadCount: asNumber(source.guestUnreadCount ?? source.guest_unread_count) ?? 0,
+  };
+};
+
+const normalizeHostMessageThreadDetail = (payload: unknown): HostMessageThreadDetail => {
+  const source = asRecord(payload);
+
+  return {
+    ...normalizeHostMessageThreadSummary(payload),
+    messages: extractHostMessagesArray(source.messages ?? source.items ?? source.results)
+      .map((item) => normalizeHostMessage(item))
+      .filter((item) => item.id || item.body),
+  };
+};
+
+const normalizeHostReview = (payload: unknown): HostReview => {
+  const source = asRecord(payload);
+  const propertySource = asRecord(source.property);
+  const unitSource = asRecord(source.unit);
+  const guestSource = asRecord(source.guest);
+
+  return {
+    id: asString(source.id) || asString(source.reviewId ?? source.review_id),
+    reviewType: asString(source.reviewType ?? source.review_type ?? source.type),
+    reservationId: asString(source.reservationId ?? source.reservation_id),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    propertyName:
+      asString(source.propertyName ?? source.property_name) ||
+      asString(propertySource.name ?? propertySource.propertyName ?? propertySource.property_name),
+    unitId: asString(source.unitId ?? source.unit_id),
+    unitName:
+      asString(source.unitName ?? source.unit_name) ||
+      asString(unitSource.name ?? unitSource.unitName ?? unitSource.unit_name),
+    hostId: asString(source.hostId ?? source.host_id),
+    guestId: asString(source.guestId ?? source.guest_id),
+    guestName:
+      asString(source.guestName ?? source.guest_name) ||
+      asString(guestSource.name ?? guestSource.fullName ?? guestSource.full_name),
+    reviewerId: asString(source.reviewerId ?? source.reviewer_id),
+    reviewerRole: asString(source.reviewerRole ?? source.reviewer_role),
+    targetUserId: asString(source.targetUserId ?? source.target_user_id),
+    rating: asNumber(source.rating),
+    title: asString(source.title),
+    comment: asString(source.comment ?? source.body),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+  };
+};
+
+const normalizeHostEarningsSummary = (payload: unknown): HostEarningsSummary => {
+  const source = asRecord(payload);
+
+  return {
+    grossRevenue: asNumber(source.grossRevenue ?? source.gross_revenue) ?? 0,
+    commissionTotal: asNumber(source.commissionTotal ?? source.commission_total) ?? 0,
+    refundTotal: asNumber(source.refundTotal ?? source.refund_total) ?? 0,
+    netEarnings: asNumber(source.netEarnings ?? source.net_earnings) ?? 0,
+    pendingPayout: asNumber(source.pendingPayout ?? source.pending_payout) ?? 0,
+    paidOut: asNumber(source.paidOut ?? source.paid_out) ?? 0,
+    currency: asString(source.currency ?? source.currencyCode ?? source.currency_code),
+  };
+};
+
+const normalizeHostEarningsTransaction = (payload: unknown): HostEarningsTransaction => {
+  const source = asRecord(payload);
+  const propertySource = asRecord(source.property);
+  const unitSource = asRecord(source.unit);
+
+  return {
+    id: asString(source.id) || asString(source.transactionId ?? source.transaction_id),
+    reservationId: asString(source.reservationId ?? source.reservation_id),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    propertyName:
+      asString(source.propertyName ?? source.property_name) ||
+      asString(propertySource.name ?? propertySource.propertyName ?? propertySource.property_name),
+    unitId: asString(source.unitId ?? source.unit_id),
+    unitName:
+      asString(source.unitName ?? source.unit_name) ||
+      asString(unitSource.name ?? unitSource.unitName ?? unitSource.unit_name),
+    transactionType: asString(source.transactionType ?? source.transaction_type),
+    status: asString(source.status),
+    currency: asString(source.currency ?? source.currencyCode ?? source.currency_code),
+    grossAmount: asNumber(source.grossAmount ?? source.gross_amount),
+    commissionAmount: asNumber(source.commissionAmount ?? source.commission_amount),
+    refundAmount: asNumber(source.refundAmount ?? source.refund_amount),
+    netAmount: asNumber(source.netAmount ?? source.net_amount),
+    processedAt: asOptionalString(source.processedAt ?? source.processed_at),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+  };
+};
+
+const normalizeHostPayoutHistoryItem = (payload: unknown): HostPayoutHistoryItem => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id) || asString(source.payoutId ?? source.payout_id),
+    currency: asString(source.currency ?? source.currencyCode ?? source.currency_code),
+    grossAmount: asNumber(source.grossAmount ?? source.gross_amount),
+    commissionAmount: asNumber(source.commissionAmount ?? source.commission_amount),
+    refundAmount: asNumber(source.refundAmount ?? source.refund_amount),
+    netAmount: asNumber(source.netAmount ?? source.net_amount),
+    status: asString(source.status),
+    periodStart: asString(source.periodStart ?? source.period_start),
+    periodEnd: asString(source.periodEnd ?? source.period_end),
+    paidAt: asOptionalString(source.paidAt ?? source.paid_at),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    payoutProfileId: asString(source.payoutProfileId ?? source.payout_profile_id),
+    reference: asString(source.reference ?? source.code),
+    notes: asString(source.notes ?? source.note ?? source.description),
+  };
 };
 
 const normalizeHostBusiness = (payload: unknown): HostBusiness => {
@@ -1133,6 +1627,32 @@ const extractHostBusinessDocumentArray = (payload: unknown) => {
   return [];
 };
 
+const extractHostMessagesArray = (payload: unknown) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  const source = asRecord(payload);
+
+  if (Array.isArray(source.items)) {
+    return source.items;
+  }
+
+  if (Array.isArray(source.results)) {
+    return source.results;
+  }
+
+  if (Array.isArray(source.messages)) {
+    return source.messages;
+  }
+
+  if (Array.isArray(source.data)) {
+    return source.data;
+  }
+
+  return [];
+};
+
 const extractReferenceArray = (payload: unknown) => {
   if (Array.isArray(payload)) {
     return payload;
@@ -1173,6 +1693,26 @@ const extractReferenceArray = (payload: unknown) => {
   }
 
   return [];
+};
+
+const buildQueryString = (params: Record<string, string | boolean | undefined>) => {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (typeof value === "boolean") {
+      searchParams.set(key, value ? "true" : "false");
+      return;
+    }
+
+    const normalized = value?.trim();
+
+    if (normalized) {
+      searchParams.set(key, normalized);
+    }
+  });
+
+  const query = searchParams.toString();
+  return query ? `?${query}` : "";
 };
 
 const normalizeReferenceOption = (payload: unknown): HostPropertyReferenceOption => {
@@ -1519,6 +2059,476 @@ export async function getHostDashboard(token: string): Promise<HostDashboardData
     },
     cache: "no-store",
   });
+}
+
+export async function getHostReservations(
+  token: string,
+  filters: HostReservationFilters = {},
+): Promise<HostReservation[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const query = buildQueryString({
+    status: filters.status,
+    propertyId: filters.propertyId,
+    unitId: filters.unitId,
+    fromDate: filters.fromDate,
+    toDate: filters.toDate,
+  });
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/reservations${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return extractReferenceArray(response)
+      .map((item) => normalizeHostReservation(item))
+      .filter((item) => item.id);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+export async function getHostReservation(
+  token: string,
+  reservationId: string,
+): Promise<HostReservation> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/reservations/${reservationId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostReservation(response);
+}
+
+export async function respondHostReservation(
+  token: string,
+  reservationId: string,
+  payload: RespondHostReservationPayload,
+): Promise<HostReservation> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequestOptional<unknown>(
+    `/api/v1/host/reservations/${reservationId}/respond`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        action: payload.action,
+        reason: payload.reason.trim() || undefined,
+      },
+      cache: "no-store",
+    },
+  );
+
+  if (response) {
+    return normalizeHostReservation(response);
+  }
+
+  return getHostReservation(token, reservationId);
+}
+
+export async function updateHostReservationStatus(
+  token: string,
+  reservationId: string,
+  payload: UpdateHostReservationStatusPayload,
+): Promise<HostReservation> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequestOptional<unknown>(
+    `/api/v1/host/reservations/${reservationId}/status`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        status: payload.status,
+        reason: payload.reason.trim() || undefined,
+      },
+      cache: "no-store",
+    },
+  );
+
+  if (response) {
+    return normalizeHostReservation(response);
+  }
+
+  return getHostReservation(token, reservationId);
+}
+
+export async function getHostMessageThreads(
+  token: string,
+  filters: HostMessageThreadFilters = {},
+): Promise<HostMessageThreadSummary[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const query = buildQueryString({
+    reservationId: filters.reservationId,
+    propertyId: filters.propertyId,
+    unitId: filters.unitId,
+    hasUnread: filters.hasUnread,
+  });
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/messages/threads${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return extractReferenceArray(response)
+      .map((item) => normalizeHostMessageThreadSummary(item))
+      .filter((item) => item.id);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+export async function getHostMessageThread(
+  token: string,
+  threadId: string,
+): Promise<HostMessageThreadDetail> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/messages/threads/${threadId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostMessageThreadDetail(response);
+}
+
+export async function sendHostMessage(
+  token: string,
+  threadId: string,
+  payload: SendHostMessagePayload,
+): Promise<HostMessageThreadDetail> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequestOptional<unknown>(
+    `/api/v1/host/messages/threads/${threadId}/messages`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        body: payload.body.trim(),
+      },
+      cache: "no-store",
+    },
+  );
+
+  if (response) {
+    return normalizeHostMessageThreadDetail(response);
+  }
+
+  return getHostMessageThread(token, threadId);
+}
+
+export async function markHostMessageThreadRead(
+  token: string,
+  threadId: string,
+): Promise<HostMessageThreadDetail> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequestOptional<unknown>(
+    `/api/v1/host/messages/threads/${threadId}/read`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {},
+      cache: "no-store",
+    },
+  );
+
+  if (response) {
+    return normalizeHostMessageThreadDetail(response);
+  }
+
+  return getHostMessageThread(token, threadId);
+}
+
+export async function getHostPropertyReviews(
+  token: string,
+  filters: HostPropertyReviewsFilters = {},
+): Promise<HostReview[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const query = buildQueryString({
+    propertyId: filters.propertyId,
+    unitId: filters.unitId,
+    reservationId: filters.reservationId,
+    rating: filters.rating,
+  });
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/reviews/property${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return extractReferenceArray(response)
+      .map((item) => normalizeHostReview(item))
+      .filter((item) => item.id);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+export async function getHostPropertyReview(
+  token: string,
+  reviewId: string,
+): Promise<HostReview> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/reviews/property/${reviewId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostReview(response);
+}
+
+export async function getHostGuestReviews(
+  token: string,
+  filters: HostGuestReviewsFilters = {},
+): Promise<HostReview[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const query = buildQueryString({
+    guestId: filters.guestId,
+    reservationId: filters.reservationId,
+    rating: filters.rating,
+  });
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/reviews/guest${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return extractReferenceArray(response)
+      .map((item) => normalizeHostReview(item))
+      .filter((item) => item.id);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+export async function createHostGuestReview(
+  token: string,
+  payload: CreateHostGuestReviewPayload,
+): Promise<HostReview> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const normalizedRating = payload.rating.trim();
+
+  const response = await apiRequest<unknown>("/api/v1/host/reviews/guest", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      reservationId: payload.reservationId.trim(),
+      rating: normalizedRating ? Number(normalizedRating) : undefined,
+      title: payload.title.trim() || undefined,
+      comment: payload.comment.trim() || undefined,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostReview(response);
+}
+
+export async function getHostEarningsSummary(token: string): Promise<HostEarningsSummary> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  try {
+    const response = await apiRequest<unknown>("/api/v1/host/earnings/summary", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return normalizeHostEarningsSummary(response);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      const dashboard = await getHostDashboard(token);
+
+      return normalizeHostEarningsSummary({
+        ...dashboard.earnings,
+        pendingPayout: dashboard.payouts.pendingPayout,
+        paidOut: dashboard.payouts.paidOut,
+        currency: dashboard.earnings.currency || dashboard.payouts.currency,
+      });
+    }
+
+    throw error;
+  }
+}
+
+export async function getHostEarningsTransactions(
+  token: string,
+  filters: HostEarningsTransactionFilters = {},
+): Promise<HostEarningsTransaction[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const query = buildQueryString({
+    status: filters.status,
+    transactionType: filters.transactionType,
+    reservationId: filters.reservationId,
+    propertyId: filters.propertyId,
+    fromDate: filters.fromDate,
+    toDate: filters.toDate,
+  });
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/earnings/transactions${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return extractReferenceArray(response)
+      .map((item) => normalizeHostEarningsTransaction(item))
+      .filter((item) => item.id);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+export async function getHostPayoutHistory(
+  token: string,
+  filters: HostPayoutHistoryFilters = {},
+): Promise<HostPayoutHistoryItem[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const query = buildQueryString({
+    status: filters.status,
+    fromDate: filters.fromDate,
+    toDate: filters.toDate,
+  });
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/payouts${query}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return extractReferenceArray(response)
+      .map((item) => normalizeHostPayoutHistoryItem(item))
+      .filter((item) => item.id);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+export async function getHostPayoutHistoryDetail(
+  token: string,
+  payoutId: string,
+): Promise<HostPayoutHistoryItem> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/payouts/${payoutId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostPayoutHistoryItem(response);
 }
 
 export async function getHostIdentityVerificationStatus(
