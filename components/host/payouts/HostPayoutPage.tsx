@@ -46,6 +46,9 @@ export const HostPayoutPage: React.FC = () => {
   const [historyError, setHistoryError] = useState("");
   const [historyDetailError, setHistoryDetailError] = useState("");
   const [isHistoryLoading, setIsHistoryLoading] = useState(true);
+  const [historyStatusFilter, setHistoryStatusFilter] = useState("");
+  const [historyFromDate, setHistoryFromDate] = useState("");
+  const [historyToDate, setHistoryToDate] = useState("");
 
   useEffect(() => {
     if (!token) {
@@ -106,7 +109,11 @@ export const HostPayoutPage: React.FC = () => {
       setHistoryDetailError("");
 
       try {
-        const history = await getHostPayoutHistory(token);
+        const history = await getHostPayoutHistory(token, {
+          status: historyStatusFilter || undefined,
+          fromDate: historyFromDate || undefined,
+          toDate: historyToDate || undefined,
+        });
 
         if (!isActive) {
           return;
@@ -145,7 +152,7 @@ export const HostPayoutPage: React.FC = () => {
     return () => {
       isActive = false;
     };
-  }, [historyRetryKey, token]);
+  }, [historyFromDate, historyRetryKey, historyStatusFilter, historyToDate, token]);
 
   useEffect(() => {
     if (!token || !selectedPayoutId) {
@@ -189,6 +196,7 @@ export const HostPayoutPage: React.FC = () => {
   }, [payoutHistory, selectedPayoutId, token]);
 
   const setupStatus = useMemo(() => getHostPayoutSetupStatus(values), [values]);
+  const hasHistoryFilters = Boolean(historyStatusFilter || historyFromDate || historyToDate);
 
   const updateValue = (field: keyof HostPayoutProfile, value: string) => {
     setValues((current) => {
@@ -405,12 +413,89 @@ export const HostPayoutPage: React.FC = () => {
       </div>
 
       <div className="mt-8">
+        <div className="mb-6 surface-card rounded-panel p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                History filters
+              </p>
+              <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+                Narrow payout records
+              </h2>
+              <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
+                Filter payout history by release status or period dates when reconciling recent host disbursements.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setHistoryStatusFilter("");
+                setHistoryFromDate("");
+                setHistoryToDate("");
+                setHistoryRetryKey((current) => current + 1);
+              }}
+              className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+            >
+              Clear history filters
+            </button>
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                Status
+              </span>
+              <select
+                value={historyStatusFilter}
+                onChange={(event) => setHistoryStatusFilter(event.target.value)}
+                className="mt-2 w-full rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-colors duration-200 focus:border-text-primary/25"
+              >
+                <option value="">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="paid">Paid</option>
+                <option value="failed">Failed</option>
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                From date
+              </span>
+              <input
+                type="date"
+                value={historyFromDate}
+                onChange={(event) => setHistoryFromDate(event.target.value)}
+                className="mt-2 w-full rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-colors duration-200 focus:border-text-primary/25"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                To date
+              </span>
+              <input
+                type="date"
+                value={historyToDate}
+                onChange={(event) => setHistoryToDate(event.target.value)}
+                className="mt-2 w-full rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-colors duration-200 focus:border-text-primary/25"
+              />
+            </label>
+          </div>
+        </div>
+
         <HostPayoutHistorySection
           items={payoutHistory}
           selectedPayout={selectedPayout}
           isLoading={isHistoryLoading}
           error={historyError}
           detailError={historyDetailError}
+          emptyText={
+            hasHistoryFilters
+              ? "No payout records match the current history filters. Adjust the status or date range and try again."
+              : undefined
+          }
           onRetry={() => setHistoryRetryKey((current) => current + 1)}
           onSelect={setSelectedPayoutId}
         />

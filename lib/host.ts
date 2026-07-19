@@ -501,6 +501,9 @@ export type HostPropertyVerificationDocument = {
   propertyId: string;
   fileUrl: string;
   fileName: string;
+  originalFileName: string;
+  mimeType: string;
+  fileSize: number | null;
   documentType: string;
   note: string;
   createdAt: string | null;
@@ -515,6 +518,7 @@ export type HostPropertyVerification = {
 
 export type UpdateHostPropertyVerificationPayload = {
   files: File[];
+  documentTypes: string[];
   note: string;
 };
 
@@ -772,6 +776,17 @@ const emptyHostUnitCalendarRules = (): HostUnitCalendarRules => ({
 const emptyHostPropertyVerification = (): HostPropertyVerification => ({
   propertyId: "",
   note: "",
+  documents: [],
+});
+
+const emptyHostIdentityVerification = (): HostIdentityVerification => ({
+  id: "",
+  userId: "",
+  status: "draft",
+  rawStatus: "draft",
+  rejectionReason: null,
+  submittedAt: null,
+  updatedAt: null,
   documents: [],
 });
 
@@ -1391,6 +1406,12 @@ const normalizeHostPropertyVerificationDocument = (
   payload: unknown,
 ): HostPropertyVerificationDocument => {
   const source = asRecord(payload);
+  const originalFileName =
+    asString(source.originalFileName ?? source.original_file_name) ||
+    asString(source.fileName ?? source.file_name) ||
+    asString(source.name) ||
+    asString(source.title) ||
+    asString(source.label);
 
   return {
     id: asString(source.id) || asString(source.documentId ?? source.document_id),
@@ -1400,11 +1421,10 @@ const normalizeHostPropertyVerificationDocument = (
       asString(source.url) ||
       asString(source.path) ||
       asString(source.src),
-    fileName:
-      asString(source.fileName ?? source.file_name) ||
-      asString(source.name) ||
-      asString(source.title) ||
-      asString(source.label),
+    fileName: originalFileName,
+    originalFileName,
+    mimeType: asString(source.mimeType ?? source.mime_type),
+    fileSize: asNumber(source.fileSize ?? source.file_size),
     documentType:
       asString(source.documentType ?? source.document_type) ||
       asString(source.type) ||
@@ -1474,6 +1494,25 @@ const normalizeHostPropertyVerification = (
       asString(source.propertyId ?? source.property_id) || propertyId || documents[0]?.propertyId || "",
     note: asString(source.note ?? source.notes ?? source.description ?? source.comment),
     documents,
+  };
+};
+
+const normalizeHostIdentityVerificationDocument = (
+  payload: unknown,
+): HostIdentityVerificationDocument => {
+  const source = asRecord(payload);
+
+  return {
+    documentType:
+      asString(source.documentType ?? source.document_type) ||
+      asString(source.type) ||
+      asString(source.category),
+    documentFront:
+      asString(source.documentFront ?? source.document_front) ||
+      asString(source.front ?? source.frontUrl ?? source.front_url),
+    documentBack:
+      asString(source.documentBack ?? source.document_back) ||
+      asString(source.back ?? source.backUrl ?? source.back_url),
   };
 };
 
@@ -1976,6 +2015,9 @@ export const getHostPropertySubmissionChecklist = ({
 
 type HostIdentityVerificationApiData = {
   id?: string;
+  userId?: string;
+  user_id?: string;
+  documents?: unknown;
   status?: string;
   state?: string;
   applicationStatus?: string;
@@ -1996,6 +2038,21 @@ export type HostIdentityVerificationStatus = {
   rejectionReason: string | null;
   submittedAt: string | null;
   updatedAt: string | null;
+};
+
+export type HostIdentityVerificationDocument = {
+  documentType: string;
+  documentFront: string;
+  documentBack: string;
+};
+
+export type HostIdentityVerification = HostIdentityVerificationStatus & {
+  userId: string;
+  documents: HostIdentityVerificationDocument[];
+};
+
+export type UpsertHostIdentityVerificationPayload = {
+  documents: HostIdentityVerificationDocument[];
 };
 
 const getNormalizedVerificationStatus = (value: string | null | undefined) => {
@@ -2025,25 +2082,50 @@ const getNormalizedVerificationStatus = (value: string | null | undefined) => {
   return "draft" as const;
 };
 
-const normalizeHostIdentityVerificationStatus = (
-  payload: HostIdentityVerificationApiData,
-): HostIdentityVerificationStatus => {
+const normalizeHostIdentityVerification = (
+  payload: HostIdentityVerificationApiData | unknown,
+): HostIdentityVerification => {
+  const source = asRecord(payload);
   const rawStatus =
-    payload.status ??
-    payload.state ??
-    payload.applicationStatus ??
-    payload.verificationStatus ??
-    payload.reviewStatus ??
+    asOptionalString(source.status) ??
+    asOptionalString(source.state) ??
+    asOptionalString(source.applicationStatus ?? source.application_status) ??
+    asOptionalString(source.verificationStatus ?? source.verification_status) ??
+    asOptionalString(source.reviewStatus ?? source.review_status) ??
     null;
+  const documents = asArray(source.documents)
+    .map((item) => normalizeHostIdentityVerificationDocument(item))
+    .filter((item) => item.documentType || item.documentFront || item.documentBack);
 
   return {
-    id: payload.id,
+    ...emptyHostIdentityVerification(),
+    id: asString(source.id),
+    userId: asString(source.userId ?? source.user_id),
+    documents,
     status: getNormalizedVerificationStatus(rawStatus),
     rawStatus,
     rejectionReason:
-      payload.rejectionReason ?? payload.rejectedReason ?? payload.reason ?? payload.note ?? null,
-    submittedAt: payload.submittedAt ?? null,
-    updatedAt: payload.updatedAt ?? null,
+      asOptionalString(source.rejectionReason ?? source.rejection_reason) ??
+      asOptionalString(source.rejectedReason ?? source.rejected_reason) ??
+      asOptionalString(source.reason) ??
+      asOptionalString(source.note),
+    submittedAt: asOptionalString(source.submittedAt ?? source.submitted_at),
+    updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
+  };
+};
+
+const normalizeHostIdentityVerificationStatus = (
+  payload: HostIdentityVerificationApiData,
+): HostIdentityVerificationStatus => {
+  const normalized = normalizeHostIdentityVerification(payload);
+
+  return {
+    id: normalized.id,
+    status: normalized.status,
+    rawStatus: normalized.rawStatus,
+    rejectionReason: normalized.rejectionReason,
+    submittedAt: normalized.submittedAt,
+    updatedAt: normalized.updatedAt,
   };
 };
 
@@ -2560,6 +2642,123 @@ export async function getHostIdentityVerificationStatus(
   }
 }
 
+const normalizeIdentityVerificationDocumentsPayload = (
+  documents: HostIdentityVerificationDocument[],
+) =>
+  documents
+    .map((document) => ({
+      documentType: document.documentType.trim(),
+      documentFront: document.documentFront.trim(),
+      documentBack: document.documentBack.trim(),
+    }))
+    .filter((document) => document.documentType && document.documentFront);
+
+export async function getHostIdentityVerification(
+  token: string,
+): Promise<HostIdentityVerification | null> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  try {
+    const response = await apiRequest<HostIdentityVerificationApiData>(
+      "/api/v1/host/verifications/identity",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      },
+    );
+
+    return normalizeHostIdentityVerification(response);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+
+    throw error;
+  }
+}
+
+export async function createHostIdentityVerificationDraft(
+  token: string,
+  payload: UpsertHostIdentityVerificationPayload,
+): Promise<HostIdentityVerification> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<HostIdentityVerificationApiData>(
+    "/api/v1/host/verifications/identity",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        documents: normalizeIdentityVerificationDocumentsPayload(payload.documents),
+      },
+      cache: "no-store",
+    },
+  );
+
+  return normalizeHostIdentityVerification(response);
+}
+
+export async function updateHostIdentityVerificationDraft(
+  token: string,
+  payload: UpsertHostIdentityVerificationPayload,
+): Promise<HostIdentityVerification> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<HostIdentityVerificationApiData>(
+    "/api/v1/host/verifications/identity",
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        documents: normalizeIdentityVerificationDocumentsPayload(payload.documents),
+      },
+      cache: "no-store",
+    },
+  );
+
+  return normalizeHostIdentityVerification(response);
+}
+
+export async function submitHostEnable(token: string): Promise<HostIdentityVerificationStatus> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequestOptional<HostIdentityVerificationApiData>("/api/v1/host/enable", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {},
+    cache: "no-store",
+  });
+
+  if (response) {
+    return normalizeHostIdentityVerificationStatus(response);
+  }
+
+  const verification = await getHostIdentityVerification(token);
+
+  if (!verification) {
+    throw new ApiError("We couldn't confirm the host application submission right now.", 500);
+  }
+
+  return normalizeHostIdentityVerificationStatus(verification);
+}
+
 export async function getHostProfile(token: string): Promise<HostProfile> {
   if (!token) {
     throw new ApiError("Missing access token.", 401);
@@ -2770,6 +2969,20 @@ export async function updateHostProperty(
   });
 
   return normalizeHostPropertyDetail(response);
+}
+
+export async function deleteHostProperty(token: string, propertyId: string): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
 }
 
 export async function getHostBusinesses(token: string): Promise<HostBusiness[]> {
@@ -3520,8 +3733,20 @@ export async function updateHostPropertyVerification(
     formData.append("files", file);
   });
 
+  if (payload.files.length > 0) {
+    const normalizedDocumentTypes = payload.documentTypes
+      .map((documentType) => documentType.trim())
+      .filter(Boolean);
+
+    if (normalizedDocumentTypes.length !== payload.files.length) {
+      throw new ApiError("Each verification file needs a matching document type.", 400);
+    }
+
+    formData.append("documentTypes", JSON.stringify(normalizedDocumentTypes));
+  }
+
   if (payload.note.trim()) {
-    formData.append("note", payload.note.trim());
+    formData.append("notes", payload.note.trim());
   }
 
   const response = await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/verification`, {
@@ -3607,5 +3832,6 @@ export const createEmptyHostPropertyDetail = emptyHostPropertyDetail;
 export const createEmptyHostPropertyUnit = emptyHostPropertyUnit;
 export const createEmptyHostUnitPricing = emptyHostUnitPricing;
 export const createEmptyHostUnitCalendarRules = emptyHostUnitCalendarRules;
+export const createEmptyHostIdentityVerification = emptyHostIdentityVerification;
 export const createEmptyHostPropertyVerification = emptyHostPropertyVerification;
 export const createEmptyHostPropertySubmissionStatus = emptyHostPropertySubmissionStatus;

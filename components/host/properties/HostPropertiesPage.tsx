@@ -6,7 +6,7 @@ import { HostShell } from "@/components/host/HostShell";
 import { HostPropertiesList } from "@/components/host/properties/HostPropertiesList";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
-import { getHostProperties, type HostPropertySummary } from "@/lib/host";
+import { deleteHostProperty, getHostProperties, type HostPropertySummary } from "@/lib/host";
 
 const PropertiesSkeleton = () => (
   <HostShell badge="Properties">
@@ -25,6 +25,8 @@ export const HostPropertiesPage: React.FC = () => {
   const { token } = useAuth();
   const [properties, setProperties] = useState<HostPropertySummary[]>([]);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [deletingPropertyId, setDeletingPropertyId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [retryKey, setRetryKey] = useState(0);
 
@@ -38,6 +40,7 @@ export const HostPropertiesPage: React.FC = () => {
     const loadProperties = async () => {
       setIsLoading(true);
       setError("");
+      setSuccessMessage("");
 
       try {
         const nextProperties = await getHostProperties(token);
@@ -94,6 +97,30 @@ export const HostPropertiesPage: React.FC = () => {
   if (isLoading) {
     return <PropertiesSkeleton />;
   }
+
+  const handleDelete = async (property: HostPropertySummary) => {
+    if (!token) {
+      return;
+    }
+
+    setDeletingPropertyId(property.id);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      await deleteHostProperty(token, property.id);
+      setProperties((current) => current.filter((item) => item.id !== property.id));
+      setSuccessMessage("Property deleted successfully.");
+    } catch (requestError) {
+      setError(
+        requestError instanceof ApiError
+          ? requestError.message || "We couldn't delete this property right now."
+          : "We couldn't delete this property right now.",
+      );
+    } finally {
+      setDeletingPropertyId("");
+    }
+  };
 
   return (
     <HostShell
@@ -156,6 +183,12 @@ export const HostPropertiesPage: React.FC = () => {
         </div>
       </div>
 
+      {successMessage ? (
+        <div className="surface-card mb-6 rounded-panel p-6">
+          <p className="text-[14px] leading-7 text-[rgb(35,92,69)]">{successMessage}</p>
+        </div>
+      ) : null}
+
       {error ? (
         <div className="surface-card rounded-panel p-6">
           <p className="text-[14px] leading-7 text-text-secondary">{error}</p>
@@ -182,7 +215,11 @@ export const HostPropertiesPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <HostPropertiesList properties={properties} />
+        <HostPropertiesList
+          properties={properties}
+          deletingPropertyId={deletingPropertyId}
+          onDelete={handleDelete}
+        />
       )}
     </HostShell>
   );

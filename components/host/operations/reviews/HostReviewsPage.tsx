@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { HostShell } from "@/components/host/HostShell";
 import {
   formatHostDateTime,
@@ -11,6 +13,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
+  createHostGuestReview,
   getHostGuestReviews,
   getHostPropertyReviews,
   type HostReview,
@@ -101,13 +104,27 @@ const ReviewSection: React.FC<{
 );
 
 export const HostReviewsPage: React.FC = () => {
+  const searchParams = useSearchParams();
   const { token } = useAuth();
   const [propertyReviews, setPropertyReviews] = useState<HostReview[]>([]);
   const [guestReviews, setGuestReviews] = useState<HostReview[]>([]);
   const [propertyError, setPropertyError] = useState("");
   const [guestError, setGuestError] = useState("");
+  const [ratingFilter, setRatingFilter] = useState(searchParams.get("rating")?.trim() || "");
+  const [reviewRating, setReviewRating] = useState("");
+  const [reviewTitle, setReviewTitle] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
+  const [createError, setCreateError] = useState("");
+  const [createSuccess, setCreateSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
+  const reservationId = searchParams.get("reservationId")?.trim() || "";
+  const searchParamRating = searchParams.get("rating")?.trim() || "";
+
+  useEffect(() => {
+    setRatingFilter(searchParamRating);
+  }, [searchParamRating]);
 
   useEffect(() => {
     if (!token) {
@@ -123,8 +140,14 @@ export const HostReviewsPage: React.FC = () => {
 
       try {
         const [propertyResults, guestResults] = await Promise.allSettled([
-          getHostPropertyReviews(token),
-          getHostGuestReviews(token),
+          getHostPropertyReviews(token, {
+            reservationId: reservationId || undefined,
+            rating: ratingFilter || undefined,
+          }),
+          getHostGuestReviews(token, {
+            reservationId: reservationId || undefined,
+            rating: ratingFilter || undefined,
+          }),
         ]);
 
         if (!isActive) {
@@ -159,10 +182,11 @@ export const HostReviewsPage: React.FC = () => {
     return () => {
       isActive = false;
     };
-  }, [retryKey, token]);
+  }, [ratingFilter, reservationId, retryKey, token]);
 
   const propertyAverage = useMemo(() => getAverageRating(propertyReviews), [propertyReviews]);
   const guestAverage = useMemo(() => getAverageRating(guestReviews), [guestReviews]);
+  const hasRatingFilter = Boolean(ratingFilter);
 
   if (isLoading) {
     return <ReviewsSkeleton />;
@@ -190,6 +214,72 @@ export const HostReviewsPage: React.FC = () => {
         </>
       }
     >
+      {reservationId ? (
+        <div className="surface-card rounded-panel p-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                Reservation context
+              </p>
+              <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+                Review workspace for reservation #{reservationId.slice(-6).toUpperCase()}
+              </h2>
+              <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
+                This reviews view is scoped to one stay so you can inspect existing feedback and write a guest review from the correct reservation context.
+              </p>
+            </div>
+
+            <Link
+              href={`/host/reservations/${reservationId}`}
+              className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+            >
+              Back to reservation
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mt-6 surface-card rounded-panel p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+              Filters
+            </p>
+            <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+              Narrow the review history
+            </h2>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <label className="block">
+              <span className="sr-only">Filter by rating</span>
+              <select
+                value={ratingFilter}
+                onChange={(event) => setRatingFilter(event.target.value)}
+                className="rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-colors duration-200 focus:border-text-primary/25"
+              >
+                <option value="">All ratings</option>
+                <option value="5">5 / 5</option>
+                <option value="4">4 / 5</option>
+                <option value="3">3 / 5</option>
+                <option value="2">2 / 5</option>
+                <option value="1">1 / 5</option>
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                setRatingFilter("");
+                setRetryKey((current) => current + 1);
+              }}
+              className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+            >
+              Clear filters
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard
           label="Property review average"
@@ -224,25 +314,169 @@ export const HostReviewsPage: React.FC = () => {
           subtitle="Read-only reviews"
           reviews={propertyReviews}
           errorText={propertyError}
-          emptyText="No property reviews are available yet. Guest feedback will appear here once completed stays start receiving reviews."
+          emptyText={
+            hasRatingFilter
+              ? "No property reviews match the selected rating right now. Change the filter to inspect the broader review history."
+              : "No property reviews are available yet. Guest feedback will appear here once completed stays start receiving reviews."
+          }
         />
         <ReviewSection
           title="Guest reviews written"
           subtitle="Host-side review history"
           reviews={guestReviews}
           errorText={guestError}
-          emptyText="No guest reviews are visible yet. Once completed reservations receive a host review, that history will show up here."
+          emptyText={
+            hasRatingFilter
+              ? "No guest reviews match the selected rating right now. Change the filter to inspect the broader review history."
+              : "No guest reviews are visible yet. Once completed reservations receive a host review, that history will show up here."
+          }
         />
       </div>
 
-      <div className="mt-8 surface-card rounded-panel px-6 py-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-          Operational note
-        </p>
-        <p className="mt-3 max-w-4xl text-[14px] leading-7 text-text-secondary">
-          Property reviews remain read-only in this version. Guest review creation is supported by the backend only for completed reservations, so this workspace focuses on honest review visibility instead of showing a generic form without reservation context.
-        </p>
-      </div>
+      {reservationId ? (
+        <div className="mt-8 surface-card rounded-panel px-6 py-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+            Guest review action
+          </p>
+          <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+            Write a guest review for this stay
+          </h2>
+          <p className="mt-3 max-w-4xl text-[14px] leading-7 text-text-secondary">
+            Use this form only for a completed reservation. The backend keeps the final eligibility rules, including one host guest review per reservation.
+          </p>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                Rating
+              </span>
+              <select
+                value={reviewRating}
+                onChange={(event) => {
+                  setReviewRating(event.target.value);
+                  setCreateError("");
+                  setCreateSuccess("");
+                }}
+                className="mt-2 w-full rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-colors duration-200 focus:border-text-primary/25"
+              >
+                <option value="">Choose rating</option>
+                <option value="5">5 / 5</option>
+                <option value="4">4 / 5</option>
+                <option value="3">3 / 5</option>
+                <option value="2">2 / 5</option>
+                <option value="1">1 / 5</option>
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                Title
+              </span>
+              <input
+                value={reviewTitle}
+                onChange={(event) => {
+                  setReviewTitle(event.target.value);
+                  setCreateError("");
+                  setCreateSuccess("");
+                }}
+                placeholder="Respectful guest"
+                className="mt-2 w-full rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-colors duration-200 placeholder:text-text-secondary focus:border-text-primary/25"
+              />
+            </label>
+          </div>
+
+          <label className="mt-4 block">
+            <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+              Comment
+            </span>
+            <textarea
+              value={reviewComment}
+              onChange={(event) => {
+                setReviewComment(event.target.value);
+                setCreateError("");
+                setCreateSuccess("");
+              }}
+              rows={5}
+              placeholder="Communication was clear and the unit was left in good condition."
+              className="mt-2 w-full rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-colors duration-200 placeholder:text-text-secondary focus:border-text-primary/25"
+            />
+          </label>
+
+          {createError ? (
+            <div className="mt-5 rounded-[20px] border border-red-200 bg-red-50/80 px-4 py-4 text-[14px] leading-6 text-red-700">
+              {createError}
+            </div>
+          ) : null}
+
+          {createSuccess ? (
+            <div className="mt-5 rounded-[20px] border border-emerald-200 bg-emerald-50/80 px-4 py-4 text-[14px] leading-6 text-emerald-700">
+              {createSuccess}
+            </div>
+          ) : null}
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={async () => {
+                if (!token) {
+                  return;
+                }
+
+                if (!reviewRating.trim()) {
+                  setCreateError("Choose a rating before creating the guest review.");
+                  setCreateSuccess("");
+                  return;
+                }
+
+                if (!reviewComment.trim()) {
+                  setCreateError("Add a short review comment before submitting.");
+                  setCreateSuccess("");
+                  return;
+                }
+
+                setIsCreating(true);
+                setCreateError("");
+                setCreateSuccess("");
+
+                try {
+                  await createHostGuestReview(token, {
+                    reservationId,
+                    rating: reviewRating,
+                    title: reviewTitle,
+                    comment: reviewComment,
+                  });
+                  setReviewRating("");
+                  setReviewTitle("");
+                  setReviewComment("");
+                  setCreateSuccess("Guest review created successfully.");
+                  setRetryKey((current) => current + 1);
+                } catch (requestError) {
+                  setCreateError(
+                    requestError instanceof ApiError
+                      ? requestError.message || "We couldn't create this guest review right now."
+                      : "We couldn't create this guest review right now.",
+                  );
+                } finally {
+                  setIsCreating(false);
+                }
+              }}
+              disabled={isCreating}
+              className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isCreating ? "Saving review..." : "Create guest review"}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-8 surface-card rounded-panel px-6 py-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+            Operational note
+          </p>
+          <p className="mt-3 max-w-4xl text-[14px] leading-7 text-text-secondary">
+            Property reviews remain read-only in this version. To create a guest review, enter this workspace from a completed reservation so the review stays tied to the correct stay context.
+          </p>
+        </div>
+      )}
     </HostShell>
   );
 };
