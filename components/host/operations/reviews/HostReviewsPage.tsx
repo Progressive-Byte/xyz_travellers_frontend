@@ -51,12 +51,17 @@ const ReviewSection: React.FC<{
   subtitle: string;
   reviews: HostReview[];
   emptyText: string;
-}> = ({ title, subtitle, reviews, emptyText }) => (
+  errorText?: string;
+}> = ({ title, subtitle, reviews, emptyText, errorText = "" }) => (
   <div className="surface-card rounded-panel p-6">
     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">{subtitle}</p>
     <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">{title}</h2>
 
-    {reviews.length > 0 ? (
+    {errorText ? (
+      <div className="mt-6 rounded-[24px] border border-dashed border-border bg-[rgba(184,82,82,0.05)] px-5 py-6 text-[14px] leading-7 text-text-secondary">
+        {errorText}
+      </div>
+    ) : reviews.length > 0 ? (
       <div className="mt-6 space-y-4">
         {reviews.map((review) => (
           <div
@@ -99,7 +104,8 @@ export const HostReviewsPage: React.FC = () => {
   const { token } = useAuth();
   const [propertyReviews, setPropertyReviews] = useState<HostReview[]>([]);
   const [guestReviews, setGuestReviews] = useState<HostReview[]>([]);
-  const [error, setError] = useState("");
+  const [propertyError, setPropertyError] = useState("");
+  const [guestError, setGuestError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [retryKey, setRetryKey] = useState(0);
 
@@ -112,10 +118,11 @@ export const HostReviewsPage: React.FC = () => {
 
     const loadReviews = async () => {
       setIsLoading(true);
-      setError("");
+      setPropertyError("");
+      setGuestError("");
 
       try {
-        const [propertyResults, guestResults] = await Promise.all([
+        const [propertyResults, guestResults] = await Promise.allSettled([
           getHostPropertyReviews(token),
           getHostGuestReviews(token),
         ]);
@@ -124,17 +131,21 @@ export const HostReviewsPage: React.FC = () => {
           return;
         }
 
-        setPropertyReviews(propertyResults);
-        setGuestReviews(guestResults);
-      } catch (requestError) {
-        if (!isActive) {
-          return;
-        }
-
-        setError(
-          requestError instanceof ApiError
-            ? requestError.message || "We couldn't load your reviews workspace right now."
-            : "We couldn't load your reviews workspace right now.",
+        setPropertyReviews(propertyResults.status === "fulfilled" ? propertyResults.value : []);
+        setGuestReviews(guestResults.status === "fulfilled" ? guestResults.value : []);
+        setPropertyError(
+          propertyResults.status === "rejected"
+            ? propertyResults.reason instanceof ApiError
+              ? propertyResults.reason.message || "We couldn't load property reviews right now."
+              : "We couldn't load property reviews right now."
+            : "",
+        );
+        setGuestError(
+          guestResults.status === "rejected"
+            ? guestResults.reason instanceof ApiError
+              ? guestResults.reason.message || "We couldn't load guest reviews right now."
+              : "We couldn't load guest reviews right now."
+            : "",
         );
       } finally {
         if (isActive) {
@@ -197,34 +208,32 @@ export const HostReviewsPage: React.FC = () => {
         />
       </div>
 
-      {error ? (
-        <div className="mt-8 surface-card rounded-panel px-6 py-8">
-          <p className="text-[15px] font-semibold text-text-primary">Reviews unavailable</p>
-          <p className="mt-3 max-w-2xl text-[14px] leading-7 text-text-secondary">{error}</p>
-          <button
-            type="button"
-            onClick={() => setRetryKey((current) => current + 1)}
-            className="mt-6 inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-          >
-            Reload reviews
-          </button>
-        </div>
-      ) : (
-        <div className="mt-8 grid gap-6 xl:grid-cols-2">
-          <ReviewSection
-            title="Property feedback"
-            subtitle="Read-only reviews"
-            reviews={propertyReviews}
-            emptyText="No property reviews are available yet. Guest feedback will appear here once completed stays start receiving reviews."
-          />
-          <ReviewSection
-            title="Guest reviews written"
-            subtitle="Host-side review history"
-            reviews={guestReviews}
-            emptyText="No guest reviews are visible yet. Once completed reservations receive a host review, that history will show up here."
-          />
-        </div>
-      )}
+      <div className="mt-8 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setRetryKey((current) => current + 1)}
+          className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+        >
+          Reload reviews
+        </button>
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <ReviewSection
+          title="Property feedback"
+          subtitle="Read-only reviews"
+          reviews={propertyReviews}
+          errorText={propertyError}
+          emptyText="No property reviews are available yet. Guest feedback will appear here once completed stays start receiving reviews."
+        />
+        <ReviewSection
+          title="Guest reviews written"
+          subtitle="Host-side review history"
+          reviews={guestReviews}
+          errorText={guestError}
+          emptyText="No guest reviews are visible yet. Once completed reservations receive a host review, that history will show up here."
+        />
+      </div>
 
       <div className="mt-8 surface-card rounded-panel px-6 py-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">

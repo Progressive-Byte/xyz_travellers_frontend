@@ -61,6 +61,24 @@ export const HostShell: React.FC<HostShellProps> = ({
     };
   }, [isSidebarOpen]);
 
+  useEffect(() => {
+    if (!isSidebarOpen) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isSidebarOpen]);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="lg:flex lg:min-h-screen">
@@ -157,6 +175,9 @@ export const HostShell: React.FC<HostShellProps> = ({
           className={`fixed inset-y-0 left-0 z-50 w-[min(88vw,360px)] p-4 transition-transform duration-250 ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Host navigation"
         >
           <div className="flex h-full flex-col">
             <div className="mb-3 flex justify-end">

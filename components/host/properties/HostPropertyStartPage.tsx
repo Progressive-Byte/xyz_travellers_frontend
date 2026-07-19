@@ -53,8 +53,8 @@ export const HostPropertyStartPage: React.FC = () => {
           </h2>
           <p className="mt-4 max-w-3xl text-[15px] leading-7 text-text-secondary">
             This first step prepares a real draft property record so you can move into basics and
-            location right away. Later media, units, pricing, and verification steps will plug into
-            the same editor path.
+            location right away. The same listing then continues through media, units, pricing,
+            calendar, and verification in the full editor path.
           </p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -117,15 +117,25 @@ export const HostPropertyStartPage: React.FC = () => {
 
           <div className="surface-card rounded-panel p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Coming next
+              Full workflow
             </p>
             <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Later add-property stages
+              Keep the next stages in view
             </h2>
-            <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-              Media, units, pricing, and verification are intentionally left for the next chunks, so
-              this first draft flow stays focused and independently testable.
-            </p>
+            <div className="mt-5 space-y-3">
+              {[
+                "Media and cover image turn the draft into a guest-facing listing.",
+                "Units, pricing, and calendar make the property operationally ready.",
+                "Verification and review checklist prepare the listing for submission.",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[20px] border border-border-light bg-white/80 px-4 py-3 text-[14px] leading-6 text-text-primary"
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

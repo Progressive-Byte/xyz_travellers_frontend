@@ -9,15 +9,20 @@ import { type HostMessageThreadSummary } from "@/lib/host";
 
 type HostMessagesListProps = {
   threads: HostMessageThreadSummary[];
+  reservationId?: string;
 };
 
-export const HostMessagesList: React.FC<HostMessagesListProps> = ({ threads }) => {
+export const HostMessagesList: React.FC<HostMessagesListProps> = ({ threads, reservationId = "" }) => {
   return (
     <div className="space-y-4">
       {threads.map((thread) => (
         <Link
           key={thread.id}
-          href={`/host/messages/${thread.id}`}
+          href={
+            reservationId
+              ? `/host/messages/${thread.id}?reservationId=${reservationId}`
+              : `/host/messages/${thread.id}`
+          }
           className="group block rounded-[24px] border border-border-light bg-card p-5 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/15 hover:shadow-medium"
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">

@@ -38,7 +38,7 @@ export const HostConversationPanel: React.FC<HostConversationPanelProps> = ({
         </span>
       </div>
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 max-h-[520px] space-y-4 overflow-y-auto pr-1 sm:pr-2">
         {thread.messages.length > 0 ? (
           thread.messages.map((message) => {
             const isHostMessage = message.senderRole.trim().toLowerCase() === "host";

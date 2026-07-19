@@ -44,6 +44,7 @@ export const HostPayoutPage: React.FC = () => {
   const [selectedPayoutId, setSelectedPayoutId] = useState("");
   const [selectedPayout, setSelectedPayout] = useState<HostPayoutHistoryItem | null>(null);
   const [historyError, setHistoryError] = useState("");
+  const [historyDetailError, setHistoryDetailError] = useState("");
   const [isHistoryLoading, setIsHistoryLoading] = useState(true);
 
   useEffect(() => {
@@ -102,6 +103,7 @@ export const HostPayoutPage: React.FC = () => {
     const loadPayoutHistory = async () => {
       setIsHistoryLoading(true);
       setHistoryError("");
+      setHistoryDetailError("");
 
       try {
         const history = await getHostPayoutHistory(token);
@@ -154,6 +156,8 @@ export const HostPayoutPage: React.FC = () => {
     let isActive = true;
 
     const loadSelectedPayout = async () => {
+      setHistoryDetailError("");
+
       try {
         const payout = await getHostPayoutHistoryDetail(token, selectedPayoutId);
 
@@ -169,10 +173,11 @@ export const HostPayoutPage: React.FC = () => {
 
         const fallback = payoutHistory.find((item) => item.id === selectedPayoutId) ?? null;
         setSelectedPayout(fallback);
-
-        if (error instanceof ApiError && !historyError) {
-          setHistoryError(error.message || "We couldn't load one payout detail right now.");
-        }
+        setHistoryDetailError(
+          error instanceof ApiError
+            ? error.message || "We couldn't load this payout detail right now."
+            : "We couldn't load this payout detail right now.",
+        );
       }
     };
 
@@ -181,7 +186,7 @@ export const HostPayoutPage: React.FC = () => {
     return () => {
       isActive = false;
     };
-  }, [historyError, payoutHistory, selectedPayoutId, token]);
+  }, [payoutHistory, selectedPayoutId, token]);
 
   const setupStatus = useMemo(() => getHostPayoutSetupStatus(values), [values]);
 
@@ -308,7 +313,7 @@ export const HostPayoutPage: React.FC = () => {
 
   return (
     <HostShell
-      badge="Setup"
+      badge="Payouts"
       headerAside={
         <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -363,7 +368,7 @@ export const HostPayoutPage: React.FC = () => {
                 Finish payout readiness
               </h2>
               <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                Complete the remaining payout details so later earnings and payout flows start from a ready profile.
+                Complete the remaining payout details so earnings history and payout releases stay tied to a ready profile.
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
                 {setupStatus.missingFields.map((field) => (
@@ -405,6 +410,7 @@ export const HostPayoutPage: React.FC = () => {
           selectedPayout={selectedPayout}
           isLoading={isHistoryLoading}
           error={historyError}
+          detailError={historyDetailError}
           onRetry={() => setHistoryRetryKey((current) => current + 1)}
           onSelect={setSelectedPayoutId}
         />

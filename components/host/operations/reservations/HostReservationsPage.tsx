@@ -107,6 +107,9 @@ export const HostReservationsPage: React.FC = () => {
     return reservations.filter((reservation) => reservation.status === selectedFilter);
   }, [reservations, selectedFilter]);
 
+  const selectedFilterLabel =
+    reservationFilters.find((filter) => filter.value === selectedFilter)?.label ?? "Current";
+
   const counts = useMemo(
     () => ({
       total: reservations.length,
@@ -212,6 +215,24 @@ export const HostReservationsPage: React.FC = () => {
         ) : filteredReservations.length > 0 ? (
           <div className="mt-6">
             <HostReservationsList reservations={filteredReservations} />
+          </div>
+        ) : selectedFilter !== "all" ? (
+          <div className="mt-6 rounded-[24px] border border-dashed border-border-light bg-white/80 px-5 py-6">
+            <p className="text-[15px] font-semibold text-text-primary">
+              No {selectedFilterLabel.toLowerCase()} reservations right now
+            </p>
+            <p className="mt-2 max-w-2xl text-[14px] leading-7 text-text-secondary">
+              Clear the current filter to return to the full reservation pipeline or switch to another status view.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setSelectedFilter("all")}
+                className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+              >
+                Clear filter
+              </button>
+            </div>
           </div>
         ) : (
           <div className="mt-6 rounded-[24px] border border-dashed border-border-light bg-white/80 px-5 py-6">

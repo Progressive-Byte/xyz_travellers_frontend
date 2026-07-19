@@ -44,7 +44,7 @@ export const HostTopbar: React.FC<HostTopbarProps> = ({
           </div>
         </div>
 
-        {quickAction ?? null}
+        {quickAction ? <div className="shrink-0">{quickAction}</div> : null}
       </div>
     </div>
   );

@@ -173,50 +173,52 @@ export const HostEarningsPage: React.FC = () => {
             </div>
 
             {recentTransactions.length > 0 ? (
-              <div className="mt-6 overflow-hidden rounded-[24px] border border-border-light">
-                <div className="grid grid-cols-[1.25fr_1.1fr_0.95fr_0.9fr] gap-3 bg-white/85 px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
-                  <span>Reservation</span>
-                  <span>Type</span>
-                  <span>Status</span>
-                  <span className="text-right">Net amount</span>
-                </div>
-                <div className="divide-y divide-border-light bg-card">
-                  {recentTransactions.map((transaction) => (
-                    <div
-                      key={transaction.id}
-                      className="grid grid-cols-[1.25fr_1.1fr_0.95fr_0.9fr] gap-3 px-5 py-4"
-                    >
-                      <div className="min-w-0">
-                        <p className="text-[14px] font-semibold text-text-primary">
-                          {transaction.propertyName || "Property pending"}
-                        </p>
-                        <p className="mt-1 text-[12px] text-text-secondary">
-                          Reservation #{transaction.reservationId.slice(-6).toUpperCase()}
-                        </p>
-                        <p className="mt-1 text-[12px] text-text-secondary">
-                          {formatHostDateTime(transaction.processedAt || transaction.createdAt)}
-                        </p>
+              <div className="mt-6 overflow-x-auto rounded-[24px] border border-border-light">
+                <div className="min-w-[720px]">
+                  <div className="grid grid-cols-[1.25fr_1.1fr_0.95fr_0.9fr] gap-3 bg-white/85 px-5 py-4 text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                    <span>Reservation</span>
+                    <span>Type</span>
+                    <span>Status</span>
+                    <span className="text-right">Net amount</span>
+                  </div>
+                  <div className="divide-y divide-border-light bg-card">
+                    {recentTransactions.map((transaction) => (
+                      <div
+                        key={transaction.id}
+                        className="grid grid-cols-[1.25fr_1.1fr_0.95fr_0.9fr] gap-3 px-5 py-4"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-[14px] font-semibold text-text-primary">
+                            {transaction.propertyName || "Property pending"}
+                          </p>
+                          <p className="mt-1 text-[12px] text-text-secondary">
+                            Reservation #{transaction.reservationId.slice(-6).toUpperCase()}
+                          </p>
+                          <p className="mt-1 text-[12px] text-text-secondary">
+                            {formatHostDateTime(transaction.processedAt || transaction.createdAt)}
+                          </p>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[14px] text-text-primary">
+                            {transaction.transactionType || "Transaction"}
+                          </p>
+                          <p className="mt-1 text-[12px] text-text-secondary">
+                            {transaction.unitName || "Unit pending"}
+                          </p>
+                        </div>
+                        <div>
+                          <span
+                            className={`inline-flex rounded-full px-3 py-1.5 text-[12px] font-semibold ${getFinanceStatusClasses(transaction.status)}`}
+                          >
+                            {transaction.status || "Unknown"}
+                          </span>
+                        </div>
+                        <div className="text-right text-[14px] font-semibold text-text-primary">
+                          {formatHostCurrency(transaction.netAmount, transaction.currency || currency)}
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-[14px] text-text-primary">
-                          {transaction.transactionType || "Transaction"}
-                        </p>
-                        <p className="mt-1 text-[12px] text-text-secondary">
-                          {transaction.unitName || "Unit pending"}
-                        </p>
-                      </div>
-                      <div>
-                        <span
-                          className={`inline-flex rounded-full px-3 py-1.5 text-[12px] font-semibold ${getFinanceStatusClasses(transaction.status)}`}
-                        >
-                          {transaction.status || "Unknown"}
-                        </span>
-                      </div>
-                      <div className="text-right text-[14px] font-semibold text-text-primary">
-                        {formatHostCurrency(transaction.netAmount, transaction.currency || currency)}
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : (

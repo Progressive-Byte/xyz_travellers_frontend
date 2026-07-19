@@ -315,7 +315,7 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
               </h2>
               <p className="mt-4 text-[14px] leading-7 text-text-secondary">
                 Basics and location stay editable in the previous step. Units now open next, followed by
-                pricing and calendar controls before verification lands.
+                pricing and calendar controls before the final verification stage.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link

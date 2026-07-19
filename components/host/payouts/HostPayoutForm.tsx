@@ -64,7 +64,7 @@ export const HostPayoutForm: React.FC<HostPayoutFormProps> = ({
           </h2>
         </div>
         <span className="rounded-full bg-primary-light px-3 py-2 text-[12px] font-semibold text-text-primary">
-          Setup only
+          Required
         </span>
       </div>
 

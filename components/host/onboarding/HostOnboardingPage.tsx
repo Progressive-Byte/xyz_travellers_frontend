@@ -126,7 +126,7 @@ export const HostOnboardingPage: React.FC = () => {
           badge="Draft saved"
           title="Your host application draft is waiting"
           description="We found an onboarding draft for this account. You are not approved as a host yet, but your application progress is already recognized."
-          note="Chunk 2 focuses on route access and status-aware onboarding entry. The detailed identity editor can plug into this state next."
+          note="Return here when you are ready to continue the onboarding process or refresh this page to check for status changes."
           actions={sharedActions}
         />
       );
@@ -150,10 +150,10 @@ export const HostOnboardingPage: React.FC = () => {
         <HostOnboardingStatusCard
           badge="Needs updates"
           title="Your host application needs revision"
-          description="The last host onboarding submission for this account was rejected. Review the reason below, then return once the next onboarding editor step is available."
+          description="The last host onboarding submission for this account was rejected. Review the reason below, then return when you are ready to continue the onboarding process."
           accent="danger"
           rejectionReason={status?.rejectionReason}
-          note="This route is now the stable home for rejected-state guidance. The editable resubmission flow can plug into it next."
+          note="Keep the rejection reason nearby so your next update can address exactly what was requested."
           actions={sharedActions}
         />
       );
@@ -193,7 +193,7 @@ export const HostOnboardingPage: React.FC = () => {
   return (
     <HostOnboardingShell
       title="Complete your host onboarding"
-      subtitle="Host access now has its own routed entry. If your account is not approved yet, this page explains your current status and what happens next."
+      subtitle="If your account is not approved yet, this page explains your current status and what happens next before full host portal access opens."
     >
       <div className="grid gap-6 lg:grid-cols-[1.35fr_0.9fr]">
         <div>{renderPrimaryContent()}</div>
@@ -201,16 +201,16 @@ export const HostOnboardingPage: React.FC = () => {
         <div className="space-y-6">
           <div className="surface-card rounded-panel p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              What this step does
+              What happens here
             </p>
             <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Access is now routed correctly
+              Follow the onboarding journey clearly
             </h2>
             <div className="mt-5 space-y-3">
               {[
-                "Logged-out users are redirected to host sign in.",
-                "Authenticated non-host users land here instead of a dashboard dead-end.",
-                "Approved hosts continue into the dashboard workspace.",
+                "Check whether you still need to start, continue, or wait on a host application.",
+                "See draft, submitted, rejected, or approved-on-backend status without guessing.",
+                "Understand the next best action before full host access opens.",
               ].map((item) => (
                 <div
                   key={item}
