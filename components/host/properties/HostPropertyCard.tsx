@@ -7,6 +7,8 @@ import { isHostPropertyEditable, type HostPropertySummary } from "@/lib/host";
 
 type HostPropertyCardProps = {
   property: HostPropertySummary;
+  isDeleting?: boolean;
+  onDelete?: (property: HostPropertySummary) => Promise<void>;
 };
 
 const formatUpdatedAt = (value: string | null) => {
@@ -21,7 +23,11 @@ const formatUpdatedAt = (value: string | null) => {
   });
 };
 
-export const HostPropertyCard: React.FC<HostPropertyCardProps> = ({ property }) => {
+export const HostPropertyCard: React.FC<HostPropertyCardProps> = ({
+  property,
+  isDeleting = false,
+  onDelete,
+}) => {
   const canEdit = isHostPropertyEditable(property.status);
   const editHref = `/host/properties/${property.id}/edit`;
 
@@ -73,6 +79,24 @@ export const HostPropertyCard: React.FC<HostPropertyCardProps> = ({ property }) 
         >
           {canEdit ? "Continue draft" : "View details"}
         </Link>
+        {canEdit && onDelete ? (
+          <button
+            type="button"
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Delete this property draft? This also removes its media, units, calendars, pricing, and verification files.",
+                )
+              ) {
+                void onDelete(property);
+              }
+            }}
+            disabled={isDeleting}
+            className="inline-flex items-center justify-center rounded-[18px] border border-red-200 bg-red-50/80 px-4 py-3 text-[14px] font-semibold text-[rgb(140,50,50)] shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-red-300 hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isDeleting ? "Deleting..." : "Delete property"}
+          </button>
+        ) : null}
         <Link
           href="/host/properties"
           className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"

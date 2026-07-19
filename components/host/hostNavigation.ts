@@ -10,7 +10,7 @@ export type HostNavIcon =
   | "profile"
   | "payouts";
 
-export type HostNavGroupKey = "Main" | "Setup";
+export type HostNavGroupKey = "Main" | "Operations" | "Setup";
 
 export type HostNavItem = {
   label: string;
@@ -29,6 +29,14 @@ export const hostNavigationItems: HostNavItem[] = [
     group: "Main",
     isLive: true,
     description: "Overview of hosting performance and current activity.",
+  },
+  {
+    label: "Add Property",
+    href: "/host/properties/new",
+    icon: "add-property",
+    group: "Main",
+    isLive: true,
+    description: "Start a new listing draft and continue through the add-property workflow.",
   },
   {
     label: "Properties",
@@ -58,7 +66,7 @@ export const hostNavigationItems: HostNavItem[] = [
     label: "Reviews",
     href: "/host/reviews",
     icon: "reviews",
-    group: "Main",
+    group: "Operations",
     isLive: true,
     description: "Track property feedback and guest-review history from completed stays.",
   },
@@ -66,17 +74,9 @@ export const hostNavigationItems: HostNavItem[] = [
     label: "Earnings",
     href: "/host/earnings",
     icon: "earnings",
-    group: "Main",
+    group: "Operations",
     isLive: true,
     description: "Track revenue, commissions, and payout history.",
-  },
-  {
-    label: "Add Property",
-    href: "/host/properties/new",
-    icon: "add-property",
-    group: "Setup",
-    isLive: true,
-    description: "Start a new listing draft and continue through the add-property workflow.",
   },
   {
     label: "Host Profile",
@@ -95,16 +95,16 @@ export const hostNavigationItems: HostNavItem[] = [
     description: "Manage reusable business profiles and business documents for commercial properties.",
   },
   {
-    label: "Payout Setup",
+    label: "Payouts",
     href: "/host/payouts",
     icon: "payouts",
-    group: "Setup",
+    group: "Operations",
     isLive: true,
-    description: "Manage payout method, billing details, and readiness for future payouts.",
+    description: "Manage payout setup, historical disbursements, and payout readiness.",
   },
 ];
 
-export const hostNavigationGroups: HostNavGroupKey[] = ["Main", "Setup"];
+export const hostNavigationGroups: HostNavGroupKey[] = ["Main", "Operations", "Setup"];
 
 export const isHostNavItemActive = (pathname: string, href: string) => {
   if (href === "/host/properties") {

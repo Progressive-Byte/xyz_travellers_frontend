@@ -9,7 +9,10 @@ import { HostPropertySubmissionStatusCard } from "@/components/host/properties/r
 import { HostPropertySubmitPanel } from "@/components/host/properties/review-submit/HostPropertySubmitPanel";
 import { HostPropertyVerificationList } from "@/components/host/properties/verification/HostPropertyVerificationList";
 import { HostPropertyVerificationNotesForm } from "@/components/host/properties/verification/HostPropertyVerificationNotesForm";
-import { HostPropertyVerificationUploader } from "@/components/host/properties/verification/HostPropertyVerificationUploader";
+import {
+  HostPropertyVerificationUploader,
+  type HostPropertyVerificationUploadEntry,
+} from "@/components/host/properties/verification/HostPropertyVerificationUploader";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
@@ -219,7 +222,7 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
     );
   };
 
-  const handleUpload = async (files: File[]) => {
+  const handleUpload = async (entries: HostPropertyVerificationUploadEntry[]) => {
     if (!token || !canEdit) {
       return;
     }
@@ -231,7 +234,8 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
 
     try {
       const nextVerification = await updateHostPropertyVerification(token, propertyId, {
-        files,
+        files: entries.map((entry) => entry.file),
+        documentTypes: entries.map((entry) => entry.documentType),
         note: noteValue,
       });
 
@@ -256,6 +260,7 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
     try {
       const nextVerification = await updateHostPropertyVerification(token, propertyId, {
         files: [],
+        documentTypes: [],
         note: noteValue,
       });
 

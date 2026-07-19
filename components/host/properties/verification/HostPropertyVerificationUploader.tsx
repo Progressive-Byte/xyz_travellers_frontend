@@ -2,10 +2,15 @@
 
 import React, { useRef, useState } from "react";
 
+export type HostPropertyVerificationUploadEntry = {
+  file: File;
+  documentType: string;
+};
+
 type HostPropertyVerificationUploaderProps = {
   disabled: boolean;
   isUploading: boolean;
-  onUpload: (files: File[]) => Promise<void>;
+  onUpload: (entries: HostPropertyVerificationUploadEntry[]) => Promise<void>;
 };
 
 export const HostPropertyVerificationUploader: React.FC<HostPropertyVerificationUploaderProps> = ({
@@ -14,13 +19,13 @@ export const HostPropertyVerificationUploader: React.FC<HostPropertyVerification
   onUpload,
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<HostPropertyVerificationUploadEntry[]>([]);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleFilesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextFiles = Array.from(event.target.files ?? []);
-    setSelectedFiles(nextFiles);
+    setSelectedFiles(nextFiles.map((file) => ({ file, documentType: "" })));
     setError("");
     setSuccessMessage("");
   };
@@ -32,6 +37,13 @@ export const HostPropertyVerificationUploader: React.FC<HostPropertyVerification
 
     setError("");
     setSuccessMessage("");
+
+    const hasMissingDocumentType = selectedFiles.some((entry) => !entry.documentType.trim());
+
+    if (hasMissingDocumentType) {
+      setError("Choose a document type for every verification file before uploading.");
+      return;
+    }
 
     try {
       await onUpload(selectedFiles);
@@ -84,11 +96,44 @@ export const HostPropertyVerificationUploader: React.FC<HostPropertyVerification
           <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
             Ready to upload
           </p>
-          <ul className="mt-3 space-y-2 text-[14px] leading-6 text-text-primary">
-            {selectedFiles.map((file) => (
-              <li key={`${file.name}-${file.size}`}>{file.name}</li>
+          <div className="mt-3 space-y-3">
+            {selectedFiles.map((entry, index) => (
+              <div
+                key={`${entry.file.name}-${entry.file.size}-${index}`}
+                className="rounded-[18px] border border-border-light bg-white/90 px-4 py-4"
+              >
+                <p className="text-[14px] font-semibold text-text-primary">{entry.file.name}</p>
+                <p className="mt-1 text-[12px] text-text-secondary">
+                  {(entry.file.size / 1024 / 1024).toFixed(2)} MB
+                </p>
+                <label className="mt-3 block">
+                  <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
+                    Document type
+                  </span>
+                  <select
+                    value={entry.documentType}
+                    onChange={(event) =>
+                      setSelectedFiles((current) =>
+                        current.map((item, currentIndex) =>
+                          currentIndex === index
+                            ? { ...item, documentType: event.target.value }
+                            : item,
+                        ),
+                      )
+                    }
+                    className="mt-2 w-full rounded-[16px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-colors duration-200 focus:border-text-primary/25"
+                  >
+                    <option value="">Choose document type</option>
+                    <option value="proof_of_ownership">Proof of ownership</option>
+                    <option value="tax_record">Tax record</option>
+                    <option value="utility_bill">Utility bill</option>
+                    <option value="trade_license">Trade license</option>
+                    <option value="other">Other proof</option>
+                  </select>
+                </label>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       ) : null}
 

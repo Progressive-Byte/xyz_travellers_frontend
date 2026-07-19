@@ -3,17 +3,21 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { HostOnboardingEmptyState } from "@/components/host/onboarding/HostOnboardingEmptyState";
 import { HostOnboardingShell } from "@/components/host/onboarding/HostOnboardingShell";
 import { HostOnboardingStatusCard } from "@/components/host/onboarding/HostOnboardingStatusCard";
+import { HostOnboardingWorkspace } from "@/components/host/onboarding/HostOnboardingWorkspace";
 import {
   getHostOnboardingViewState,
   type HostOnboardingViewState,
 } from "@/components/host/onboarding/hostOnboarding";
 import { useAuth } from "@/context/AuthContext";
 import {
-  getHostIdentityVerificationStatus,
-  type HostIdentityVerificationStatus,
+  createHostIdentityVerificationDraft,
+  getHostIdentityVerification,
+  submitHostEnable,
+  updateHostIdentityVerificationDraft,
+  type HostIdentityVerification,
+  type HostIdentityVerificationDocument,
 } from "@/lib/host";
 
 const OnboardingLoadingState = () => (
@@ -34,9 +38,18 @@ const OnboardingLoadingState = () => (
 export const HostOnboardingPage: React.FC = () => {
   const router = useRouter();
   const { token } = useAuth();
-  const [status, setStatus] = useState<HostIdentityVerificationStatus | null>(null);
+  const [verification, setVerification] = useState<HostIdentityVerification | null>(null);
+  const [documents, setDocuments] = useState<HostIdentityVerificationDocument[]>([
+    { documentType: "", documentFront: "", documentBack: "" },
+  ]);
   const [error, setError] = useState("");
+  const [formError, setFormError] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState("");
+  const [submitError, setSubmitError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
@@ -49,15 +62,24 @@ export const HostOnboardingPage: React.FC = () => {
     const loadStatus = async () => {
       setIsLoading(true);
       setError("");
+      setFormError("");
+      setSaveError("");
+      setSaveSuccess("");
+      setSubmitError("");
 
       try {
-        const nextStatus = await getHostIdentityVerificationStatus(token);
+        const nextVerification = await getHostIdentityVerification(token);
 
         if (!isActive) {
           return;
         }
 
-        setStatus(nextStatus);
+        setVerification(nextVerification);
+        setDocuments(
+          nextVerification?.documents.length
+            ? nextVerification.documents
+            : [{ documentType: "", documentFront: "", documentBack: "" }],
+        );
       } catch {
         if (!isActive) {
           return;
@@ -78,7 +100,87 @@ export const HostOnboardingPage: React.FC = () => {
     };
   }, [retryKey, token]);
 
-  const viewState = useMemo<HostOnboardingViewState>(() => getHostOnboardingViewState(status), [status]);
+  const viewState = useMemo<HostOnboardingViewState>(
+    () => getHostOnboardingViewState(verification),
+    [verification],
+  );
+
+  const normalizeDocumentsForSave = () => {
+    const normalizedDocuments = documents
+      .map((document) => ({
+        documentType: document.documentType.trim(),
+        documentFront: document.documentFront.trim(),
+        documentBack: document.documentBack.trim(),
+      }))
+      .filter(
+        (document) => document.documentType || document.documentFront || document.documentBack,
+      );
+
+    if (normalizedDocuments.length === 0) {
+      setFormError("Add at least one identity document before saving the draft.");
+      return null;
+    }
+
+    const hasInvalidDocument = normalizedDocuments.some(
+      (document) => !document.documentType || !document.documentFront,
+    );
+
+    if (hasInvalidDocument) {
+      setFormError("Each saved document needs a document type and a front document URL.");
+      return null;
+    }
+
+    setFormError("");
+    return normalizedDocuments;
+  };
+
+  const persistDraft = async (showSuccessMessage: boolean) => {
+    if (!token) {
+      return null;
+    }
+
+    const normalizedDocuments = normalizeDocumentsForSave();
+
+    if (!normalizedDocuments) {
+      return null;
+    }
+
+    setIsSaving(true);
+    setSaveError("");
+    setSubmitError("");
+
+    try {
+      const nextVerification = verification?.id
+        ? await updateHostIdentityVerificationDraft(token, {
+            documents: normalizedDocuments,
+          })
+        : await createHostIdentityVerificationDraft(token, {
+            documents: normalizedDocuments,
+          });
+
+      setVerification(nextVerification);
+      setDocuments(
+        nextVerification.documents.length
+          ? nextVerification.documents
+          : [{ documentType: "", documentFront: "", documentBack: "" }],
+      );
+
+      if (showSuccessMessage) {
+        setSaveSuccess("Host application draft saved.");
+      }
+
+      return nextVerification;
+    } catch (requestError) {
+      setSaveError(
+        requestError instanceof Error
+          ? requestError.message || "We couldn't save your host application draft right now."
+          : "We couldn't save your host application draft right now.",
+      );
+      return null;
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return <OnboardingLoadingState />;
@@ -116,18 +218,86 @@ export const HostOnboardingPage: React.FC = () => {
       );
     }
 
-    if (viewState === "noDraft") {
-      return <HostOnboardingEmptyState actions={sharedActions} />;
-    }
-
-    if (viewState === "draft") {
+    if (viewState === "noDraft" || viewState === "draft" || viewState === "rejected") {
       return (
-        <HostOnboardingStatusCard
-          badge="Draft saved"
-          title="Your host application draft is waiting"
-          description="We found an onboarding draft for this account. You are not approved as a host yet, but your application progress is already recognized."
-          note="Return here when you are ready to continue the onboarding process or refresh this page to check for status changes."
-          actions={sharedActions}
+        <HostOnboardingWorkspace
+          documents={documents}
+          status={verification}
+          rejectionReason={viewState === "rejected" ? verification?.rejectionReason : null}
+          formError={formError}
+          saveError={saveError}
+          saveSuccess={saveSuccess}
+          submitError={submitError}
+          isSaving={isSaving}
+          isSubmitting={isSubmitting}
+          onDocumentChange={(index, field, value) => {
+            setDocuments((current) =>
+              current.map((document, currentIndex) =>
+                currentIndex === index ? { ...document, [field]: value } : document,
+              ),
+            );
+            setFormError("");
+            setSaveError("");
+            setSaveSuccess("");
+            setSubmitError("");
+          }}
+          onAddDocument={() => {
+            setDocuments((current) => [
+              ...current,
+              { documentType: "", documentFront: "", documentBack: "" },
+            ]);
+            setFormError("");
+            setSaveError("");
+            setSaveSuccess("");
+            setSubmitError("");
+          }}
+          onRemoveDocument={(index) => {
+            setDocuments((current) =>
+              current.filter((_, currentIndex) => currentIndex !== index).length > 0
+                ? current.filter((_, currentIndex) => currentIndex !== index)
+                : [{ documentType: "", documentFront: "", documentBack: "" }],
+            );
+            setFormError("");
+            setSaveError("");
+            setSaveSuccess("");
+            setSubmitError("");
+          }}
+          onSaveDraft={async () => {
+            await persistDraft(true);
+          }}
+          onSubmitApplication={async () => {
+            if (!token) {
+              return;
+            }
+
+            setIsSubmitting(true);
+            setSubmitError("");
+            setSaveError("");
+            setSaveSuccess("");
+
+            try {
+              const savedVerification = await persistDraft(false);
+
+              if (!savedVerification) {
+                return;
+              }
+
+              const nextStatus = await submitHostEnable(token);
+              setVerification({
+                ...savedVerification,
+                ...nextStatus,
+              });
+            } catch (requestError) {
+              setSubmitError(
+                requestError instanceof Error
+                  ? requestError.message || "We couldn't submit your host request right now."
+                  : "We couldn't submit your host request right now.",
+              );
+            } finally {
+              setIsSubmitting(false);
+            }
+          }}
+          onRefresh={() => setRetryKey((current) => current + 1)}
         />
       );
     }
@@ -140,20 +310,6 @@ export const HostOnboardingPage: React.FC = () => {
           description="Your onboarding request is currently waiting for review. We will keep sending you here until your approved host role is active in your session."
           accent="warning"
           note="Check back here later for updates. Once your host role is active, this route will send you into the real portal automatically."
-          actions={sharedActions}
-        />
-      );
-    }
-
-    if (viewState === "rejected") {
-      return (
-        <HostOnboardingStatusCard
-          badge="Needs updates"
-          title="Your host application needs revision"
-          description="The last host onboarding submission for this account was rejected. Review the reason below, then return when you are ready to continue the onboarding process."
-          accent="danger"
-          rejectionReason={status?.rejectionReason}
-          note="Keep the rejection reason nearby so your next update can address exactly what was requested."
           actions={sharedActions}
         />
       );
@@ -227,11 +383,11 @@ export const HostOnboardingPage: React.FC = () => {
               Current status
             </p>
             <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              {status?.rawStatus ? status.rawStatus : "No application yet"}
+              {verification?.rawStatus ? verification.rawStatus : "No application yet"}
             </h2>
             <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-              {status?.updatedAt
-                ? `Last update recorded: ${new Date(status.updatedAt).toLocaleDateString("en-BD", {
+              {verification?.updatedAt
+                ? `Last update recorded: ${new Date(verification.updatedAt).toLocaleDateString("en-BD", {
                     day: "numeric",
                     month: "short",
                     year: "numeric",

@@ -100,3 +100,17 @@
 - Removed stale implementation-era wording across onboarding, profile, payouts, businesses, and the property workflow so the host portal now speaks in present-tense product language instead of chunk-by-chunk rollout copy.
 - Improved operational polish by adding contextual filtered empty states, preserving reservation-scoped messaging handoffs, making reviews resilient to partial API failure, preventing payout-detail fetch issues from blanking payout history, and making dense earnings/message layouts safer on smaller screens.
 - Verified the final Chunk 10 portal polish with diagnostics and confirmed `npm.cmd run build` passes with the full host route family intact.
+
+## Host Portal Chunk 11
+
+- [completed] Implement the real onboarding draft, document, and submission flow for `/host/onboarding`.
+- [completed] Add property delete support and richer verification-document metadata handling for the listing workflow.
+- [completed] Complete the remaining operations parity work for guest-review creation, useful review/earnings/payout filters, and sidebar IA grouping.
+- [completed] Run diagnostics and `npm.cmd run build`, then document the Chunk 11 review result.
+
+### Review
+
+- Replaced the onboarding status-only treatment with a real host-application workspace that loads the current verification draft, lets hosts manage document rows with type/front/back URLs, saves draft changes, and submits the enable request against the actual onboarding contract.
+- Added missing listing lifecycle parity by wiring property delete into the properties workspace, extending verification uploads to require aligned document types, and surfacing richer verification proof metadata returned by the backend.
+- Finished the remaining operational parity by regrouping sidebar IA into Main, Operations, and Setup, adding reservation-scoped guest-review creation from completed stays, and exposing rating, earnings, and payout-history filters directly in the host workspace.
+- Verified the final Chunk 11 workflow-closure pass with diagnostics and confirmed `npm.cmd run build` passes with the host onboarding, property, reviews, earnings, and payouts routes intact.

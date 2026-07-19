@@ -243,6 +243,14 @@ export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps>
             Open messages
           </Link>
         ) : null}
+        {reservation.status === "completed" ? (
+          <Link
+            href={`/host/reviews?reservationId=${reservation.id}`}
+            className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+          >
+            Write guest review
+          </Link>
+        ) : null}
       </div>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -369,7 +377,9 @@ export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps>
               </>
             ) : (
               <div className="mt-5 rounded-[20px] border border-dashed border-border-light bg-white/80 px-4 py-4 text-[14px] leading-7 text-text-secondary">
-                This reservation is already in a final operational state, so no further host action is shown here.
+                {reservation.status === "completed"
+                  ? "This stay is completed. Use the review handoff above if you want to leave a guest review from the correct reservation context."
+                  : "This reservation is already in a final operational state, so no further host action is shown here."}
               </div>
             )}
 

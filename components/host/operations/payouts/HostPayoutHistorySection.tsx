@@ -14,6 +14,7 @@ type HostPayoutHistorySectionProps = {
   isLoading: boolean;
   error: string;
   detailError?: string;
+  emptyText?: string;
   onRetry: () => void;
   onSelect: (payoutId: string) => void;
 };
@@ -31,6 +32,7 @@ export const HostPayoutHistorySection: React.FC<HostPayoutHistorySectionProps> =
   isLoading,
   error,
   detailError = "",
+  emptyText = "",
   onRetry,
   onSelect,
 }) => {
@@ -180,7 +182,8 @@ export const HostPayoutHistorySection: React.FC<HostPayoutHistorySectionProps> =
         </div>
       ) : (
         <div className="mt-6 rounded-[24px] border border-dashed border-border-light bg-white/80 px-5 py-6 text-[14px] leading-7 text-text-secondary">
-          No payout history is available yet. Past disbursements will appear here once earnings progress into paid payout records.
+          {emptyText ||
+            "No payout history is available yet. Past disbursements will appear here once earnings progress into paid payout records."}
         </div>
       )}
     </div>

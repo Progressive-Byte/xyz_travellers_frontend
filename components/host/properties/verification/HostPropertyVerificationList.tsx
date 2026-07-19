@@ -25,6 +25,22 @@ const formatTimestamp = (value: string | null) => {
   }).format(date);
 };
 
+const formatFileSize = (value: number | null) => {
+  if (value === null || !Number.isFinite(value)) {
+    return "";
+  }
+
+  if (value >= 1024 * 1024) {
+    return `${(value / 1024 / 1024).toFixed(2)} MB`;
+  }
+
+  if (value >= 1024) {
+    return `${(value / 1024).toFixed(0)} KB`;
+  }
+
+  return `${value} B`;
+};
+
 export const HostPropertyVerificationList: React.FC<HostPropertyVerificationListProps> = ({
   documents,
 }) => {
@@ -60,11 +76,16 @@ export const HostPropertyVerificationList: React.FC<HostPropertyVerificationList
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <p className="text-[15px] font-semibold text-text-primary">
-                      {document.fileName || "Verification document"}
+                      {document.originalFileName || document.fileName || "Verification document"}
                     </p>
                     {document.documentType ? (
                       <p className="mt-1 text-[13px] leading-6 text-text-secondary">
                         Type: {document.documentType}
+                      </p>
+                    ) : null}
+                    {document.mimeType || document.fileSize !== null ? (
+                      <p className="mt-1 text-[13px] leading-6 text-text-secondary">
+                        {[document.mimeType, formatFileSize(document.fileSize)].filter(Boolean).join(" · ")}
                       </p>
                     ) : null}
                     {document.note ? (
