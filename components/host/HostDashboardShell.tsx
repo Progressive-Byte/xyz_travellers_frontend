@@ -3,8 +3,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Navbar } from "@/components/layout/Navbar";
+import { HostShell } from "@/components/host/HostShell";
 import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import { getHostDashboard, type HostDashboardData, type HostReservationPreview } from "@/lib/host";
@@ -144,6 +145,7 @@ export const HostDashboardShell: React.FC = () => {
   const [data, setData] = useState<HostDashboardData | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [retryKey, setRetryKey] = useState(0);
 
   const hasHostRole = useMemo(() => user?.roles?.includes("host") ?? false, [user]);
 
@@ -199,7 +201,7 @@ export const HostDashboardShell: React.FC = () => {
     return () => {
       isActive = false;
     };
-  }, [hasHostRole, isAuthenticated, isHydrated, router, token, user]);
+  }, [hasHostRole, isAuthenticated, isHydrated, retryKey, router, token, user]);
 
   if (!isHydrated || isLoading) {
     return <DashboardSkeleton />;
@@ -263,7 +265,7 @@ export const HostDashboardShell: React.FC = () => {
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={() => router.refresh()}
+                  onClick={() => setRetryKey((current) => current + 1)}
                   className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
                 >
                   Try again
@@ -286,43 +288,30 @@ export const HostDashboardShell: React.FC = () => {
   const currency = data.earnings.currency || data.payouts.currency || "BDT";
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="section-shell py-10 md:py-14">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="surface-card-strong rounded-panel p-6 md:p-8">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <span className="section-badge">Host Portal</span>
-                <h1 className="mt-5 font-sora text-[34px] font-bold tracking-[-0.05em] text-text-primary md:text-[46px]">
-                  Welcome back, {user.firstName}
-                </h1>
-                <p className="mt-4 max-w-2xl text-[15px] leading-7 text-text-secondary">
-                  Here&apos;s your hosting overview today, including property status, upcoming
-                  reservations, unread messages, and earnings.
-                </p>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                    Host status
-                  </p>
-                  <p className="mt-3 text-[17px] font-semibold text-text-primary">Approved host</p>
-                </div>
-                <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                    Net earnings
-                  </p>
-                  <p className="mt-3 text-[17px] font-semibold text-text-primary">
-                    {formatCurrency(data.earnings.netEarnings, currency)}
-                  </p>
-                </div>
-              </div>
-            </div>
+    <HostShell
+      badge="Host Portal"
+      title={`Welcome back, ${user.firstName}`}
+      subtitle="Here's your hosting overview today, including property status, upcoming reservations, unread messages, and earnings."
+      headerAside={
+        <>
+          <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+              Host status
+            </p>
+            <p className="mt-3 text-[17px] font-semibold text-text-primary">Approved host</p>
           </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+              Net earnings
+            </p>
+            <p className="mt-3 text-[17px] font-semibold text-text-primary">
+              {formatCurrency(data.earnings.netEarnings, currency)}
+            </p>
+          </div>
+        </>
+      }
+    >
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard
               label="Total properties"
               value={data.properties.total}
@@ -343,165 +332,162 @@ export const HostDashboardShell: React.FC = () => {
               value={data.reservations.upcomingCount}
               helper="Your next arrivals are shown below"
             />
-          </div>
+      </div>
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-[1.3fr_0.95fr]">
-            <div className="space-y-6">
-              <div className="surface-card rounded-panel p-6">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                      Property status
-                    </p>
-                    <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-                      Listing health
-                    </h2>
-                  </div>
-                  <p className="text-[14px] leading-6 text-text-secondary">
-                    Quick overview of all property states.
-                  </p>
-                </div>
-
-                <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                  {[
-                    { label: "Approved", value: data.properties.approved },
-                    { label: "Submitted", value: data.properties.submitted },
-                    { label: "Draft", value: data.properties.draft },
-                    { label: "Rejected", value: data.properties.rejected },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-[22px] border border-border-light bg-card px-4 py-4 shadow-soft"
-                    >
-                      <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">
-                        {item.label}
-                      </p>
-                      <p className="mt-3 text-[26px] font-semibold text-text-primary">
-                        {item.value}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="surface-card rounded-panel p-6">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                      Reservations
-                    </p>
-                    <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-                      Upcoming stays
-                    </h2>
-                  </div>
-                  <span className="rounded-full bg-primary-light px-3 py-2 text-[12px] font-semibold text-text-primary">
-                    {data.reservations.upcomingCount} upcoming
-                  </span>
-                </div>
-
-                {data.reservations.upcoming.length > 0 ? (
-                  <div className="mt-6 space-y-4">
-                    {data.reservations.upcoming.map((reservation) => (
-                      <ReservationItem key={reservation.id} reservation={reservation} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mt-6 rounded-[24px] border border-dashed border-border bg-card px-5 py-6 text-[14px] leading-7 text-text-secondary">
-                    No upcoming reservations right now.
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="surface-card rounded-panel p-6">
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1.3fr_0.95fr]">
+        <div className="space-y-6">
+          <div className="surface-card rounded-panel p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                  Messages
+                  Property status
                 </p>
                 <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-                  Inbox snapshot
+                  Listing health
                 </h2>
-
-                <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                  <div className="rounded-[22px] border border-border-light bg-card px-4 py-4 shadow-soft">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">
-                      Unread threads
-                    </p>
-                    <p className="mt-3 text-[28px] font-semibold text-text-primary">
-                      {data.messages.unreadThreads}
-                    </p>
-                  </div>
-                  <div className="rounded-[22px] border border-border-light bg-card px-4 py-4 shadow-soft">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">
-                      Unread messages
-                    </p>
-                    <p className="mt-3 text-[28px] font-semibold text-text-primary">
-                      {data.messages.unreadMessages}
-                    </p>
-                  </div>
-                </div>
               </div>
+              <p className="text-[14px] leading-6 text-text-secondary">
+                Quick overview of all property states.
+              </p>
+            </div>
 
-              <MoneyCard
-                title="Earnings"
-                rows={[
-                  {
-                    label: "Net earnings",
-                    value: formatCurrency(data.earnings.netEarnings, currency),
-                  },
-                  {
-                    label: "Gross revenue",
-                    value: formatCurrency(data.earnings.grossRevenue, currency),
-                  },
-                  {
-                    label: "Commission total",
-                    value: formatCurrency(data.earnings.commissionTotal, currency),
-                  },
-                  {
-                    label: "Refund total",
-                    value: formatCurrency(data.earnings.refundTotal, currency),
-                  },
-                ]}
-              />
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {[
+                { label: "Approved", value: data.properties.approved },
+                { label: "Submitted", value: data.properties.submitted },
+                { label: "Draft", value: data.properties.draft },
+                { label: "Rejected", value: data.properties.rejected },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-[22px] border border-border-light bg-card px-4 py-4 shadow-soft"
+                >
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">
+                    {item.label}
+                  </p>
+                  <p className="mt-3 text-[26px] font-semibold text-text-primary">
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
 
-              <MoneyCard
-                title="Payouts"
-                rows={[
-                  {
-                    label: "Pending payout",
-                    value: formatCurrency(data.payouts.pendingPayout, currency),
-                  },
-                  {
-                    label: "Paid out",
-                    value: formatCurrency(data.payouts.paidOut, currency),
-                  },
-                ]}
-              />
-
-              <div className="surface-card rounded-panel p-6">
+          <div className="surface-card rounded-panel p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                  Next steps
+                  Reservations
                 </p>
-                <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-                  More host tools later
+                <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
+                  Upcoming stays
                 </h2>
-
-                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                  {["Reservations", "Messages", "Earnings", "Properties"].map((item) => (
-                    <div
-                      key={item}
-                      className="rounded-[22px] border border-border-light bg-card px-4 py-4 text-[14px] font-medium text-text-primary shadow-soft"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
               </div>
+              <span className="rounded-full bg-primary-light px-3 py-2 text-[12px] font-semibold text-text-primary">
+                {data.reservations.upcomingCount} upcoming
+              </span>
+            </div>
+
+            {data.reservations.upcoming.length > 0 ? (
+              <div className="mt-6 space-y-4">
+                {data.reservations.upcoming.map((reservation) => (
+                  <ReservationItem key={reservation.id} reservation={reservation} />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-6 rounded-[24px] border border-dashed border-border bg-card px-5 py-6 text-[14px] leading-7 text-text-secondary">
+                No upcoming reservations right now.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="surface-card rounded-panel p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+              Messages
+            </p>
+            <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
+              Inbox snapshot
+            </h2>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              <div className="rounded-[22px] border border-border-light bg-card px-4 py-4 shadow-soft">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">
+                  Unread threads
+                </p>
+                <p className="mt-3 text-[28px] font-semibold text-text-primary">
+                  {data.messages.unreadThreads}
+                </p>
+              </div>
+              <div className="rounded-[22px] border border-border-light bg-card px-4 py-4 shadow-soft">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">
+                  Unread messages
+                </p>
+                <p className="mt-3 text-[28px] font-semibold text-text-primary">
+                  {data.messages.unreadMessages}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <MoneyCard
+            title="Earnings"
+            rows={[
+              {
+                label: "Net earnings",
+                value: formatCurrency(data.earnings.netEarnings, currency),
+              },
+              {
+                label: "Gross revenue",
+                value: formatCurrency(data.earnings.grossRevenue, currency),
+              },
+              {
+                label: "Commission total",
+                value: formatCurrency(data.earnings.commissionTotal, currency),
+              },
+              {
+                label: "Refund total",
+                value: formatCurrency(data.earnings.refundTotal, currency),
+              },
+            ]}
+          />
+
+          <MoneyCard
+            title="Payouts"
+            rows={[
+              {
+                label: "Pending payout",
+                value: formatCurrency(data.payouts.pendingPayout, currency),
+              },
+              {
+                label: "Paid out",
+                value: formatCurrency(data.payouts.paidOut, currency),
+              },
+            ]}
+          />
+
+          <div className="surface-card rounded-panel p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+              Next steps
+            </p>
+            <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+              More host tools later
+            </h2>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              {["Reservations", "Messages", "Earnings", "Properties"].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[22px] border border-border-light bg-card px-4 py-4 text-[14px] font-medium text-text-primary shadow-soft"
+                >
+                  {item}
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </HostShell>
   );
 };
