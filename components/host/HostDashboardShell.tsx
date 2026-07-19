@@ -377,6 +377,38 @@ export const HostDashboardShell: React.FC = () => {
         </div>
       ) : null}
 
+      <div className="surface-card mb-6 rounded-panel p-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+              Listing workflow
+            </p>
+            <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
+              Turn your overview into active listings
+            </h2>
+            <p className="mt-3 max-w-3xl text-[14px] leading-7 text-text-secondary">
+              Properties and add-property routes are now part of the portal, so you can move straight
+              from summary metrics into draft creation and listing management.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/host/properties/new"
+              className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+            >
+              Add property
+            </Link>
+            <Link
+              href="/host/properties"
+              className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+            >
+              View properties
+            </Link>
+          </div>
+        </div>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard
               label="Total properties"

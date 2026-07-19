@@ -49,6 +49,7 @@ type UnknownRecord = Record<string, unknown>;
 const asRecord = (value: unknown): UnknownRecord => (value && typeof value === "object" ? (value as UnknownRecord) : {});
 const asString = (value: unknown) => (typeof value === "string" ? value : "");
 const asOptionalString = (value: unknown) => (typeof value === "string" ? value : null);
+const asArray = (value: unknown) => (Array.isArray(value) ? value : []);
 
 export type HostProfile = {
   id?: string;
@@ -94,6 +95,55 @@ export type HostSetupStatus = {
   missingFields: string[];
 };
 
+export type HostPropertyStatus = "draft" | "submitted" | "approved" | "rejected";
+
+export type HostPropertySummary = {
+  id: string;
+  name: string;
+  status: HostPropertyStatus;
+  rawStatus: string | null;
+  propertyType: string;
+  ownershipType: string;
+  address: string;
+  city: string;
+  country: string;
+  updatedAt: string | null;
+  createdAt: string | null;
+};
+
+export type HostPropertyDetail = HostPropertySummary & {
+  description: string;
+  amenities: string[];
+  lat: string;
+  lng: string;
+  houseRules: string;
+};
+
+export type HostPropertyReferenceOption = {
+  id: string;
+  value: string;
+  label: string;
+};
+
+export type HostPropertyCommissionInfo = {
+  rate: string;
+  note: string;
+};
+
+export type UpdateHostPropertyPayload = {
+  name: string;
+  description: string;
+  propertyType: string;
+  ownershipType: string;
+  amenities: string[];
+  address: string;
+  city: string;
+  country: string;
+  lat: string;
+  lng: string;
+  houseRules: string;
+};
+
 const emptyHostProfile = (): HostProfile => ({
   id: undefined,
   firstName: "",
@@ -118,6 +168,25 @@ const emptyHostPayoutProfile = (): HostPayoutProfile => ({
   swiftCode: "",
   walletProvider: "",
   walletNumber: "",
+});
+
+const emptyHostPropertyDetail = (): HostPropertyDetail => ({
+  id: "",
+  name: "",
+  status: "draft",
+  rawStatus: "draft",
+  propertyType: "",
+  ownershipType: "",
+  address: "",
+  city: "",
+  country: "",
+  updatedAt: null,
+  createdAt: null,
+  description: "",
+  amenities: [],
+  lat: "",
+  lng: "",
+  houseRules: "",
 });
 
 const normalizeHostProfile = (payload: unknown): HostProfile => {
@@ -156,6 +225,173 @@ const normalizePayoutMethod = (value: unknown): HostPayoutMethod => {
   }
 
   return "";
+};
+
+const normalizeHostPropertyStatus = (value: unknown): HostPropertyStatus => {
+  const normalized = asString(value).trim().toLowerCase();
+
+  if (normalized.includes("reject")) {
+    return "rejected";
+  }
+
+  if (
+    normalized.includes("submit") ||
+    normalized.includes("pending") ||
+    normalized.includes("review") ||
+    normalized.includes("waiting")
+  ) {
+    return "submitted";
+  }
+
+  if (normalized.includes("approve") || normalized.includes("active") || normalized === "live") {
+    return "approved";
+  }
+
+  return "draft";
+};
+
+const normalizeHostPropertyAmenities = (value: unknown): string[] =>
+  asArray(value)
+    .map((item) => {
+      if (typeof item === "string") {
+        return item;
+      }
+
+      const source = asRecord(item);
+
+      return (
+        asString(source.value) ||
+        asString(source.label) ||
+        asString(source.name) ||
+        asString(source.title) ||
+        asString(source.id)
+      );
+    })
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const normalizeHostPropertySummary = (payload: unknown): HostPropertySummary => {
+  const source = asRecord(payload);
+  const addressSource = asRecord(source.location ?? source.addressInfo ?? source.address_info);
+  const propertyTypeSource = asRecord(source.propertyType ?? source.property_type);
+  const ownershipTypeSource = asRecord(source.ownershipType ?? source.ownership_type);
+  const rawStatus =
+    asOptionalString(source.status) ??
+    asOptionalString(source.propertyStatus) ??
+    asOptionalString(source.property_status);
+
+  return {
+    id: asString(source.id) || asString(source.propertyId ?? source.property_id),
+    name:
+      asString(source.name) ||
+      asString(source.propertyName ?? source.property_name) ||
+      asString(source.title),
+    status: normalizeHostPropertyStatus(rawStatus),
+    rawStatus,
+    propertyType:
+      asString(source.propertyTypeName ?? source.property_type_name) ||
+      asString(propertyTypeSource.name ?? propertyTypeSource.label ?? propertyTypeSource.value) ||
+      asString(source.propertyType ?? source.property_type),
+    ownershipType:
+      asString(source.ownershipTypeName ?? source.ownership_type_name) ||
+      asString(ownershipTypeSource.name ?? ownershipTypeSource.label ?? ownershipTypeSource.value) ||
+      asString(source.ownershipType ?? source.ownership_type),
+    address: asString(source.address ?? addressSource.address ?? addressSource.line1 ?? addressSource.line_1),
+    city: asString(source.city ?? addressSource.city),
+    country: asString(source.country ?? addressSource.country),
+    updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+  };
+};
+
+const normalizeHostPropertyDetail = (payload: unknown): HostPropertyDetail => {
+  const source = asRecord(payload);
+  const summary = normalizeHostPropertySummary(payload);
+  const locationSource = asRecord(source.location ?? source.addressInfo ?? source.address_info);
+
+  return {
+    ...summary,
+    description: asString(source.description),
+    amenities: normalizeHostPropertyAmenities(source.amenities ?? source.amenityIds ?? source.amenity_ids),
+    lat: asString(source.lat ?? source.latitude ?? locationSource.lat ?? locationSource.latitude),
+    lng: asString(source.lng ?? source.longitude ?? locationSource.lng ?? locationSource.longitude),
+    houseRules: asString(source.houseRules ?? source.house_rules ?? source.rules),
+  };
+};
+
+const extractReferenceArray = (payload: unknown) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  const source = asRecord(payload);
+
+  if (Array.isArray(source.items)) {
+    return source.items;
+  }
+
+  if (Array.isArray(source.results)) {
+    return source.results;
+  }
+
+  if (Array.isArray(source.data)) {
+    return source.data;
+  }
+
+  if (Array.isArray(source.propertyTypes)) {
+    return source.propertyTypes;
+  }
+
+  if (Array.isArray(source.property_types)) {
+    return source.property_types;
+  }
+
+  if (Array.isArray(source.amenities)) {
+    return source.amenities;
+  }
+
+  if (Array.isArray(source.properties)) {
+    return source.properties;
+  }
+
+  return [];
+};
+
+const normalizeReferenceOption = (payload: unknown): HostPropertyReferenceOption => {
+  if (typeof payload === "string") {
+    return {
+      id: payload,
+      value: payload,
+      label: payload,
+    };
+  }
+
+  const source = asRecord(payload);
+  const label =
+    asString(source.label) ||
+    asString(source.name) ||
+    asString(source.title) ||
+    asString(source.value) ||
+    asString(source.id);
+  const value = asString(source.value) || asString(source.slug) || asString(source.code) || label;
+
+  return {
+    id: asString(source.id) || value || label,
+    value: value || label,
+    label: label || value,
+  };
+};
+
+const normalizeCommissionInfo = (payload: unknown): HostPropertyCommissionInfo => {
+  const source = asRecord(payload);
+
+  return {
+    rate:
+      asString(source.rate) ||
+      asString(source.commissionRate ?? source.commission_rate) ||
+      asString(source.value),
+    note: asString(source.note) || asString(source.description) || asString(source.summary),
+  };
 };
 
 const normalizeHostPayoutProfile = (payload: unknown): HostPayoutProfile => {
@@ -515,5 +751,153 @@ export async function updateHostPayoutProfile(
   return normalizeHostPayoutProfile(response);
 }
 
+export const isHostPropertyEditable = (status: HostPropertyStatus) =>
+  status === "draft" || status === "rejected";
+
+export async function getHostProperties(token: string): Promise<HostPropertySummary[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>("/api/v1/host/properties", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return extractReferenceArray(response)
+    .map((item) => normalizeHostPropertySummary(item))
+    .filter((item) => item.id);
+}
+
+export async function createHostPropertyDraft(token: string): Promise<HostPropertyDetail> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>("/api/v1/host/properties", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {},
+    cache: "no-store",
+  });
+
+  return normalizeHostPropertyDetail(response);
+}
+
+export async function getHostProperty(token: string, propertyId: string): Promise<HostPropertyDetail> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/properties/${propertyId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostPropertyDetail(response);
+}
+
+export async function updateHostProperty(
+  token: string,
+  propertyId: string,
+  payload: UpdateHostPropertyPayload,
+): Promise<HostPropertyDetail> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/properties/${propertyId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      name: payload.name.trim() || undefined,
+      description: payload.description.trim() || undefined,
+      propertyType: payload.propertyType.trim() || undefined,
+      ownershipType: payload.ownershipType.trim() || undefined,
+      amenities: payload.amenities,
+      address: payload.address.trim() || undefined,
+      city: payload.city.trim() || undefined,
+      country: payload.country.trim() || undefined,
+      lat: payload.lat.trim() || undefined,
+      lng: payload.lng.trim() || undefined,
+      houseRules: payload.houseRules.trim() || undefined,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostPropertyDetail(response);
+}
+
+export async function getHostPropertyTypes(token: string): Promise<HostPropertyReferenceOption[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>("/api/v1/host/reference/property-types", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return extractReferenceArray(response)
+    .map((item) => normalizeReferenceOption(item))
+    .filter((item) => item.value);
+}
+
+export async function getHostAmenities(token: string): Promise<HostPropertyReferenceOption[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>("/api/v1/host/reference/amenities", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return extractReferenceArray(response)
+    .map((item) => normalizeReferenceOption(item))
+    .filter((item) => item.value);
+}
+
+export async function getHostCommissionInfo(token: string): Promise<HostPropertyCommissionInfo | null> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  try {
+    const response = await apiRequest<unknown>("/api/v1/host/reference/commission", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return normalizeCommissionInfo(response);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+
+    throw error;
+  }
+}
+
 export const createEmptyHostProfile = emptyHostProfile;
 export const createEmptyHostPayoutProfile = emptyHostPayoutProfile;
+export const createEmptyHostPropertyDetail = emptyHostPropertyDetail;

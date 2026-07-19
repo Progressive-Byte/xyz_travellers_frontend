@@ -33,8 +33,8 @@ export const hostNavigationItems: HostNavItem[] = [
     href: "/host/properties",
     icon: "properties",
     group: "Main",
-    isLive: false,
-    description: "Manage all listings and availability in one place.",
+    isLive: true,
+    description: "Manage listing drafts, statuses, and existing properties in one place.",
   },
   {
     label: "Reservations",
@@ -65,8 +65,8 @@ export const hostNavigationItems: HostNavItem[] = [
     href: "/host/properties/new",
     icon: "add-property",
     group: "Setup",
-    isLive: false,
-    description: "Start a new listing setup flow when onboarding tools land.",
+    isLive: true,
+    description: "Start a new listing draft and continue through the add-property workflow.",
   },
   {
     label: "Host Profile",
@@ -88,8 +88,17 @@ export const hostNavigationItems: HostNavItem[] = [
 
 export const hostNavigationGroups: HostNavGroupKey[] = ["Main", "Setup"];
 
-export const isHostNavItemActive = (pathname: string, href: string) =>
-  pathname === href || pathname.startsWith(`${href}/`);
+export const isHostNavItemActive = (pathname: string, href: string) => {
+  if (href === "/host/properties") {
+    return pathname === href;
+  }
+
+  if (href === "/host/properties/new") {
+    return pathname === href || /^\/host\/properties\/[^/]+\/edit$/.test(pathname);
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+};
 
 export const getHostPageMeta = (pathname: string) => {
   const activeItem = hostNavigationItems.find((item) => isHostNavItemActive(pathname, item.href));
