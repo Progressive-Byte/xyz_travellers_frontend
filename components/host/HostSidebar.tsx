@@ -67,6 +67,15 @@ const HostNavIconMark: React.FC<{ icon: HostNavIcon; isActive: boolean }> = ({ i
           <path d="M5 19.5c1.9-2.6 4.3-3.9 7-3.9s5.1 1.3 7 3.9" strokeLinecap="round" />
         </svg>
       );
+    case "payouts":
+      return (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">
+          <rect x="4" y="6" width="16" height="12" rx="3" strokeLinecap="round" />
+          <path d="M4 10h16" strokeLinecap="round" />
+          <path d="M8 14h4" strokeLinecap="round" />
+          <path d="M15.5 15.5h.01" strokeLinecap="round" />
+        </svg>
+      );
     default:
       return null;
   }

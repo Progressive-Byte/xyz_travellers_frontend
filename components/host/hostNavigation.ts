@@ -5,7 +5,8 @@ export type HostNavIcon =
   | "reservations"
   | "messages"
   | "earnings"
-  | "profile";
+  | "profile"
+  | "payouts";
 
 export type HostNavGroupKey = "Main" | "Setup";
 
@@ -72,8 +73,16 @@ export const hostNavigationItems: HostNavItem[] = [
     href: "/host/profile",
     icon: "profile",
     group: "Setup",
-    isLive: false,
-    description: "Update host profile details, policies, and preferences.",
+    isLive: true,
+    description: "Update your host identity, contact details, photo, and bio.",
+  },
+  {
+    label: "Payout Setup",
+    href: "/host/payouts",
+    icon: "payouts",
+    group: "Setup",
+    isLive: true,
+    description: "Manage payout method, billing details, and readiness for future payouts.",
   },
 ];
 
