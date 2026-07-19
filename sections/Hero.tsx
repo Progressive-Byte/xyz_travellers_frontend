@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import type { HomeCategory } from "@/data/homeCategories";
 
 const categories = [
   {
-    label: "Apartments",
+    label: "Apartments" as HomeCategory,
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -16,7 +16,7 @@ const categories = [
     ),
   },
   {
-    label: "Rooms",
+    label: "Rooms" as HomeCategory,
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M2 4v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4" />
@@ -27,7 +27,7 @@ const categories = [
     ),
   },
   {
-    label: "Hotels",
+    label: "Hotels" as HomeCategory,
     icon: (
       <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M9 19V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14" />
@@ -38,12 +38,6 @@ const categories = [
       </svg>
     ),
   },
-];
-
-const stats = [
-  { value: "15k+", label: "verified stays" },
-  { value: "24/7", label: "guest support" },
-  { value: "8 divisions", label: "nationwide coverage" },
 ];
 
 type GuestType = {
@@ -79,8 +73,12 @@ const DateInputButton = React.forwardRef<HTMLButtonElement, DateInputButtonProps
 
 DateInputButton.displayName = "DateInputButton";
 
-export const Hero: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState("Apartments");
+type HeroProps = {
+  activeCategory: HomeCategory;
+  onCategoryChange: (category: HomeCategory) => void;
+};
+
+export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) => {
   const [destination, setDestination] = useState("");
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
@@ -137,32 +135,9 @@ export const Hero: React.FC = () => {
   );
 
   return (
-    <section className="section-shell overflow-hidden bg-background pb-14 pt-8 md:pb-20">
+    <section className="section-shell overflow-hidden bg-background pt-6">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mx-auto max-w-4xl text-center">
-          <span className="section-badge">Short Term Accommodation</span>
-          <h1 className="section-heading mx-auto mt-6 max-w-4xl">
-            Find beautifully hosted stays across Bangladesh without the usual booking friction.
-          </h1>
-          <p className="section-subtitle mx-auto mt-5">
-            Search premium short stays, furnished apartments, rooms, and hotels with
-            a cleaner booking flow built for modern travelers.
-          </p>
-
-          <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-3 text-[13px] font-semibold text-text-secondary">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="surface-card flex items-center gap-3 rounded-full px-4 py-2.5"
-              >
-                <span className="text-[14px] font-bold text-text-primary">{stat.value}</span>
-                <span>{stat.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative z-30 mx-auto mt-10 flex w-full max-w-[980px] justify-center">
+        <div className="relative z-30 mx-auto mt-4 flex w-full max-w-[980px] justify-center md:mt-6">
           <div className="surface-card-strong w-full rounded-[26px] p-1.5">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
               <div className="flex-1 rounded-[18px] px-4 py-1.5 transition-colors duration-200 hover:bg-surface">
@@ -174,7 +149,7 @@ export const Hero: React.FC = () => {
                   value={destination}
                   onChange={(event) => setDestination(event.target.value)}
                   placeholder="Search destinations"
-                  className="mt-1 w-full bg-transparent text-[1px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-primary"
+                  className="mt-1 w-full bg-transparent text-[14px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-primary"
                 />
               </div>
 
@@ -333,27 +308,29 @@ export const Hero: React.FC = () => {
           }`}
         />
 
-        <div className="mx-auto mt-7 flex w-full max-w-[980px] flex-wrap items-center justify-center gap-3">
+        <div className="mx-auto mt-3 flex w-full max-w-[980px] items-end justify-center gap-8 border-b border-border/80">
           {categories.map((category) => {
             const active = category.label === activeCategory;
 
             return (
-              <Link
+              <button
                 key={category.label}
-                href="/"
-                onClick={(event) => {
-                  event.preventDefault();
-                  setActiveCategory(category.label);
-                }}
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-3 text-[14px] font-semibold transition-all duration-200 ${
+                type="button"
+                onClick={() => onCategoryChange(category.label)}
+                className={`relative inline-flex items-center gap-2 pb-4 pt-2 text-[14px] font-semibold transition-colors duration-200 ${
                   active
-                    ? "bg-text-primary text-white shadow-medium"
-                    : "surface-card text-text-secondary hover:-translate-y-0.5 hover:text-text-primary"
+                    ? "text-text-primary"
+                    : "text-text-secondary hover:text-text-primary"
                 }`}
               >
                 <span className={active ? "text-primary" : "text-text-secondary"}>{category.icon}</span>
                 <span>{category.label}</span>
-              </Link>
+                <span
+                  className={`absolute inset-x-0 -bottom-px h-0.5 rounded-full transition-opacity duration-200 ${
+                    active ? "bg-text-primary opacity-100" : "bg-transparent opacity-0"
+                  }`}
+                />
+              </button>
             );
           })}
         </div>

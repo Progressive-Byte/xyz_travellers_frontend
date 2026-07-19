@@ -41,7 +41,13 @@
 - In the Hero search bar, `Where` must remain a real text input. `Search destinations` is placeholder text, not static copy.
 - During UI polish passes, explicitly verify cursor behavior on interactive elements; clickable controls should show a pointer, while true text-entry fields should keep the text cursor.
 - In this Hero search bar, the `Search destinations` placeholder should use the same black text tone as the other search values instead of a faded placeholder color.
+- If the user asks to strip the Hero down, remove the marketing badge/headline/stats entirely and keep only the search box plus a real tab row underneath; those tabs should drive the listings content below, not behave like isolated visual chips.
+- When the Hero uses tabs to control listings, keep the transition tight: avoid extra empty gap under the tabs and remove any separate selected-tab heading block above the listings rail unless the user explicitly asks for it.
 
 ## Property Page Notes
 
 - For the single-property page, avoid over-designed nested gradient boxes inside content cards; prefer cleaner `surface-card` sections with one strong inner block and simpler hierarchy.
+
+## Listing Card Notes
+
+- Do not show the property address as a pill overlay on the listing thumbnail; keep location details in the card body only and reserve the image overlay for badges like `New`.

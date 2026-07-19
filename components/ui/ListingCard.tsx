@@ -39,9 +39,6 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
         <div className="absolute left-3 top-3 flex items-center gap-2">
-          <span className="rounded-full bg-white/92 px-3 py-1 text-[11px] font-semibold text-text-primary shadow-soft">
-            {location}
-          </span>
           {isNew ? (
             <span className="rounded-full bg-primary px-3 py-1 text-[11px] font-semibold text-text-primary">
               New
