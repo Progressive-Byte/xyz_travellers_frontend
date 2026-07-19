@@ -50,6 +50,13 @@ const asRecord = (value: unknown): UnknownRecord => (value && typeof value === "
 const asString = (value: unknown) => (typeof value === "string" ? value : "");
 const asOptionalString = (value: unknown) => (typeof value === "string" ? value : null);
 const asArray = (value: unknown) => (Array.isArray(value) ? value : []);
+const asTextValue = (value: unknown) => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+
+  return asString(value);
+};
 const asNumber = (value: unknown) => {
   if (typeof value === "number" && Number.isFinite(value)) {
     return value;
@@ -171,6 +178,77 @@ export type HostPropertyMediaItem = {
   updatedAt: string | null;
 };
 
+export type HostPropertyUnit = {
+  id: string;
+  propertyId: string;
+  name: string;
+  capacity: string;
+  bedrooms: string;
+  bathrooms: string;
+  beds: string;
+  amenities: string[];
+  isActive: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export type UpsertHostPropertyUnitPayload = {
+  name: string;
+  capacity: string;
+  bedrooms: string;
+  bathrooms: string;
+  beds: string;
+  amenities: string[];
+  isActive: boolean;
+};
+
+export type HostUnitPricing = {
+  unitId: string;
+  basePrice: string;
+  discountedPrice: string;
+  currency: string;
+  note: string;
+};
+
+export type UpdateHostUnitPricingPayload = {
+  basePrice: string;
+  discountedPrice: string;
+  currency: string;
+};
+
+export type HostUnitBlockedDate = {
+  id: string;
+  startDate: string;
+  endDate: string;
+  note: string;
+};
+
+export type HostUnitCalendarRules = {
+  unitId: string;
+  minimumStay: string;
+  maximumStay: string;
+  note: string;
+  blockedDates: HostUnitBlockedDate[];
+};
+
+export type UpdateHostUnitCalendarRulesPayload = {
+  minimumStay: string;
+  maximumStay: string;
+};
+
+export type BlockHostUnitDatesPayload = {
+  startDate: string;
+  endDate: string;
+  note: string;
+};
+
+export type HostUnitAvailabilityPreview = {
+  unitId: string;
+  availableDates: string[];
+  blockedDates: string[];
+  summary: string;
+};
+
 export type HostPropertyReferenceOption = {
   id: string;
   value: string;
@@ -245,6 +323,36 @@ const emptyHostPropertyDetail = (): HostPropertyDetail => ({
   lat: "",
   lng: "",
   houseRules: "",
+});
+
+const emptyHostPropertyUnit = (): HostPropertyUnit => ({
+  id: "",
+  propertyId: "",
+  name: "",
+  capacity: "",
+  bedrooms: "",
+  bathrooms: "",
+  beds: "",
+  amenities: [],
+  isActive: true,
+  createdAt: null,
+  updatedAt: null,
+});
+
+const emptyHostUnitPricing = (): HostUnitPricing => ({
+  unitId: "",
+  basePrice: "",
+  discountedPrice: "",
+  currency: "",
+  note: "",
+});
+
+const emptyHostUnitCalendarRules = (): HostUnitCalendarRules => ({
+  unitId: "",
+  minimumStay: "",
+  maximumStay: "",
+  note: "",
+  blockedDates: [],
 });
 
 const normalizeHostProfile = (payload: unknown): HostProfile => {
@@ -428,6 +536,110 @@ const normalizeHostPropertyMediaItem = (payload: unknown): HostPropertyMediaItem
   };
 };
 
+const normalizeHostUnitActive = (value: unknown) => {
+  const normalized = asString(value).trim().toLowerCase();
+
+  if (!normalized) {
+    return asBoolean(value);
+  }
+
+  return ["active", "enabled", "true", "1", "yes", "available", "live"].includes(normalized);
+};
+
+const normalizeHostPropertyUnit = (payload: unknown): HostPropertyUnit => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id) || asString(source.unitId ?? source.unit_id),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    name:
+      asString(source.name) ||
+      asString(source.unitName ?? source.unit_name) ||
+      asString(source.title) ||
+      asString(source.label),
+    capacity: asTextValue(source.capacity ?? source.maxGuests ?? source.max_guests ?? source.guests),
+    bedrooms: asTextValue(source.bedrooms ?? source.bedroomCount ?? source.bedroom_count),
+    bathrooms: asTextValue(source.bathrooms ?? source.bathroomCount ?? source.bathroom_count),
+    beds: asTextValue(source.beds ?? source.bedCount ?? source.bed_count),
+    amenities: normalizeHostPropertyAmenities(source.amenities ?? source.amenityIds ?? source.amenity_ids),
+    isActive: normalizeHostUnitActive(source.isActive ?? source.is_active ?? source.active ?? source.status),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
+  };
+};
+
+const normalizeHostUnitPricing = (payload: unknown, unitId = ""): HostUnitPricing => {
+  const source = asRecord(payload);
+
+  return {
+    unitId: asString(source.unitId ?? source.unit_id) || unitId,
+    basePrice: asTextValue(source.basePrice ?? source.base_price ?? source.price ?? source.amount),
+    discountedPrice: asTextValue(
+      source.discountedPrice ?? source.discounted_price ?? source.salePrice ?? source.sale_price,
+    ),
+    currency: asString(source.currency ?? source.currencyCode ?? source.currency_code),
+    note: asString(source.note ?? source.description ?? source.summary),
+  };
+};
+
+const normalizeHostUnitBlockedDate = (payload: unknown): HostUnitBlockedDate => {
+  const source = asRecord(payload);
+  const singleDate = asString(source.date);
+
+  return {
+    id: asString(source.id) || asString(source.blockId ?? source.block_id) || singleDate,
+    startDate: asString(source.startDate ?? source.start_date) || singleDate,
+    endDate: asString(source.endDate ?? source.end_date) || singleDate,
+    note: asString(source.note ?? source.reason ?? source.description),
+  };
+};
+
+const normalizeHostUnitCalendarRules = (payload: unknown, unitId = ""): HostUnitCalendarRules => {
+  const source = asRecord(payload);
+
+  return {
+    unitId: asString(source.unitId ?? source.unit_id) || unitId,
+    minimumStay: asTextValue(source.minimumStay ?? source.minimum_stay ?? source.minStay ?? source.min_stay),
+    maximumStay: asTextValue(source.maximumStay ?? source.maximum_stay ?? source.maxStay ?? source.max_stay),
+    note: asString(source.note ?? source.description ?? source.summary),
+    blockedDates: extractHostUnitBlockedDateArray(
+      source.blockedDates ?? source.blocked_dates ?? source.blocks ?? source.blocksList,
+    )
+      .map((item) => normalizeHostUnitBlockedDate(item))
+      .filter((item) => item.startDate),
+  };
+};
+
+const normalizeAvailabilityDates = (value: unknown) =>
+  asArray(value)
+    .map((item) => {
+      if (typeof item === "string") {
+        return item;
+      }
+
+      const source = asRecord(item);
+      return (
+        asString(source.date) ||
+        asString(source.startDate ?? source.start_date) ||
+        asString(source.availableDate ?? source.available_date)
+      );
+    })
+    .filter(Boolean);
+
+const normalizeHostUnitAvailabilityPreview = (
+  payload: unknown,
+  unitId = "",
+): HostUnitAvailabilityPreview => {
+  const source = asRecord(payload);
+
+  return {
+    unitId: asString(source.unitId ?? source.unit_id) || unitId,
+    availableDates: normalizeAvailabilityDates(source.availableDates ?? source.available_dates ?? source.available),
+    blockedDates: normalizeAvailabilityDates(source.blockedDates ?? source.blocked_dates ?? source.blocks),
+    summary: asString(source.summary ?? source.note ?? source.description),
+  };
+};
+
 const extractHostPropertyMediaArray = (payload: unknown) => {
   if (Array.isArray(payload)) {
     return payload;
@@ -453,6 +665,62 @@ const extractHostPropertyMediaArray = (payload: unknown) => {
 
   if (Array.isArray(source.images)) {
     return source.images;
+  }
+
+  return [];
+};
+
+const extractHostPropertyUnitArray = (payload: unknown) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  const source = asRecord(payload);
+
+  if (Array.isArray(source.items)) {
+    return source.items;
+  }
+
+  if (Array.isArray(source.results)) {
+    return source.results;
+  }
+
+  if (Array.isArray(source.units)) {
+    return source.units;
+  }
+
+  if (Array.isArray(source.data)) {
+    return source.data;
+  }
+
+  return [];
+};
+
+const extractHostUnitBlockedDateArray = (payload: unknown) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  const source = asRecord(payload);
+
+  if (Array.isArray(source.items)) {
+    return source.items;
+  }
+
+  if (Array.isArray(source.results)) {
+    return source.results;
+  }
+
+  if (Array.isArray(source.blockedDates)) {
+    return source.blockedDates;
+  }
+
+  if (Array.isArray(source.blocked_dates)) {
+    return source.blocked_dates;
+  }
+
+  if (Array.isArray(source.blocks)) {
+    return source.blocks;
   }
 
   return [];
@@ -1161,6 +1429,299 @@ export async function deleteHostPropertyMedia(
   });
 }
 
+const toOptionalNumber = (value: string) => {
+  const normalized = value.trim();
+
+  if (!normalized) {
+    return undefined;
+  }
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+export async function getHostPropertyUnits(
+  token: string,
+  propertyId: string,
+): Promise<HostPropertyUnit[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/properties/${propertyId}/units`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return extractHostPropertyUnitArray(response)
+    .map((item) => normalizeHostPropertyUnit(item))
+    .filter((item) => item.id);
+}
+
+export async function createHostPropertyUnit(
+  token: string,
+  propertyId: string,
+  payload: UpsertHostPropertyUnitPayload,
+): Promise<HostPropertyUnit> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/properties/${propertyId}/units`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      name: payload.name.trim() || undefined,
+      capacity: toOptionalNumber(payload.capacity),
+      bedrooms: toOptionalNumber(payload.bedrooms),
+      bathrooms: toOptionalNumber(payload.bathrooms),
+      beds: toOptionalNumber(payload.beds),
+      amenities: payload.amenities,
+      isActive: payload.isActive,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostPropertyUnit(response);
+}
+
+export async function updateHostPropertyUnit(
+  token: string,
+  propertyId: string,
+  unitId: string,
+  payload: UpsertHostPropertyUnitPayload,
+): Promise<HostPropertyUnit> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/properties/${propertyId}/units/${unitId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      name: payload.name.trim() || undefined,
+      capacity: toOptionalNumber(payload.capacity),
+      bedrooms: toOptionalNumber(payload.bedrooms),
+      bathrooms: toOptionalNumber(payload.bathrooms),
+      beds: toOptionalNumber(payload.beds),
+      amenities: payload.amenities,
+      isActive: payload.isActive,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostPropertyUnit(response);
+}
+
+export async function deleteHostPropertyUnit(
+  token: string,
+  propertyId: string,
+  unitId: string,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  await apiRequestOptional<unknown>(`/api/v1/host/properties/${propertyId}/units/${unitId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+}
+
+export async function getHostUnitPricing(token: string, unitId: string): Promise<HostUnitPricing> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/units/${unitId}/pricing`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return normalizeHostUnitPricing(response, unitId);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return {
+        ...emptyHostUnitPricing(),
+        unitId,
+      };
+    }
+
+    throw error;
+  }
+}
+
+export async function updateHostUnitPricing(
+  token: string,
+  unitId: string,
+  payload: UpdateHostUnitPricingPayload,
+): Promise<HostUnitPricing> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/units/${unitId}/pricing`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      basePrice: toOptionalNumber(payload.basePrice),
+      discountedPrice: toOptionalNumber(payload.discountedPrice),
+      currency: payload.currency.trim() || undefined,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostUnitPricing(response, unitId);
+}
+
+export async function getHostUnitCalendar(
+  token: string,
+  unitId: string,
+): Promise<HostUnitCalendarRules> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/units/${unitId}/calendar`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return normalizeHostUnitCalendarRules(response, unitId);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return {
+        ...emptyHostUnitCalendarRules(),
+        unitId,
+      };
+    }
+
+    throw error;
+  }
+}
+
+export async function updateHostUnitCalendarRules(
+  token: string,
+  unitId: string,
+  payload: UpdateHostUnitCalendarRulesPayload,
+): Promise<HostUnitCalendarRules> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/units/${unitId}/calendar/rules`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      minimumStay: toOptionalNumber(payload.minimumStay),
+      maximumStay: toOptionalNumber(payload.maximumStay),
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostUnitCalendarRules(response, unitId);
+}
+
+export async function blockHostUnitDates(
+  token: string,
+  unitId: string,
+  payload: BlockHostUnitDatesPayload,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  await apiRequestOptional<unknown>(`/api/v1/host/units/${unitId}/calendar/block`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      note: payload.note.trim() || undefined,
+    },
+    cache: "no-store",
+  });
+}
+
+export async function unblockHostUnitDates(
+  token: string,
+  unitId: string,
+  blockedDate: HostUnitBlockedDate,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  await apiRequestOptional<unknown>(`/api/v1/host/units/${unitId}/calendar/unblock`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      blockId: blockedDate.id || undefined,
+      id: blockedDate.id || undefined,
+      startDate: blockedDate.startDate || undefined,
+      endDate: blockedDate.endDate || undefined,
+      date: blockedDate.startDate || undefined,
+    },
+    cache: "no-store",
+  });
+}
+
+export async function getHostUnitAvailabilityPreview(
+  token: string,
+  unitId: string,
+): Promise<HostUnitAvailabilityPreview | null> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/units/${unitId}/availability`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return normalizeHostUnitAvailabilityPreview(response, unitId);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+
+    throw error;
+  }
+}
+
 export const createEmptyHostProfile = emptyHostProfile;
 export const createEmptyHostPayoutProfile = emptyHostPayoutProfile;
 export const createEmptyHostPropertyDetail = emptyHostPropertyDetail;
+export const createEmptyHostPropertyUnit = emptyHostPropertyUnit;
+export const createEmptyHostUnitPricing = emptyHostUnitPricing;
+export const createEmptyHostUnitCalendarRules = emptyHostUnitCalendarRules;

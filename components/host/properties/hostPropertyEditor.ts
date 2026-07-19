@@ -5,6 +5,7 @@ export type HostPropertyEditorStepKey =
   | "media"
   | "units"
   | "pricing"
+  | "calendar"
   | "verification";
 
 export type HostPropertyEditorStep = {
@@ -39,7 +40,12 @@ const hostPropertyEditorStepDefinitions: Array<Omit<HostPropertyEditorStep, "sta
   {
     key: "pricing",
     label: "Pricing",
-    description: "Pricing, availability, and rules.",
+    description: "Base rates, discounted rates, and currency.",
+  },
+  {
+    key: "calendar",
+    label: "Calendar",
+    description: "Stay rules, blocked dates, and availability preview.",
   },
   {
     key: "verification",
@@ -48,7 +54,14 @@ const hostPropertyEditorStepDefinitions: Array<Omit<HostPropertyEditorStep, "sta
   },
 ];
 
-const stepRouteKeys: HostPropertyEditorStepKey[] = ["basics", "location", "media"];
+const stepRouteKeys: HostPropertyEditorStepKey[] = [
+  "basics",
+  "location",
+  "media",
+  "units",
+  "pricing",
+  "calendar",
+];
 
 const getEditorStepHref = (propertyId: string, key: HostPropertyEditorStepKey) => {
   if (key === "basics" || key === "location") {
@@ -57,6 +70,18 @@ const getEditorStepHref = (propertyId: string, key: HostPropertyEditorStepKey) =
 
   if (key === "media") {
     return `/host/properties/${propertyId}/media`;
+  }
+
+  if (key === "units") {
+    return `/host/properties/${propertyId}/units`;
+  }
+
+  if (key === "pricing") {
+    return `/host/properties/${propertyId}/pricing`;
+  }
+
+  if (key === "calendar") {
+    return `/host/properties/${propertyId}/calendar`;
   }
 
   return undefined;

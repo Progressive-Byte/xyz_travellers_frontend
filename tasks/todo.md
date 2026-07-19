@@ -33,3 +33,16 @@
 - Added a real property media route and media manager flow for image upload, optional video URL entry, cover image selection, caption and sort-order editing, and delete actions.
 - Extended the shared API layer to support multipart uploads and optional successful responses without a `data` payload.
 - Verified the new host media files with diagnostics and confirmed `npm.cmd run build` passes with `/host/properties/[propertyId]/media` present in the route tree.
+
+## Host Portal Chunk 6
+
+- [completed] Extend the shared host data layer to support property units, unit pricing, calendar rules, blocked dates, and availability preview helpers.
+- [completed] Build the `/host/properties/[propertyId]/units`, `/host/properties/[propertyId]/pricing`, and `/host/properties/[propertyId]/calendar` routes inside the shared host shell.
+- [completed] Update the property workflow stepper, host navigation matching, and media-page forward navigation so Chunk 6 routes behave like real add-property stages.
+- [completed] Run diagnostics and `npm.cmd run build`, then document the Chunk 6 review result.
+
+### Review
+
+- Added real unit-management, pricing, and calendar routes for approved hosts, with loading, empty, error, populated, and read-only states aligned to existing draft editability rules.
+- Extended `lib/host.ts` with normalized helpers for unit CRUD, pricing load/save, calendar rules, blocked-date updates, and optional availability preview handling.
+- Verified the new Chunk 6 host files with diagnostics and confirmed `npm.cmd run build` passes with `/host/properties/[propertyId]/units`, `/host/properties/[propertyId]/pricing`, and `/host/properties/[propertyId]/calendar` present in the route tree.
