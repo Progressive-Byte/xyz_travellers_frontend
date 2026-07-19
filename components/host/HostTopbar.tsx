@@ -15,12 +15,12 @@ export const HostTopbar: React.FC<HostTopbarProps> = ({
 }) => {
   return (
     <div className="border-b border-border-light bg-[rgba(245,243,237,0.88)] backdrop-blur-xl lg:hidden">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
             onClick={onMenuToggle}
-            className="surface-card-strong flex h-11 w-11 items-center justify-center rounded-[18px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-medium"
+            className="surface-card-strong flex h-10 w-10 items-center justify-center rounded-[16px] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-medium"
             aria-label="Open host navigation"
           >
             <svg
@@ -35,11 +35,11 @@ export const HostTopbar: React.FC<HostTopbarProps> = ({
           </button>
 
           <div className="min-w-0">
-            <p className="truncate font-sora text-[20px] font-bold tracking-[-0.04em] text-text-primary">
+            <p className="truncate font-sora text-[18px] font-bold tracking-[-0.04em] text-text-primary">
               {title}
             </p>
             {subtitle ? (
-              <p className="mt-1 truncate text-[12px] font-medium text-text-secondary">{subtitle}</p>
+              <p className="mt-0.5 truncate text-[11px] font-medium text-text-secondary">{subtitle}</p>
             ) : null}
           </div>
         </div>
