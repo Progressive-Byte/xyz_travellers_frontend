@@ -162,7 +162,8 @@ export const HostPropertyBasicsForm: React.FC<HostPropertyBasicsFormProps> = ({
 
       {values.ownershipType === "commercial" ? (
         <div className="mt-5 rounded-[22px] border border-border-light bg-surface px-4 py-4 text-[14px] leading-6 text-text-secondary">
-          Commercial ownership is saved now, and the deeper business-linking step will plug in later.
+          Commercial ownership is saved here, and the reusable business-linking controls now appear
+          in the editor alongside the rest of the property workflow.
         </div>
       ) : null}
 

@@ -17,6 +17,7 @@ import {
   createEmptyHostPropertySubmissionStatus,
   createEmptyHostPropertyVerification,
   createEmptyHostUnitPricing,
+  getHostBusinesses,
   getHostProperty,
   getHostPropertyMedia,
   getHostPropertySubmissionChecklist,
@@ -33,6 +34,7 @@ import {
   type HostPropertySubmissionStatus,
   type HostPropertyUnit,
   type HostPropertyVerification,
+  type HostBusiness,
   type HostUnitCalendarRules,
   type HostUnitPricing,
 } from "@/lib/host";
@@ -68,6 +70,7 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
   const [units, setUnits] = useState<HostPropertyUnit[]>([]);
   const [pricings, setPricings] = useState<HostUnitPricing[]>([]);
   const [calendars, setCalendars] = useState<HostUnitCalendarRules[]>([]);
+  const [businesses, setBusinesses] = useState<HostBusiness[]>([]);
   const [verification, setVerification] = useState<HostPropertyVerification>(
     createEmptyHostPropertyVerification(),
   );
@@ -100,13 +103,14 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
       setSubmitError("");
 
       try {
-        const [propertyResult, mediaResult, unitsResult, verificationResult, statusResult] =
+        const [propertyResult, mediaResult, unitsResult, verificationResult, statusResult, businessesResult] =
           await Promise.all([
             getHostProperty(token, propertyId),
             getHostPropertyMedia(token, propertyId),
             getHostPropertyUnits(token, propertyId),
             getHostPropertyVerification(token, propertyId),
             getHostPropertySubmissionStatus(token, propertyId),
+            getHostBusinesses(token).catch(() => []),
           ]);
 
         const unitDetails = await Promise.all(
@@ -149,6 +153,7 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
         setUnits(unitsResult);
         setPricings(unitDetails.map((item) => item.pricing));
         setCalendars(unitDetails.map((item) => item.calendar));
+        setBusinesses(businessesResult);
         setVerification(verificationResult);
         setSubmissionStatus(statusResult);
         setNoteValue(verificationResult.note);
@@ -195,8 +200,9 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
       pricings,
       calendars,
       verification,
+      businesses,
     });
-  }, [calendars, mediaItems, pricings, property, units, verification]);
+  }, [businesses, calendars, mediaItems, pricings, property, units, verification]);
   const missingItems = checklist?.items.filter((item) => !item.isComplete) ?? [];
 
   const syncPropertyStatus = (nextStatus: HostPropertySubmissionStatus) => {

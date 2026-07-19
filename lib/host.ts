@@ -139,6 +139,51 @@ export type HostSetupStatus = {
   missingFields: string[];
 };
 
+export type HostBusiness = {
+  id: string;
+  name: string;
+  registrationNumber: string;
+  country: string;
+  address: string;
+  status: string;
+  note: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export type UpsertHostBusinessPayload = {
+  name: string;
+  registrationNumber: string;
+  country: string;
+  address: string;
+  note: string;
+};
+
+export type HostBusinessDocument = {
+  id: string;
+  businessId: string;
+  fileUrl: string;
+  fileName: string;
+  title: string;
+  documentType: string;
+  note: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
+export type UploadHostBusinessDocumentsPayload = {
+  files: File[];
+  title: string;
+  documentType: string;
+  note: string;
+};
+
+export type UpdateHostBusinessDocumentPayload = {
+  title: string;
+  documentType: string;
+  note: string;
+};
+
 export type HostPropertyStatus = "draft" | "submitted" | "approved" | "rejected";
 
 export type HostPropertySummary = {
@@ -151,6 +196,9 @@ export type HostPropertySummary = {
   address: string;
   city: string;
   country: string;
+  businessId: string;
+  businessName: string;
+  selectedBusinessDocumentIds: string[];
   updatedAt: string | null;
   createdAt: string | null;
 };
@@ -283,6 +331,7 @@ export type HostPropertySubmissionStatus = {
 export type HostPropertySubmissionChecklistKey =
   | "basics"
   | "location"
+  | "business"
   | "cover-image"
   | "media"
   | "units"
@@ -309,6 +358,7 @@ export type HostPropertySubmissionChecklistInput = {
   pricings: HostUnitPricing[];
   calendars: HostUnitCalendarRules[];
   verification: HostPropertyVerification | null;
+  businesses?: HostBusiness[];
 };
 
 export type HostPropertyReferenceOption = {
@@ -327,6 +377,8 @@ export type UpdateHostPropertyPayload = {
   description: string;
   propertyType: string;
   ownershipType: string;
+  businessId: string;
+  selectedBusinessDocumentIds: string[];
   amenities: string[];
   address: string;
   city: string;
@@ -368,6 +420,30 @@ const emptyHostPayoutProfile = (): HostPayoutProfile => ({
   walletNumber: "",
 });
 
+const emptyHostBusiness = (): HostBusiness => ({
+  id: "",
+  name: "",
+  registrationNumber: "",
+  country: "",
+  address: "",
+  status: "",
+  note: "",
+  createdAt: null,
+  updatedAt: null,
+});
+
+const emptyHostBusinessDocument = (): HostBusinessDocument => ({
+  id: "",
+  businessId: "",
+  fileUrl: "",
+  fileName: "",
+  title: "",
+  documentType: "",
+  note: "",
+  createdAt: null,
+  updatedAt: null,
+});
+
 const emptyHostPropertyDetail = (): HostPropertyDetail => ({
   id: "",
   name: "",
@@ -378,6 +454,9 @@ const emptyHostPropertyDetail = (): HostPropertyDetail => ({
   address: "",
   city: "",
   country: "",
+  businessId: "",
+  businessName: "",
+  selectedBusinessDocumentIds: [],
   updatedAt: null,
   createdAt: null,
   description: "",
@@ -470,6 +549,79 @@ const normalizePayoutMethod = (value: unknown): HostPayoutMethod => {
   return "";
 };
 
+const normalizeHostBusiness = (payload: unknown): HostBusiness => {
+  const source = asRecord(payload);
+  const addressSource = asRecord(source.addressInfo ?? source.address_info ?? source.location);
+
+  return {
+    id: asString(source.id) || asString(source.businessId ?? source.business_id),
+    name:
+      asString(source.name) ||
+      asString(source.businessName ?? source.business_name) ||
+      asString(source.title),
+    registrationNumber:
+      asString(source.registrationNumber ?? source.registration_number) ||
+      asString(source.tradeLicenseNumber ?? source.trade_license_number) ||
+      asString(source.licenseNumber ?? source.license_number),
+    country: asString(source.country ?? addressSource.country),
+    address:
+      asString(source.address) ||
+      asString(addressSource.address ?? addressSource.line1 ?? addressSource.line_1),
+    status: asString(source.status ?? source.state ?? source.businessStatus ?? source.business_status),
+    note: asString(source.note ?? source.description ?? source.comment),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
+  };
+};
+
+const normalizeHostBusinessDocument = (payload: unknown): HostBusinessDocument => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id) || asString(source.documentId ?? source.document_id),
+    businessId: asString(source.businessId ?? source.business_id),
+    fileUrl:
+      asString(source.fileUrl ?? source.file_url) ||
+      asString(source.url) ||
+      asString(source.path) ||
+      asString(source.src),
+    fileName:
+      asString(source.fileName ?? source.file_name) ||
+      asString(source.name) ||
+      asString(source.title) ||
+      asString(source.label),
+    title:
+      asString(source.title) ||
+      asString(source.label) ||
+      asString(source.name) ||
+      asString(source.fileName ?? source.file_name),
+    documentType:
+      asString(source.documentType ?? source.document_type) ||
+      asString(source.type) ||
+      asString(source.category),
+    note: asString(source.note ?? source.description ?? source.comment),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
+  };
+};
+
+const normalizeSelectedBusinessDocumentIds = (value: unknown): string[] =>
+  asArray(value)
+    .map((item) => {
+      if (typeof item === "string") {
+        return item.trim();
+      }
+
+      const source = asRecord(item);
+
+      return (
+        asString(source.id) ||
+        asString(source.documentId ?? source.document_id) ||
+        asString(source.value)
+      ).trim();
+    })
+    .filter(Boolean);
+
 const normalizeHostPropertyStatus = (value: unknown): HostPropertyStatus => {
   const normalized = asString(value).trim().toLowerCase();
 
@@ -518,6 +670,13 @@ const normalizeHostPropertySummary = (payload: unknown): HostPropertySummary => 
   const addressSource = asRecord(source.location ?? source.addressInfo ?? source.address_info);
   const propertyTypeSource = asRecord(source.propertyType ?? source.property_type);
   const ownershipTypeSource = asRecord(source.ownershipType ?? source.ownership_type);
+  const businessSource = asRecord(
+    source.business ??
+      source.businessProfile ??
+      source.business_profile ??
+      source.selectedBusiness ??
+      source.selected_business,
+  );
   const rawStatus =
     asOptionalString(source.status) ??
     asOptionalString(source.propertyStatus) ??
@@ -542,6 +701,23 @@ const normalizeHostPropertySummary = (payload: unknown): HostPropertySummary => 
     address: asString(source.address ?? addressSource.address ?? addressSource.line1 ?? addressSource.line_1),
     city: asString(source.city ?? addressSource.city),
     country: asString(source.country ?? addressSource.country),
+    businessId:
+      asString(source.businessId ?? source.business_id) ||
+      asString(source.selectedBusinessId ?? source.selected_business_id) ||
+      asString(businessSource.id ?? businessSource.businessId ?? businessSource.business_id),
+    businessName:
+      asString(source.businessName ?? source.business_name) ||
+      asString(businessSource.name ?? businessSource.businessName ?? businessSource.business_name),
+    selectedBusinessDocumentIds: normalizeSelectedBusinessDocumentIds(
+      source.selectedBusinessDocumentIds ??
+        source.selected_business_document_ids ??
+        source.businessDocumentIds ??
+        source.business_document_ids ??
+        source.selectedBusinessDocuments ??
+        source.selected_business_documents ??
+        businessSource.documents ??
+        businessSource.businessDocuments,
+    ),
     updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
     createdAt: asOptionalString(source.createdAt ?? source.created_at),
   };
@@ -923,6 +1099,40 @@ const extractHostPropertyVerificationDocumentsArray = (payload: unknown) => {
   return [];
 };
 
+const extractHostBusinessDocumentArray = (payload: unknown) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  const source = asRecord(payload);
+
+  if (Array.isArray(source.items)) {
+    return source.items;
+  }
+
+  if (Array.isArray(source.results)) {
+    return source.results;
+  }
+
+  if (Array.isArray(source.documents)) {
+    return source.documents;
+  }
+
+  if (Array.isArray(source.files)) {
+    return source.files;
+  }
+
+  if (Array.isArray(source.attachments)) {
+    return source.attachments;
+  }
+
+  if (Array.isArray(source.data)) {
+    return source.data;
+  }
+
+  return [];
+};
+
 const extractReferenceArray = (payload: unknown) => {
   if (Array.isArray(payload)) {
     return payload;
@@ -956,6 +1166,10 @@ const extractReferenceArray = (payload: unknown) => {
 
   if (Array.isArray(source.properties)) {
     return source.properties;
+  }
+
+  if (Array.isArray(source.businesses)) {
+    return source.businesses;
   }
 
   return [];
@@ -1126,6 +1340,7 @@ export const getHostPropertySubmissionChecklist = ({
   pricings,
   calendars,
   verification,
+  businesses = [],
 }: HostPropertySubmissionChecklistInput): HostPropertySubmissionChecklist => {
   const hasBasics =
     Boolean(property.name.trim()) &&
@@ -1136,6 +1351,12 @@ export const getHostPropertySubmissionChecklist = ({
     Boolean(property.address.trim()) &&
     Boolean(property.city.trim()) &&
     Boolean(property.country.trim());
+  const isCommercial = property.ownershipType.trim().toLowerCase() === "commercial";
+  const hasBusinessLinkage =
+    !isCommercial ||
+    (Boolean(property.businessId.trim()) &&
+      (property.selectedBusinessDocumentIds.length > 0 ||
+        businesses.some((item) => item.id === property.businessId)));
   const hasMedia = mediaItems.length > 0;
   const hasCoverImage = mediaItems.some((item) => item.type === "image" && item.isCover);
   const hasUnits = units.length > 0;
@@ -1160,6 +1381,14 @@ export const getHostPropertySubmissionChecklist = ({
       label: "Location complete",
       description: "Address, city, and country are ready for review.",
       isComplete: hasLocation,
+    },
+    {
+      key: "business",
+      label: "Commercial business linked",
+      description: isCommercial
+        ? "Commercial properties should be linked to a business profile and reusable business documents."
+        : "Personal properties do not need business linkage for submission readiness.",
+      isComplete: hasBusinessLinkage,
     },
     {
       key: "cover-image",
@@ -1514,6 +1743,11 @@ export async function updateHostProperty(
       description: payload.description.trim() || undefined,
       propertyType: payload.propertyType.trim() || undefined,
       ownershipType: payload.ownershipType.trim() || undefined,
+      businessId: payload.businessId.trim() || undefined,
+      selectedBusinessDocumentIds:
+        payload.selectedBusinessDocumentIds.length > 0
+          ? payload.selectedBusinessDocumentIds
+          : undefined,
       amenities: payload.amenities,
       address: payload.address.trim() || undefined,
       city: payload.city.trim() || undefined,
@@ -1526,6 +1760,235 @@ export async function updateHostProperty(
   });
 
   return normalizeHostPropertyDetail(response);
+}
+
+export async function getHostBusinesses(token: string): Promise<HostBusiness[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>("/api/v1/host/businesses", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return extractReferenceArray(response)
+    .map((item) => normalizeHostBusiness(item))
+    .filter((item) => item.id);
+}
+
+export async function getHostBusiness(token: string, businessId: string): Promise<HostBusiness> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/businesses/${businessId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostBusiness(response);
+}
+
+export async function createHostBusiness(
+  token: string,
+  payload: UpsertHostBusinessPayload,
+): Promise<HostBusiness> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>("/api/v1/host/businesses", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      name: payload.name.trim() || undefined,
+      registrationNumber: payload.registrationNumber.trim() || undefined,
+      country: payload.country.trim() || undefined,
+      address: payload.address.trim() || undefined,
+      note: payload.note.trim() || undefined,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostBusiness(response);
+}
+
+export async function updateHostBusiness(
+  token: string,
+  businessId: string,
+  payload: UpsertHostBusinessPayload,
+): Promise<HostBusiness> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(`/api/v1/host/businesses/${businessId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: {
+      name: payload.name.trim() || undefined,
+      registrationNumber: payload.registrationNumber.trim() || undefined,
+      country: payload.country.trim() || undefined,
+      address: payload.address.trim() || undefined,
+      note: payload.note.trim() || undefined,
+    },
+    cache: "no-store",
+  });
+
+  return normalizeHostBusiness(response);
+}
+
+export async function deleteHostBusiness(token: string, businessId: string): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  await apiRequestOptional<unknown>(`/api/v1/host/businesses/${businessId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+}
+
+export async function getHostBusinessDocuments(
+  token: string,
+  businessId: string,
+): Promise<HostBusinessDocument[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  try {
+    const response = await apiRequest<unknown>(`/api/v1/host/businesses/${businessId}/documents`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    return extractHostBusinessDocumentArray(response)
+      .map((item) => normalizeHostBusinessDocument(item))
+      .filter((item) => item.id || item.fileUrl);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return [];
+    }
+
+    throw error;
+  }
+}
+
+export async function uploadHostBusinessDocuments(
+  token: string,
+  businessId: string,
+  payload: UploadHostBusinessDocumentsPayload,
+): Promise<HostBusinessDocument[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const formData = new FormData();
+
+  payload.files.forEach((file) => {
+    formData.append("files", file);
+  });
+
+  if (payload.title.trim()) {
+    formData.append("title", payload.title.trim());
+  }
+
+  if (payload.documentType.trim()) {
+    formData.append("documentType", payload.documentType.trim());
+  }
+
+  if (payload.note.trim()) {
+    formData.append("note", payload.note.trim());
+  }
+
+  const response = await apiRequestOptional<unknown>(
+    `/api/v1/host/businesses/${businessId}/documents`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+      cache: "no-store",
+    },
+  );
+
+  if (response) {
+    const documents = extractHostBusinessDocumentArray(response)
+      .map((item) => normalizeHostBusinessDocument(item))
+      .filter((item) => item.id || item.fileUrl);
+
+    if (documents.length > 0) {
+      return documents;
+    }
+  }
+
+  return getHostBusinessDocuments(token, businessId);
+}
+
+export async function updateHostBusinessDocument(
+  token: string,
+  businessId: string,
+  documentId: string,
+  payload: UpdateHostBusinessDocumentPayload,
+): Promise<HostBusinessDocument> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(
+    `/api/v1/host/businesses/${businessId}/documents/${documentId}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: {
+        title: payload.title.trim() || undefined,
+        documentType: payload.documentType.trim() || undefined,
+        note: payload.note.trim() || undefined,
+      },
+      cache: "no-store",
+    },
+  );
+
+  return normalizeHostBusinessDocument(response);
+}
+
+export async function deleteHostBusinessDocument(
+  token: string,
+  businessId: string,
+  documentId: string,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  await apiRequestOptional<unknown>(`/api/v1/host/businesses/${businessId}/documents/${documentId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
 }
 
 export async function getHostPropertyTypes(token: string): Promise<HostPropertyReferenceOption[]> {
@@ -2128,6 +2591,8 @@ export async function submitHostPropertyForReview(
 
 export const createEmptyHostProfile = emptyHostProfile;
 export const createEmptyHostPayoutProfile = emptyHostPayoutProfile;
+export const createEmptyHostBusiness = emptyHostBusiness;
+export const createEmptyHostBusinessDocument = emptyHostBusinessDocument;
 export const createEmptyHostPropertyDetail = emptyHostPropertyDetail;
 export const createEmptyHostPropertyUnit = emptyHostPropertyUnit;
 export const createEmptyHostUnitPricing = emptyHostUnitPricing;

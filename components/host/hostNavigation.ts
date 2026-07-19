@@ -5,6 +5,7 @@ export type HostNavIcon =
   | "reservations"
   | "messages"
   | "earnings"
+  | "businesses"
   | "profile"
   | "payouts";
 
@@ -75,6 +76,14 @@ export const hostNavigationItems: HostNavItem[] = [
     group: "Setup",
     isLive: true,
     description: "Update your host identity, contact details, photo, and bio.",
+  },
+  {
+    label: "Businesses",
+    href: "/host/businesses",
+    icon: "businesses",
+    group: "Setup",
+    isLive: true,
+    description: "Manage reusable business profiles and business documents for commercial properties.",
   },
   {
     label: "Payout Setup",
