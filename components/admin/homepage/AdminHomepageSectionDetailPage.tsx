@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
@@ -11,10 +11,12 @@ import {
   createEmptyAdminHomepageSectionItemForm,
   deleteAdminHomepageSectionItem,
   getAdminHomepageSection,
+  getAdminPropertyApplications,
   updateAdminHomepageSection,
   updateAdminHomepageSectionItem,
   type AdminHomepageSectionDetail,
   type AdminHomepageSectionItem,
+  type AdminPropertyApplicationSummary,
   type CreateAdminHomepageSectionItemPayload,
   type UpdateAdminHomepageSectionItemPayload,
   type UpsertAdminHomepageSectionPayload,
@@ -57,9 +59,34 @@ export const AdminHomepageSectionDetailPage: React.FC<AdminHomepageSectionDetail
   const [pageError, setPageError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingApprovedProperties, setIsLoadingApprovedProperties] = useState(false);
+  const [approvedPropertiesError, setApprovedPropertiesError] = useState("");
+  const [approvedProperties, setApprovedProperties] = useState<AdminPropertyApplicationSummary[]>([]);
   const [isSavingSection, setIsSavingSection] = useState(false);
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [itemActionKey, setItemActionKey] = useState("");
+
+  const loadApprovedProperties = async () => {
+    if (!token) {
+      return;
+    }
+
+    setIsLoadingApprovedProperties(true);
+    setApprovedPropertiesError("");
+
+    try {
+      const data = await getAdminPropertyApplications(token, { status: "approved" });
+      setApprovedProperties(data);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setApprovedPropertiesError(error.message);
+      } else {
+        setApprovedPropertiesError("Unable to load the approved property list.");
+      }
+    } finally {
+      setIsLoadingApprovedProperties(false);
+    }
+  };
 
   const loadSection = async () => {
     if (!token) {
@@ -97,6 +124,10 @@ export const AdminHomepageSectionDetailPage: React.FC<AdminHomepageSectionDetail
     void loadSection();
   }, [sectionId, token]);
 
+  useEffect(() => {
+    void loadApprovedProperties();
+  }, [token]);
+
   const syncSectionState = (nextSection: AdminHomepageSectionDetail) => {
     setSection(nextSection);
     setSectionForm(mapSectionDetailToForm(nextSection));
@@ -126,12 +157,30 @@ export const AdminHomepageSectionDetailPage: React.FC<AdminHomepageSectionDetail
     const nextErrors: ItemErrors = {};
 
     if (!itemForm.propertyId.trim()) {
-      nextErrors.propertyId = "Approved property ID is required.";
+      nextErrors.propertyId = "Approved property is required.";
     }
 
     setItemErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
+
+  const availableApprovedProperties = useMemo(() => {
+    if (!section) {
+      return approvedProperties;
+    }
+
+    const existingIds = new Set(section.items.map((item) => item.propertyId));
+    return approvedProperties.filter((item) => !existingIds.has(item.id));
+  }, [approvedProperties, section]);
+
+  const approvedPropertyNameById = useMemo(
+    () =>
+      approvedProperties.reduce<Record<string, string>>((accumulator, item) => {
+        accumulator[item.id] = item.propertyName || "Untitled property";
+        return accumulator;
+      }, {}),
+    [approvedProperties],
+  );
 
   const handleSaveSection = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -384,27 +433,48 @@ export const AdminHomepageSectionDetailPage: React.FC<AdminHomepageSectionDetail
                 Add Property
               </p>
               <h2 className="mt-4 font-sora text-[26px] font-bold tracking-[-0.04em] text-text-primary">
-                Add approved property by ID
+                Add approved property
               </h2>
               <p className="mt-3 text-[14px] leading-6 text-text-secondary">
-                This API expects a property ID directly. Only properties already in approved status can be
-                added into a homepage section.
+                Choose from the approved property inventory. Only approved properties can be added into a
+                homepage section.
               </p>
 
               <form className="mt-6 space-y-4" onSubmit={handleAddItem}>
                 <label className="block">
-                  <span className="mb-2 block text-[13px] font-semibold text-text-primary">Property ID</span>
-                  <input
-                    type="text"
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <span className="block text-[13px] font-semibold text-text-primary">Approved property</span>
+                    <button
+                      type="button"
+                      onClick={() => void loadApprovedProperties()}
+                      className="inline-flex items-center justify-center rounded-[14px] border border-border bg-white px-3 py-2 text-[12px] font-semibold text-text-primary shadow-soft disabled:cursor-not-allowed disabled:opacity-70"
+                      disabled={isLoadingApprovedProperties}
+                    >
+                      {isLoadingApprovedProperties ? "Refreshing..." : "Refresh list"}
+                    </button>
+                  </div>
+                  <select
                     value={itemForm.propertyId}
                     onChange={(event) =>
                       setItemForm((current) => ({ ...current, propertyId: event.target.value }))
                     }
-                    placeholder="6a4f7c54ae97f293a4032a00"
                     className={inputClassName}
-                  />
+                  >
+                    <option value="">
+                      {isLoadingApprovedProperties ? "Loading approved properties..." : "Select an approved property"}
+                    </option>
+                    {availableApprovedProperties.map((property) => (
+                      <option key={property.id} value={property.id}>
+                        {property.propertyName || "Untitled property"} • {property.city || "City"} •{" "}
+                        {property.country || "Country"}
+                      </option>
+                    ))}
+                  </select>
                   {itemErrors.propertyId ? (
                     <p className="mt-2 text-[13px] text-red-600">{itemErrors.propertyId}</p>
+                  ) : null}
+                  {approvedPropertiesError ? (
+                    <p className="mt-2 text-[13px] text-red-600">{approvedPropertiesError}</p>
                   ) : null}
                 </label>
 
@@ -465,7 +535,7 @@ export const AdminHomepageSectionDetailPage: React.FC<AdminHomepageSectionDetail
                   <thead className="bg-surface">
                     <tr className="text-left">
                       <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                        Property ID
+                        Property
                       </th>
                       <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
                         Sort order
@@ -489,7 +559,7 @@ export const AdminHomepageSectionDetailPage: React.FC<AdminHomepageSectionDetail
                         return (
                           <tr key={item.propertyId} className="border-t border-border-light">
                             <td className="px-4 py-4 align-top text-[13px] font-semibold text-text-primary">
-                              {item.propertyId}
+                              {approvedPropertyNameById[item.propertyId] || item.propertyId}
                             </td>
                             <td className="px-4 py-4 align-top">
                               <input
