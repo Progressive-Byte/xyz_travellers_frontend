@@ -89,24 +89,6 @@ const amenityIcon = (label: string) => {
   return "OK";
 };
 
-const formatDateLabel = (value: string | null) => {
-  if (!value) {
-    return "Select date";
-  }
-
-  const parsed = new Date(value);
-
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return parsed.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-};
-
 const formatReviewDate = (value: string | null) => {
   if (!value) {
     return "Recent stay";
@@ -235,18 +217,13 @@ export default async function PropertyPage({
   const stats = buildPropertyStats(detail);
   const reviewSummaryLabel = detail.reviews.summary?.displayLabel || "New";
   const reviewCount = detail.reviews.summary?.count ?? 0;
-  const guestSummary = stayFilters.guests
-    ? `${stayFilters.guests} guest${stayFilters.guests === 1 ? "" : "s"}`
-    : stats[0]?.value === "Flexible"
-      ? "Check unit capacities"
-      : `Up to ${stats[0]?.value} guests`;
   const stayTotalLabel = detail.pricing.minStayTotalLabel || "";
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="section-shell overflow-hidden bg-background pb-20 pt-8 md:pb-24">
+      <main className="section-shell overflow-visible bg-background pb-20 pt-8 md:pb-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto">
             <div className="flex flex-wrap items-center gap-3 text-[13px] font-medium text-text-secondary">
@@ -548,10 +525,14 @@ export default async function PropertyPage({
 
             <div className="self-start lg:sticky lg:top-28">
               <PropertyBookingCard
+                propertyId={propertyId}
                 priceLabel={detail.pricing.minNightlyLabel || "Rate unavailable"}
-                guestSummary={guestSummary}
-                checkInValue={formatDateLabel(stayFilters.checkIn || null)}
-                checkOutValue={formatDateLabel(stayFilters.checkOut || null)}
+                initialCheckIn={stayFilters.checkIn || undefined}
+                initialCheckOut={stayFilters.checkOut || undefined}
+                initialGuests={stayFilters.guests}
+                guestPlaceholder={
+                  stats[0]?.value === "Flexible" ? "Enter guests" : `Up to ${stats[0]?.value} guests`
+                }
                 availabilityLabel={buildAvailabilityNote(detail, stayFilters.error)}
                 stayTotalLabel={stayTotalLabel}
               />
