@@ -1,4 +1,4 @@
-import { apiRequest, apiRequestOptional, ApiError } from "@/lib/api";
+import { apiRequest, apiRequestOptional, ApiError, resolveApiUrl } from "@/lib/api";
 
 export type HostReservationPreview = {
   id: string;
@@ -1307,9 +1307,21 @@ const normalizeHostPropertyDetail = (payload: unknown): HostPropertyDetail => {
   const source = asRecord(payload);
   const summary = normalizeHostPropertySummary(payload);
   const locationSource = asRecord(source.location ?? source.addressInfo ?? source.address_info);
+  const propertyTypeSource = asRecord(source.propertyType ?? source.property_type);
 
   return {
     ...summary,
+    propertyType:
+      asString(source.propertyTypeId ?? source.property_type_id) ||
+      asString(
+        propertyTypeSource.id ??
+          propertyTypeSource._id ??
+          propertyTypeSource.propertyTypeId ??
+          propertyTypeSource.property_type_id ??
+          propertyTypeSource.value ??
+          propertyTypeSource.slug,
+      ) ||
+      summary.propertyType,
     description: asString(source.description),
     amenities: normalizeHostPropertyAmenities(source.amenities ?? source.amenityIds ?? source.amenity_ids),
     lat: asTextValue(source.lat ?? source.latitude ?? locationSource.lat ?? locationSource.latitude),
@@ -1336,23 +1348,25 @@ const normalizeHostPropertyMediaItem = (payload: unknown): HostPropertyMediaItem
     source.type ??
     source.kind ??
     (source.videoUrl ?? source.video_url ? "video" : "image");
-  const url =
+  const url = resolveApiUrl(
     asString(source.url) ||
     asString(source.fileUrl ?? source.file_url) ||
     asString(source.mediaUrl ?? source.media_url) ||
     asString(source.src) ||
     asString(source.path) ||
-    asString(source.videoUrl ?? source.video_url);
+    asString(source.videoUrl ?? source.video_url),
+  );
 
   return {
     id: asString(source.id) || asString(source.mediaId ?? source.media_id),
     propertyId: asString(source.propertyId ?? source.property_id),
     type: normalizeHostPropertyMediaType(rawType),
     url,
-    thumbnailUrl:
+    thumbnailUrl: resolveApiUrl(
       asString(source.thumbnailUrl ?? source.thumbnail_url) ||
       asString(source.previewUrl ?? source.preview_url) ||
       url,
+    ),
     caption: asString(source.caption ?? source.altText ?? source.alt_text ?? source.title),
     sortOrder: asNumber(source.sortOrder ?? source.sort_order ?? source.order ?? source.position ?? source.index),
     isCover: asBoolean(
