@@ -45,7 +45,9 @@ export const FrontServices: React.FC = () => {
                   className={`grid gap-8 lg:items-center ${
                     isTourService
                       ? "lg:grid-cols-[minmax(0,1.02fr)_420px]"
-                      : "lg:grid-cols-[minmax(0,1.2fr)_280px]"
+                      : isEventService || isTransportService
+                        ? "lg:grid-cols-[minmax(0,1.08fr)_360px]"
+                        : "lg:grid-cols-[minmax(0,1.2fr)_280px]"
                   }`}
                 >
                 <div className="max-w-2xl">
@@ -107,10 +109,10 @@ export const FrontServices: React.FC = () => {
                       </div>
                     </div>
                   ) : isEventService || isTransportService ? (
-                    <div className="relative hidden h-[210px] overflow-hidden rounded-[28px] border border-border-light bg-surface lg:block">
+                    <div className="relative hidden h-[260px] overflow-hidden rounded-[28px] border border-border-light bg-surface lg:block">
                       <div className={`absolute inset-0 bg-gradient-to-br ${service.accent}`} />
                       <div className="absolute inset-0 opacity-35 [background-image:linear-gradient(rgba(26,27,18,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(26,27,18,0.05)_1px,transparent_1px)] [background-size:24px_24px]" />
-                      <div className="absolute inset-4 overflow-hidden rounded-[24px] border border-white/80 bg-white shadow-medium">
+                      <div className="absolute inset-5 overflow-hidden rounded-[24px] border border-white/80 bg-white shadow-medium">
                         <Image
                           src={isEventService ? event3 : transp3}
                           alt={
@@ -119,7 +121,7 @@ export const FrontServices: React.FC = () => {
                               : "Transport booking program visual"
                           }
                           fill
-                          sizes="280px"
+                          sizes="360px"
                           className="object-cover"
                         />
                       </div>

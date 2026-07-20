@@ -1,7 +1,20 @@
 import React from "react";
 import Link from "next/link";
+import { frontServices } from "@/data/frontServices";
 
 export const Footer: React.FC = () => {
+  const serviceLinks = frontServices.map((service) => {
+    if (service.slug === "tanguar-haor-sundarbans-tour") {
+      return { label: "Tanguar Tour", href: `/services/${service.slug}` };
+    }
+
+    if (service.slug === "event-management-programs") {
+      return { label: "Event Management", href: `/services/${service.slug}` };
+    }
+
+    return { label: "Transport Booking", href: `/services/${service.slug}` };
+  });
+
   const footerGroups = [
     {
       title: "Explore",
@@ -9,7 +22,6 @@ export const Footer: React.FC = () => {
         { label: "Apartments", href: "/apartments" },
         { label: "Rooms", href: "/rooms" },
         { label: "Hotels", href: "/hotels" },
-        { label: "Resorts", href: "/resorts" },
       ],
     },
     {
@@ -18,6 +30,7 @@ export const Footer: React.FC = () => {
         { label: "Earn by Hosting", href: "/auth?mode=register&intent=host" },
         { label: "Host Resources", href: "/auth?mode=register&intent=host" },
         { label: "Responsible Hosting", href: "/auth?mode=register&intent=host" },
+        ...serviceLinks,
       ],
     },
     {
