@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { resolveEmbeddableApiUrl } from "@/lib/api";
 import { type HostPropertyMediaItem } from "@/lib/host";
 
 type HostPropertyMediaCardProps = {
@@ -102,7 +103,7 @@ export const HostPropertyMediaCard: React.FC<HostPropertyMediaCardProps> = ({
     }
   };
 
-  const previewUrl = item.thumbnailUrl || item.url;
+  const previewUrl = resolveEmbeddableApiUrl(item.thumbnailUrl || item.url);
 
   return (
     <div className="surface-card rounded-panel overflow-hidden">

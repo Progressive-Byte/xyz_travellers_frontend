@@ -4,6 +4,36 @@ const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_U
   "",
 );
 
+export const resolveApiUrl = (value: string) => {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith("/")) {
+    return `${API_BASE_URL}${trimmed}`;
+  }
+
+  return `${API_BASE_URL}/${trimmed.replace(/^\/+/, "")}`;
+};
+
+export const resolveEmbeddableApiUrl = (value: string) => {
+  const absoluteUrl = resolveApiUrl(value);
+
+  if (!absoluteUrl) {
+    return "";
+  }
+
+  return absoluteUrl.startsWith(API_BASE_URL)
+    ? `/api/media-proxy?src=${encodeURIComponent(absoluteUrl)}`
+    : absoluteUrl;
+};
+
 type ApiRequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
 };
