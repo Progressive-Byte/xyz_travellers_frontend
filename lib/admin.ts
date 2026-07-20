@@ -84,19 +84,26 @@ export type AdminHostApplicationVerification = {
   documents: AdminHostApplicationDocument[];
   status: string;
   submittedAt: string | null;
+  reviewedAt: string | null;
+  reviewedBy: string;
   rejectionReason: string;
 };
 
 export type AdminReviewedUser = {
   id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   roles: string[];
+  isActive: boolean;
 };
 
 export type AdminHostApplicationReviewResult = {
   verification: AdminHostApplicationVerification;
   user: AdminReviewedUser;
 };
+
+export type AdminHostApplicationQueueItem = AdminHostApplicationReviewResult;
 
 const normalizeAdminHostApplicationDocument = (payload: unknown): AdminHostApplicationDocument => {
   const source = asRecord(payload);
@@ -117,6 +124,8 @@ const normalizeAdminHostApplicationVerification = (payload: unknown): AdminHostA
     documents: asArray(source.documents).map(normalizeAdminHostApplicationDocument),
     status: asString(source.status),
     submittedAt: asOptionalString(source.submittedAt ?? source.submitted_at),
+    reviewedAt: asOptionalString(source.reviewedAt ?? source.reviewed_at),
+    reviewedBy: asString(source.reviewedBy ?? source.reviewed_by),
     rejectionReason: asString(source.rejectionReason ?? source.rejection_reason),
   };
 };
@@ -126,8 +135,11 @@ const normalizeAdminReviewedUser = (payload: unknown): AdminReviewedUser => {
 
   return {
     id: asString(source.id),
+    firstName: asString(source.firstName ?? source.first_name),
+    lastName: asString(source.lastName ?? source.last_name),
     email: asString(source.email),
     roles: asArray(source.roles).map((item) => asString(item)).filter(Boolean),
+    isActive: asBoolean(source.isActive ?? source.is_active ?? true),
   };
 };
 
@@ -156,6 +168,15 @@ export async function reviewAdminHostApplication(
   });
 
   return normalizeAdminHostApplicationReviewResult(data);
+}
+
+export async function getAdminHostApplications(token: string): Promise<AdminHostApplicationQueueItem[]> {
+  const data = await apiRequest<unknown[]>("/api/v1/admin/host-applications", {
+    method: "GET",
+    headers: authHeaders(token),
+  });
+
+  return data.map(normalizeAdminHostApplicationReviewResult);
 }
 
 export type AdminHomepageSectionSummary = {

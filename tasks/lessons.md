@@ -66,3 +66,7 @@
 - For host business document uploads, match the backend field contract exactly: use multipart field name `file` for each upload and map UI fields to API fields `label`, `notes`, `issuedAt`, `expiresAt`, and `isActive` instead of assuming generic names like `title`, `note`, or `files`.
 - For host business records, use the API contract from `api/host/host-businesses.md`: required create/update fields are `businessName`, `businessAddress`, `contactName`, `contactEmail`, and `contactPhone`, with optional `registrationNumber`, `taxVatNumber`, and `isActive`; do not send legacy frontend aliases like `name`, `country`, `address`, or `note`.
 - For host property setup, treat the separate property, media, units, pricing, calendar, and verification endpoints as one saved wizard flow: each stage should save against its own API contract, and draft resume actions should reopen the first incomplete saved step instead of resetting the host to a generic editor start.
+
+## Admin Portal Notes
+
+- When the user points out a newly added or changed admin API endpoint, re-read the exact admin doc before shaping the workspace; do not keep temporary UI assumptions like direct-ID review flows once a real queue/list endpoint exists.
