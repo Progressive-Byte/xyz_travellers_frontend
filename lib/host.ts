@@ -1419,19 +1419,55 @@ const normalizeHostPropertyUnit = (payload: unknown): HostPropertyUnit => {
 
 const normalizeHostUnitPricing = (payload: unknown, unitId = ""): HostUnitPricing => {
   const source = asRecord(payload);
+  const pricingSource = asRecord(source.pricing);
 
   return {
     unitId: asString(source.unitId ?? source.unit_id) || unitId,
-    basePrice: asTextValue(source.basePrice ?? source.base_price ?? source.price ?? source.amount),
-    discountedPrice: asTextValue(
-      source.discountedPrice ?? source.discounted_price ?? source.salePrice ?? source.sale_price,
+    basePrice: asTextValue(
+      pricingSource.basePrice ??
+        pricingSource.base_price ??
+        source.basePrice ??
+        source.base_price ??
+        source.price ??
+        source.amount,
     ),
-    currency: asString(source.currency ?? source.currencyCode ?? source.currency_code),
-    note: asString(source.note ?? source.description ?? source.summary),
+    discountedPrice: asTextValue(
+      pricingSource.discountedPrice ??
+        pricingSource.discounted_price ??
+        source.discountedPrice ??
+        source.discounted_price ??
+        source.salePrice ??
+        source.sale_price,
+    ),
+    currency: asString(
+      pricingSource.currency ??
+        pricingSource.currencyCode ??
+        pricingSource.currency_code ??
+        source.currency ??
+        source.currencyCode ??
+        source.currency_code,
+    ),
+    note: asString(
+      pricingSource.note ??
+        pricingSource.description ??
+        pricingSource.summary ??
+        source.note ??
+        source.description ??
+        source.summary,
+    ),
   };
 };
 
 const normalizeHostUnitBlockedDate = (payload: unknown): HostUnitBlockedDate => {
+  if (typeof payload === "string") {
+    return {
+      id: payload,
+      startDate: payload,
+      endDate: payload,
+      note: "",
+    };
+  }
+
   const source = asRecord(payload);
   const singleDate = asString(source.date);
 

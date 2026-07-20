@@ -21,6 +21,15 @@ type HostPropertyPricingFormProps = {
 const inputClassName =
   "w-full rounded-[22px] border border-border bg-card px-4 py-3.5 text-[15px] text-text-primary shadow-soft outline-none transition-all duration-200 placeholder:text-text-secondary/70 focus:-translate-y-0.5 focus:border-text-primary/20 focus:shadow-medium";
 
+const currencyOptions = [
+  { value: "", label: "Select currency" },
+  { value: "BDT", label: "BDT" },
+  { value: "USD", label: "USD" },
+  { value: "EUR", label: "EUR" },
+  { value: "GBP", label: "GBP" },
+  { value: "AED", label: "AED" },
+];
+
 export const HostPropertyPricingForm: React.FC<HostPropertyPricingFormProps> = ({
   values,
   errors,
@@ -82,14 +91,18 @@ export const HostPropertyPricingForm: React.FC<HostPropertyPricingFormProps> = (
 
         <label className="sm:col-span-2">
           <span className="mb-2 block text-[13px] font-semibold text-text-primary">Currency</span>
-          <input
-            type="text"
+          <select
             value={values.currency}
-            onChange={(event) => onChange("currency", event.target.value.toUpperCase())}
-            placeholder="BDT"
+            onChange={(event) => onChange("currency", event.target.value)}
             disabled={disabled}
             className={`${inputClassName} ${errors.currency ? "border-red-300 focus:border-red-400" : ""}`}
-          />
+          >
+            {currencyOptions.map((option) => (
+              <option key={option.value || "empty"} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
           {errors.currency ? <p className="mt-2 text-[13px] text-red-600">{errors.currency}</p> : null}
         </label>
       </div>
