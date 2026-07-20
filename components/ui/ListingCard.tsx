@@ -5,8 +5,12 @@ import Link from "next/link";
 interface ListingCardProps {
   title: string;
   location: string;
-  price: number;
+  price?: number;
+  priceLabel?: string;
   rating?: number;
+  ratingLabel?: string;
+  ratingCount?: number;
+  badge?: string | null;
   isNew?: boolean;
   imageUrl?: string;
   href?: string;
@@ -17,12 +21,22 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   title,
   location,
   price,
+  priceLabel,
   rating,
+  ratingLabel,
+  ratingCount = 0,
+  badge,
   isNew = false,
   imageUrl,
   href,
   className = "",
 }) => {
+  const shouldShowNewBadge = badge === "New" || isNew;
+  const resolvedPriceLabel =
+    priceLabel || (typeof price === "number" ? `BDT ${price.toLocaleString()}` : "");
+  const resolvedRatingLabel =
+    ratingLabel || (typeof rating === "number" ? rating.toFixed(1) : "");
+
   const cardContent = (
     <>
       <div className="relative h-[170px] overflow-hidden rounded-[20px] bg-surface-muted">
@@ -39,7 +53,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
         <div className="absolute left-3 top-3 flex items-center gap-2">
-          {isNew ? (
+          {shouldShowNewBadge ? (
             <span className="rounded-full bg-primary px-3 py-1 text-[11px] font-semibold text-text-primary">
               New
             </span>
@@ -54,9 +68,9 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             <p className="mt-1 text-[13px] font-medium text-text-secondary">{location}</p>
           </div>
 
-          {typeof rating === "number" ? (
+          {resolvedRatingLabel ? (
             <div className="rounded-full bg-surface px-2.5 py-1 text-[12px] font-semibold text-text-primary">
-              {rating.toFixed(1)}
+              {resolvedRatingLabel}
             </div>
           ) : null}
         </div>
@@ -67,13 +81,17 @@ export const ListingCard: React.FC<ListingCardProps> = ({
               From
             </p>
             <p className="mt-1 text-[18px] font-bold leading-none text-text-primary">
-              BDT {price.toLocaleString()}
+              {resolvedPriceLabel}
             </p>
           </div>
 
           <div className="flex items-center gap-1 text-[12px] font-medium text-text-secondary">
             <span className="text-primary">★</span>
-            <span>{typeof rating === "number" ? "Guest favorite" : "Fresh listing"}</span>
+            <span>
+              {resolvedRatingLabel
+                ? `${ratingCount} review${ratingCount === 1 ? "" : "s"}`
+                : "Fresh listing"}
+            </span>
           </div>
         </div>
       </div>

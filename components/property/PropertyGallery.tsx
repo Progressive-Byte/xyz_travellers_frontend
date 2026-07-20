@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import type { PropertyImage } from "@/data/properties";
+import type { FrontPropertyGalleryImage } from "@/lib/front";
 
 type PropertyGalleryProps = {
   title: string;
-  images: PropertyImage[];
+  images: FrontPropertyGalleryImage[];
 };
 
 export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images }) => {
