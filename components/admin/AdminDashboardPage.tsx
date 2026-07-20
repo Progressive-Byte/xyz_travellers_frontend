@@ -7,11 +7,19 @@ import { AdminShell } from "@/components/admin/AdminShell";
 const dashboardCards = [
   {
     label: "Host Applications",
-    title: "Direct review workspace",
+    title: "Review host applications",
     description:
-      "Open the admin review action workspace, enter a host user ID, and approve or reject the application using the documented review endpoint.",
+      "Moderate pending host requests in a searchable review queue and approve or reject from the selected application panel.",
     href: "/admin/host-applications",
     cta: "Open host applications",
+  },
+  {
+    label: "Property Applications",
+    title: "Moderate property inventory",
+    description:
+      "Review property drafts and submissions, inspect the full moderation snapshot, and approve or reject submitted listings.",
+    href: "/admin/property-applications",
+    cta: "Open property applications",
   },
   {
     label: "Homepage Curation",
@@ -28,9 +36,9 @@ export const AdminDashboardPage: React.FC = () => {
     <AdminShell
       badge="Admin Portal"
       title="Dashboard"
-      subtitle="Start from the operational workspace you need right now."
+      subtitle="Start from the moderation or curation workspace you need right now."
     >
-      <section className="mt-4 grid gap-4 lg:grid-cols-2">
+      <section className="mt-4 grid gap-4 xl:grid-cols-3">
         {dashboardCards.map((card) => (
           <div key={card.href} className="surface-card rounded-[28px] p-5 sm:p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
