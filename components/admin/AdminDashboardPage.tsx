@@ -30,60 +30,6 @@ export const AdminDashboardPage: React.FC = () => {
       title="Dashboard"
       subtitle="Start from the operational workspace you need right now."
     >
-      <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <section className="surface-card rounded-[28px] p-5 sm:p-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
-            Current Scope
-          </p>
-          <h2 className="mt-4 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-            Moderation and homepage control
-          </h2>
-          <p className="mt-3 max-w-3xl text-[14px] leading-6 text-text-secondary">
-            This first admin release is intentionally focused. It covers dedicated admin login, direct
-            host application review actions, and homepage section curation with property-level section
-            item management.
-          </p>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-[22px] border border-border-light bg-surface px-4 py-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                Auth
-              </p>
-              <p className="mt-3 text-[14px] font-semibold text-text-primary">Dedicated admin login</p>
-            </div>
-            <div className="rounded-[22px] border border-border-light bg-surface px-4 py-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                Review
-              </p>
-              <p className="mt-3 text-[14px] font-semibold text-text-primary">Approve or reject by user ID</p>
-            </div>
-            <div className="rounded-[22px] border border-border-light bg-surface px-4 py-4">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                Curation
-              </p>
-              <p className="mt-3 text-[14px] font-semibold text-text-primary">Sections and items</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="surface-card rounded-[28px] p-5 sm:p-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
-            Quick Notes
-          </p>
-          <div className="mt-4 space-y-3 text-[14px] leading-6 text-text-secondary">
-            <p>
-              Host application review currently uses the documented direct review endpoint. Because the
-              scoped API set does not include a list endpoint, the first workspace lets admins review by
-              target user ID.
-            </p>
-            <p>
-              Homepage curation supports both section metadata and section item operations, including
-              item sort order and active state.
-            </p>
-          </div>
-        </section>
-      </div>
-
       <section className="mt-4 grid gap-4 lg:grid-cols-2">
         {dashboardCards.map((card) => (
           <div key={card.href} className="surface-card rounded-[28px] p-5 sm:p-6">
