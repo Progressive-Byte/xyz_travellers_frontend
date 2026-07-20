@@ -1,8 +1,12 @@
 import React from "react";
 
 type PropertyBookingCardProps = {
-  pricePerNight: number;
-  guestCount: number;
+  priceLabel: string;
+  guestSummary: string;
+  checkInValue?: string;
+  checkOutValue?: string;
+  availabilityLabel?: string;
+  stayTotalLabel?: string;
 };
 
 const FieldShell: React.FC<{
@@ -18,8 +22,12 @@ const FieldShell: React.FC<{
 );
 
 export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
-  pricePerNight,
-  guestCount,
+  priceLabel,
+  guestSummary,
+  checkInValue = "Select date",
+  checkOutValue = "Select date",
+  availabilityLabel,
+  stayTotalLabel,
 }) => {
   return (
     <aside className="surface-card-strong rounded-[30px] p-6">
@@ -29,19 +37,16 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
             From
           </p>
           <p className="mt-2 font-sora text-[34px] font-bold tracking-[-0.04em] text-text-primary">
-            BDT {pricePerNight.toLocaleString()}
+            {priceLabel}
           </p>
         </div>
-        <p className="pb-1 text-[14px] font-medium text-text-secondary">per night</p>
+        <p className="pb-1 text-[14px] font-medium text-text-secondary">best available rate</p>
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-        <FieldShell label="Check in" value="Select date" />
-        <FieldShell label="Check out" value="Select date" />
-        <FieldShell
-          label="Guests"
-          value={`Up to ${guestCount} guest${guestCount > 1 ? "s" : ""}`}
-        />
+        <FieldShell label="Check in" value={checkInValue} />
+        <FieldShell label="Check out" value={checkOutValue} />
+        <FieldShell label="Guests" value={guestSummary} />
       </div>
 
       <div className="mt-3 rounded-[22px] border border-border bg-surface px-4 py-3">
@@ -49,9 +54,19 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
           Notes
         </p>
         <p className="mt-1 text-[14px] leading-6 text-text-secondary">
-          Add stay dates, special requests, or arrival notes before sending your booking request.
+          {availabilityLabel ||
+            "Add stay dates to see the best matching unit price and availability for this stay."}
         </p>
       </div>
+
+      {stayTotalLabel ? (
+        <div className="mt-3 rounded-[22px] border border-border-light bg-[rgba(245,243,237,0.66)] px-4 py-4">
+          <div className="flex items-center justify-between gap-3 text-[14px]">
+            <span className="text-text-secondary">Estimated stay total</span>
+            <span className="font-semibold text-text-primary">{stayTotalLabel}</span>
+          </div>
+        </div>
+      ) : null}
 
       <button
         type="button"

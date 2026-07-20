@@ -1,44 +1,40 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import type { HomeCategory } from "@/data/homeCategories";
+import {
+  defaultFrontHomepageTabs,
+  type FrontHomepageTab,
+  type FrontHomepageTabKey,
+} from "@/lib/front";
 
-const categories = [
-  {
-    label: "Apartments" as HomeCategory,
-    icon: (
-      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-        <polyline points="9 22 9 12 15 12 15 22" />
-      </svg>
-    ),
-  },
-  {
-    label: "Rooms" as HomeCategory,
-    icon: (
-      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M2 4v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4" />
-        <path d="M2 14h20" />
-        <circle cx="7" cy="10" r="2" />
-        <path d="M17 10h4" />
-      </svg>
-    ),
-  },
-  {
-    label: "Hotels" as HomeCategory,
-    icon: (
-      <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-        <path d="M9 19V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14" />
-        <path d="M12 19h7a2 2 0 0 0 2-2v-2H5v2a2 2 0 0 0 2 2h5" />
-        <path d="M8 7h8" />
-        <path d="M8 11h8" />
-        <path d="M8 15h8" />
-      </svg>
-    ),
-  },
-];
+const categoryIcons: Record<FrontHomepageTabKey, React.ReactNode> = {
+  apartments: (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+  rooms: (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M2 4v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V4" />
+      <path d="M2 14h20" />
+      <circle cx="7" cy="10" r="2" />
+      <path d="M17 10h4" />
+    </svg>
+  ),
+  hotels: (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M9 19V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14" />
+      <path d="M12 19h7a2 2 0 0 0 2-2v-2H5v2a2 2 0 0 0 2 2h5" />
+      <path d="M8 7h8" />
+      <path d="M8 11h8" />
+      <path d="M8 15h8" />
+    </svg>
+  ),
+};
 
 type GuestType = {
   key: "adults" | "children" | "infants";
@@ -74,11 +70,28 @@ const DateInputButton = React.forwardRef<HTMLButtonElement, DateInputButtonProps
 DateInputButton.displayName = "DateInputButton";
 
 type HeroProps = {
-  activeCategory: HomeCategory;
-  onCategoryChange: (category: HomeCategory) => void;
+  tabs?: FrontHomepageTab[];
+  activeTab: FrontHomepageTabKey;
+  onTabChange: (category: FrontHomepageTabKey) => void;
 };
 
-export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) => {
+const formatDateValue = (value: Date) => {
+  const year = value.getFullYear();
+  const month = `${value.getMonth() + 1}`.padStart(2, "0");
+  const day = `${value.getDate()}`.padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const heroDatePickerClassName =
+  "z-[60] mt-3 [&_.react-datepicker]:rounded-[24px] [&_.react-datepicker]:border [&_.react-datepicker]:border-border [&_.react-datepicker]:bg-white/95 [&_.react-datepicker]:shadow-strong [&_.react-datepicker]:backdrop-blur-xl [&_.react-datepicker__header]:rounded-t-[24px] [&_.react-datepicker__header]:border-border [&_.react-datepicker__header]:bg-surface [&_.react-datepicker__current-month]:text-[14px] [&_.react-datepicker__current-month]:font-semibold [&_.react-datepicker__day-name]:text-[11px] [&_.react-datepicker__day-name]:font-semibold [&_.react-datepicker__day--selected]:bg-primary [&_.react-datepicker__day--keyboard-selected]:bg-primary/70";
+
+export const Hero: React.FC<HeroProps> = ({
+  tabs = [...defaultFrontHomepageTabs],
+  activeTab,
+  onTabChange,
+}) => {
+  const router = useRouter();
   const [destination, setDestination] = useState("");
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
@@ -86,6 +99,7 @@ export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) 
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
+  const [searchError, setSearchError] = useState("");
   const guestDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -100,6 +114,7 @@ export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) 
   }, []);
 
   const totalGuests = adults + children;
+  const homepageTabs = tabs.length ? tabs : [...defaultFrontHomepageTabs];
 
   const guestTypes = useMemo<GuestType[]>(
     () => [
@@ -135,7 +150,7 @@ export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) 
   );
 
   return (
-    <section className="section-shell overflow-hidden bg-background pt-6">
+    <section className="section-shell overflow-visible bg-background pt-6">
       <div className="mx-auto max-w-7xl px-6">
         <div className="relative z-30 mx-auto mt-4 flex w-full max-w-[980px] justify-center md:mt-6">
           <div className="surface-card-strong w-full rounded-[26px] p-1.5">
@@ -162,11 +177,16 @@ export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) 
                 <DatePicker
                   selected={checkInDate}
                   onChange={(date: Date | null) => setCheckInDate(date)}
+                  onCalendarOpen={() => setShowGuestDropdown(false)}
                   selectsStart
                   startDate={checkInDate}
                   endDate={checkOutDate}
                   minDate={new Date()}
                   placeholderText="Add dates"
+                  popperPlacement="bottom-start"
+                  popperClassName={heroDatePickerClassName}
+                  showPopperArrow={false}
+                  wrapperClassName="block"
                   customInput={
                     <DateInputButton label="Add dates" />
                   }
@@ -182,11 +202,16 @@ export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) 
                 <DatePicker
                   selected={checkOutDate}
                   onChange={(date: Date | null) => setCheckOutDate(date)}
+                  onCalendarOpen={() => setShowGuestDropdown(false)}
                   selectsEnd
                   startDate={checkInDate}
                   endDate={checkOutDate}
                   minDate={checkInDate || new Date()}
                   placeholderText="Add dates"
+                  popperPlacement="bottom-start"
+                  popperClassName={heroDatePickerClassName}
+                  showPopperArrow={false}
+                  wrapperClassName="block"
                   customInput={
                     <DateInputButton label="Add dates" />
                   }
@@ -198,7 +223,10 @@ export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) 
               <div className="relative flex-1" ref={guestDropdownRef}>
                 <button
                   type="button"
-                  onClick={() => setShowGuestDropdown((open) => !open)}
+                  onClick={() => {
+                    setSearchError("");
+                    setShowGuestDropdown((open) => !open);
+                  }}
                   className="flex w-full items-center justify-between rounded-[18px] px-4 py-1.5 text-left outline-none transition-colors duration-200 hover:bg-surface focus:outline-none focus-visible:outline-none"
                 >
                   <span>
@@ -286,6 +314,35 @@ export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) 
 
               <button
                 type="button"
+                onClick={() => {
+                  const query = new URLSearchParams();
+                  const trimmedDestination = destination.trim();
+
+                  if ((checkInDate && !checkOutDate) || (!checkInDate && checkOutDate)) {
+                    setSearchError("Select both check-in and check-out dates to search by stay.");
+                    return;
+                  }
+
+                  if (checkInDate && checkOutDate && checkOutDate <= checkInDate) {
+                    setSearchError("Check-out must be later than check-in.");
+                    return;
+                  }
+
+                  setSearchError("");
+
+                  if (trimmedDestination) {
+                    query.set("q", trimmedDestination);
+                  }
+
+                  if (checkInDate && checkOutDate) {
+                    query.set("checkIn", formatDateValue(checkInDate));
+                    query.set("checkOut", formatDateValue(checkOutDate));
+                  }
+
+                  query.set("guests", String(Math.max(totalGuests, 1)));
+
+                  router.push(`/search?${query.toString()}`);
+                }}
                 className="flex items-center justify-center gap-2 rounded-[18px] bg-primary px-5 py-1.5 text-[13px] font-semibold text-text-primary shadow-glow outline-none transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover focus:outline-none focus-visible:outline-none lg:min-w-[112px]"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,28 +359,29 @@ export const Hero: React.FC<HeroProps> = ({ activeCategory, onCategoryChange }) 
           </div>
         </div>
 
-        <div
-          className={`hidden transition-[height] duration-300 lg:block ${
-            showGuestDropdown ? "h-[238px]" : "h-0"
-          }`}
-        />
+        {searchError ? (
+          <p className="mx-auto mt-3 w-full max-w-[980px] text-[13px] font-medium text-[var(--color-danger,#b42318)]">
+            {searchError}
+          </p>
+        ) : null}
 
         <div className="mx-auto mt-3 flex w-full max-w-[980px] items-end justify-center gap-8 border-b border-border/80">
-          {categories.map((category) => {
-            const active = category.label === activeCategory;
+          {homepageTabs.map((category) => {
+            const active = category.key === activeTab;
+            const icon = categoryIcons[category.key] ?? categoryIcons.apartments;
 
             return (
               <button
-                key={category.label}
+                key={category.key}
                 type="button"
-                onClick={() => onCategoryChange(category.label)}
+                onClick={() => onTabChange(category.key)}
                 className={`relative inline-flex items-center gap-2 pb-4 pt-2 text-[14px] font-semibold transition-colors duration-200 ${
                   active
                     ? "text-text-primary"
                     : "text-text-secondary hover:text-text-primary"
                 }`}
               >
-                <span className={active ? "text-primary" : "text-text-secondary"}>{category.icon}</span>
+                <span className={active ? "text-primary" : "text-text-secondary"}>{icon}</span>
                 <span>{category.label}</span>
                 <span
                   className={`absolute inset-x-0 -bottom-px h-0.5 rounded-full transition-opacity duration-200 ${
