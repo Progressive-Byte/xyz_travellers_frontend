@@ -125,9 +125,11 @@ export const HostPropertyVerificationUploader: React.FC<HostPropertyVerification
                   >
                     <option value="">Choose document type</option>
                     <option value="proof_of_ownership">Proof of ownership</option>
-                    <option value="tax_record">Tax record</option>
-                    <option value="utility_bill">Utility bill</option>
+                    <option value="lease_agreement">Lease agreement</option>
                     <option value="trade_license">Trade license</option>
+                    <option value="tourism_license">Tourism license</option>
+                    <option value="fire_safety_certificate">Fire safety certificate</option>
+                    <option value="insurance">Insurance</option>
                     <option value="other">Other proof</option>
                   </select>
                 </label>
