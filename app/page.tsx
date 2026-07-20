@@ -7,6 +7,7 @@ import { Hero } from "@/sections/Hero";
 import { Listings } from "@/sections/Listings";
 import { WhyChooseUs } from "@/sections/WhyChooseUs";
 import { AboutXYZTravellers } from "@/sections/AboutXYZTravellers";
+import { FrontServices } from "@/sections/FrontServices";
 import { Blogs } from "@/sections/Blogs";
 import { ApiError } from "@/lib/api";
 import {
@@ -78,6 +79,7 @@ export default function Home() {
         />
         <WhyChooseUs />
         <AboutXYZTravellers />
+        <FrontServices />
         <Blogs />
       </main>
       <Footer />
