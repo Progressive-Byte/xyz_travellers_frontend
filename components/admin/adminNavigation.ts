@@ -1,4 +1,4 @@
-export type AdminNavIcon = "dashboard" | "applications" | "homepage";
+export type AdminNavIcon = "dashboard" | "applications" | "properties" | "homepage";
 export type AdminNavGroupKey = "Main";
 
 export type AdminNavItem = {
@@ -25,6 +25,13 @@ export const adminNavigationItems: AdminNavItem[] = [
     description: "Approve or reject host applications using the documented admin review endpoint.",
   },
   {
+    label: "Property Applications",
+    href: "/admin/property-applications",
+    icon: "properties",
+    group: "Main",
+    description: "Review draft, submitted, approved, and rejected properties from one compact moderation inventory.",
+  },
+  {
     label: "Homepage Curation",
     href: "/admin/homepage-sections",
     icon: "homepage",
@@ -49,7 +56,7 @@ export const getAdminPageMeta = (pathname: string) => {
   if (!activeItem) {
     return {
       title: "Admin Portal",
-      subtitle: "Moderate host access and curate homepage sections from one compact workspace.",
+      subtitle: "Moderate hosts and properties, then curate homepage sections from one compact workspace.",
     };
   }
 

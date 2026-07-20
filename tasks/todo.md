@@ -129,3 +129,17 @@
 - Added a dedicated `/host/properties/[propertyId]/continue` resume route so property list actions reopen the first incomplete saved step based on already persisted API data instead of always restarting from the editor front.
 - Corrected property helper contracts in `lib/host.ts` for media uploads, video URLs, unit payload field names, calendar block/unblock payloads, and required availability preview query parameters.
 - Verified the property wizard refactor with file diagnostics and a successful `npm.cmd run build`.
+
+## Admin Property Applications
+
+- [completed] Add admin property application list/detail/review helpers and normalized types in `lib/admin.ts`.
+- [completed] Build the admin property applications moderation workspace and route.
+- [completed] Add the new section to the admin navigation and dashboard.
+- [completed] Run diagnostics and `npm.cmd run build`, then document the review result.
+
+### Review
+
+- Added the admin property moderation data layer for list, detail, and review actions based on `api/admin/admin-property-applications.md`.
+- Built a new `/admin/property-applications` workspace with searchable status tabs, pagination, selection-based detail loading, and approve/reject moderation controls.
+- Wired the new section into the admin navigation, sidebar icon set, dashboard cards, and protected route tree.
+- Verified the new admin section with clean diagnostics and a successful `npm.cmd run build`.
