@@ -9,9 +9,14 @@ import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
   cancelGuestBooking,
+  confirmGuestPayment,
+  createGuestPaymentCheckout,
   getGuestBooking,
   getGuestPropertyLookups,
+  getGuestTransactions,
   type GuestBooking,
+  type GuestPaymentCheckout,
+  type GuestTransaction,
 } from "@/lib/guest";
 
 const formatDate = (value: string) =>
@@ -61,6 +66,11 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
   const [cancelReason, setCancelReason] = useState("");
   const [cancelError, setCancelError] = useState("");
   const [isCancelling, setIsCancelling] = useState(false);
+  const [transactions, setTransactions] = useState<GuestTransaction[]>([]);
+  const [checkoutPreview, setCheckoutPreview] = useState<GuestPaymentCheckout | null>(null);
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentSuccess, setPaymentSuccess] = useState("");
+  const [isPaying, setIsPaying] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
@@ -75,7 +85,10 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
       setError("");
 
       try {
-        const result = await getGuestBooking(token, bookingId);
+        const [result, transactionResults] = await Promise.all([
+          getGuestBooking(token, bookingId),
+          getGuestTransactions(token),
+        ]);
         const lookups = await getGuestPropertyLookups([result.propertyId]);
 
         if (!isActive) {
@@ -83,6 +96,7 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
         }
 
         setBooking(result);
+        setTransactions(transactionResults.filter((item) => item.reservationId === result.id));
         setPropertyLookup(lookups);
       } catch (requestError) {
         if (!isActive) {
@@ -111,6 +125,15 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
   const property = booking ? propertyLookup[booking.propertyId] : null;
   const totalGuests = (booking?.adultGuests ?? 0) + (booking?.childGuests ?? 0);
   const canCancel = booking ? ["pending", "accepted"].includes(booking.status) : false;
+  const settledTransaction = useMemo(
+    () =>
+      transactions.find((item) => {
+        const normalizedStatus = item.status.trim().toLowerCase();
+        return normalizedStatus === "settled" || normalizedStatus === "paid";
+      }) ?? null,
+    [transactions],
+  );
+  const needsPayment = booking ? booking.status === "accepted" && !settledTransaction : false;
   const totalPrice = booking
     ? booking.pricingSnapshot.subtotal ?? booking.pricing.subtotal ?? 0
     : 0;
@@ -273,8 +296,135 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
                         </span>
                       </div>
                     ) : null}
+                    {settledTransaction ? (
+                      <div className="flex items-center justify-between gap-3 rounded-[18px] border border-[rgba(64,145,108,0.22)] bg-[rgba(64,145,108,0.08)] px-4 py-3">
+                        <span className="text-[14px] text-[rgb(35,92,69)]">Payment status</span>
+                        <span className="text-[15px] font-semibold uppercase text-[rgb(35,92,69)]">
+                          {settledTransaction.status || "Settled"}
+                        </span>
+                      </div>
+                    ) : null}
                   </div>
                 </section>
+
+                {needsPayment || settledTransaction ? (
+                  <section className="surface-card rounded-panel p-5">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                      Payment
+                    </p>
+                    <h2 className="mt-2 font-sora text-[22px] font-bold tracking-[-0.04em] text-text-primary">
+                      {settledTransaction ? "Payment completed" : "Complete your stay payment"}
+                    </h2>
+                    <p className="mt-2 text-[14px] leading-6 text-text-secondary">
+                      {settledTransaction
+                        ? "This accepted booking already has a settled payment record."
+                        : "Your host has accepted this reservation. Finish the one-click payment step to confirm the ledger entry for this stay."}
+                    </p>
+
+                    <div className="mt-4 space-y-3">
+                      <div className="flex items-center justify-between gap-3 rounded-[18px] border border-border bg-card px-4 py-3">
+                        <span className="text-[14px] text-text-secondary">Amount due</span>
+                        <span className="text-[15px] font-semibold text-text-primary">
+                          {formatCurrency(
+                            checkoutPreview?.totalPayable ?? totalPrice,
+                            checkoutPreview?.currency || totalCurrency,
+                          )}
+                        </span>
+                      </div>
+                      {checkoutPreview?.discountAmount ? (
+                        <div className="flex items-center justify-between gap-3 rounded-[18px] border border-border bg-card px-4 py-3">
+                          <span className="text-[14px] text-text-secondary">Discount</span>
+                          <span className="text-[15px] font-semibold text-text-primary">
+                            {formatCurrency(checkoutPreview.discountAmount, checkoutPreview.currency)}
+                          </span>
+                        </div>
+                      ) : null}
+                      {settledTransaction ? (
+                        <div className="flex items-center justify-between gap-3 rounded-[18px] border border-border bg-card px-4 py-3">
+                          <span className="text-[14px] text-text-secondary">Transaction</span>
+                          <span className="text-[15px] font-semibold text-text-primary">
+                            {settledTransaction.id.slice(-6).toUpperCase()}
+                          </span>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {paymentError ? (
+                      <p className="mt-3 text-[13px] text-[var(--color-danger,#b42318)]">
+                        {paymentError}
+                      </p>
+                    ) : null}
+                    {paymentSuccess ? (
+                      <p className="mt-3 text-[13px] text-[rgb(35,92,69)]">{paymentSuccess}</p>
+                    ) : null}
+
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      {!settledTransaction ? (
+                        <button
+                          type="button"
+                          disabled={isPaying}
+                          onClick={async () => {
+                            if (!token || !booking) {
+                              return;
+                            }
+
+                            setIsPaying(true);
+                            setPaymentError("");
+                            setPaymentSuccess("");
+
+                            try {
+                              const checkout = await createGuestPaymentCheckout(token, booking.id);
+                              setCheckoutPreview(checkout);
+
+                              const paymentReference = `GUESTPAY_${booking.id.slice(-6).toUpperCase()}_${Date.now()}`;
+                              const confirmation = await confirmGuestPayment(
+                                token,
+                                booking.id,
+                                paymentReference,
+                              );
+
+                              const [updatedBooking, updatedTransactions] = await Promise.all([
+                                getGuestBooking(token, booking.id),
+                                getGuestTransactions(token),
+                              ]);
+
+                              setBooking(updatedBooking);
+                              setTransactions(
+                                updatedTransactions.filter(
+                                  (item) => item.reservationId === updatedBooking.id,
+                                ),
+                              );
+                              setPaymentSuccess(
+                                confirmation.transactionId
+                                  ? `Payment successful. Transaction ${confirmation.transactionId.slice(-6).toUpperCase()} recorded.`
+                                  : "Payment successful.",
+                              );
+                              router.refresh();
+                            } catch (requestError) {
+                              setPaymentError(
+                                requestError instanceof ApiError
+                                  ? requestError.message || "Unable to process payment right now."
+                                  : "Unable to process payment right now.",
+                              );
+                            } finally {
+                              setIsPaying(false);
+                            }
+                          }}
+                          className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                          {isPaying ? "Processing payment..." : "Pay now"}
+                        </button>
+                      ) : null}
+
+                      <Link
+                        href="/guest/payments"
+                        className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                      >
+                        Open payments
+                      </Link>
+                    </div>
+                  </section>
+                ) : null}
 
                 {canCancel ? (
                   <section className="surface-card rounded-panel p-5">

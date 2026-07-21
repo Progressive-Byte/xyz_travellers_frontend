@@ -48,12 +48,14 @@ const GuestDetailCard: React.FC<{ reservation: HostReservation }> = ({ reservati
   const guestReference = reservation.guestId
     ? `Guest ref · ${reservation.guestId.slice(-6).toUpperCase()}`
     : "Guest reference pending";
+  const guestMeta = [reservation.guestEmail, reservation.guestPhone].filter(Boolean).join(" · ");
 
   return (
     <div className="rounded-[20px] border border-border-light bg-white/80 px-4 py-4">
       <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">Guest</p>
       <p className="mt-2 text-[15px] font-semibold text-text-primary">{guestLabel}</p>
-      <p className="mt-1 text-[12px] text-text-secondary">{guestReference}</p>
+      <p className="mt-1 text-[12px] text-text-secondary">{guestMeta || guestReference}</p>
+      {guestMeta ? <p className="mt-1 text-[12px] text-text-secondary">{guestReference}</p> : null}
     </div>
   );
 };
