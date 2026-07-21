@@ -1,4 +1,4 @@
-export type AdminNavIcon = "dashboard" | "applications" | "properties" | "homepage";
+export type AdminNavIcon = "dashboard" | "applications" | "properties" | "homepage" | "commission";
 export type AdminNavGroupKey = "Main";
 
 export type AdminNavItem = {
@@ -37,6 +37,13 @@ export const adminNavigationItems: AdminNavItem[] = [
     icon: "homepage",
     group: "Main",
     description: "Manage homepage sections and curate approved properties into them.",
+  },
+  {
+    label: "Commission",
+    href: "/admin/commission",
+    icon: "commission",
+    group: "Main",
+    description: "Configure the active default commission used by guest payment confirmation.",
   },
 ];
 
