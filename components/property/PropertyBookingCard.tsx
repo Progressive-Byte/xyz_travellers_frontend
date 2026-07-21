@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -63,6 +63,29 @@ const parseDateValue = (value?: string) => {
     return null;
   }
 
+  const normalized = value.trim();
+  const parts = normalized.split("-");
+
+  if (parts.length === 3) {
+    const [yearValue, monthValue, dayValue] = parts;
+    const year = Number(yearValue);
+    const month = Number(monthValue);
+    const day = Number(dayValue);
+
+    if (
+      Number.isInteger(year) &&
+      Number.isInteger(month) &&
+      Number.isInteger(day) &&
+      month >= 1 &&
+      month <= 12 &&
+      day >= 1 &&
+      day <= 31
+    ) {
+      const parsed = new Date(year, month - 1, day);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+  }
+
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
@@ -98,6 +121,9 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
   stayTotalLabel,
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   const [checkInDate, setCheckInDate] = useState<Date | null>(parseDateValue(initialCheckIn));
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(parseDateValue(initialCheckOut));
   const [guests, setGuests] = useState<string>(
@@ -240,11 +266,24 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
           }
 
           const query = params.toString();
-          router.push(query ? `/properties/${propertyId}?${query}` : `/properties/${propertyId}`);
+          const nextPath = `/properties/${propertyId}`;
+          const nextUrl = query ? `${nextPath}?${query}` : nextPath;
+          const currentQuery = searchParams.toString();
+          const currentUrl = currentQuery ? `${pathname}?${currentQuery}` : pathname;
+
+          startTransition(() => {
+            if (currentUrl === nextUrl) {
+              router.refresh();
+              return;
+            }
+
+            router.push(nextUrl);
+          });
         }}
-        className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3.5 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover"
+        disabled={isPending}
+        className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3.5 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
       >
-        Check availability
+        {isPending ? "Checking..." : "Check availability"}
       </button>
 
       <div className="mt-5 rounded-[22px] border border-border-light bg-[rgba(245,243,237,0.66)] px-4 py-4">
