@@ -38,10 +38,29 @@ const OnboardingLoadingState = () => (
 export const HostOnboardingPage: React.FC = () => {
   const router = useRouter();
   const { token } = useAuth();
+  const getEmptyDocument = (): HostIdentityVerificationDocument => ({
+    documentType: "",
+    documentFront: "",
+    documentBack: "",
+  });
+  const sanitizeDocument = (
+    document?: Partial<HostIdentityVerificationDocument> | null,
+  ): HostIdentityVerificationDocument => ({
+    documentType: typeof document?.documentType === "string" ? document.documentType : "",
+    documentFront: typeof document?.documentFront === "string" ? document.documentFront : "",
+    documentBack: typeof document?.documentBack === "string" ? document.documentBack : "",
+  });
+  const sanitizeDocuments = (
+    nextDocuments?: Array<Partial<HostIdentityVerificationDocument> | null> | null,
+  ) => {
+    if (!nextDocuments?.length) {
+      return [getEmptyDocument()];
+    }
+
+    return nextDocuments.map((document) => sanitizeDocument(document));
+  };
   const [verification, setVerification] = useState<HostIdentityVerification | null>(null);
-  const [documents, setDocuments] = useState<HostIdentityVerificationDocument[]>([
-    { documentType: "", documentFront: "", documentBack: "" },
-  ]);
+  const [documents, setDocuments] = useState<HostIdentityVerificationDocument[]>([getEmptyDocument()]);
   const [error, setError] = useState("");
   const [formError, setFormError] = useState("");
   const [saveError, setSaveError] = useState("");
@@ -75,11 +94,7 @@ export const HostOnboardingPage: React.FC = () => {
         }
 
         setVerification(nextVerification);
-        setDocuments(
-          nextVerification?.documents.length
-            ? nextVerification.documents
-            : [{ documentType: "", documentFront: "", documentBack: "" }],
-        );
+        setDocuments(sanitizeDocuments(nextVerification?.documents));
       } catch {
         if (!isActive) {
           return;
@@ -108,9 +123,12 @@ export const HostOnboardingPage: React.FC = () => {
   const normalizeDocumentsForSave = () => {
     const normalizedDocuments = documents
       .map((document) => ({
-        documentType: document.documentType.trim(),
-        documentFront: document.documentFront.trim(),
-        documentBack: document.documentBack.trim(),
+        documentType:
+          typeof document.documentType === "string" ? document.documentType.trim() : "",
+        documentFront:
+          typeof document.documentFront === "string" ? document.documentFront.trim() : "",
+        documentBack:
+          typeof document.documentBack === "string" ? document.documentBack.trim() : "",
       }))
       .filter(
         (document) => document.documentType || document.documentFront || document.documentBack,
@@ -152,18 +170,14 @@ export const HostOnboardingPage: React.FC = () => {
     try {
       const nextVerification = verification?.id
         ? await updateHostIdentityVerificationDraft(token, {
-            documents: normalizedDocuments,
+            ...normalizedDocuments[0],
           })
         : await createHostIdentityVerificationDraft(token, {
-            documents: normalizedDocuments,
+            ...normalizedDocuments[0],
           });
 
       setVerification(nextVerification);
-      setDocuments(
-        nextVerification.documents.length
-          ? nextVerification.documents
-          : [{ documentType: "", documentFront: "", documentBack: "" }],
-      );
+      setDocuments(sanitizeDocuments(nextVerification.documents));
 
       if (showSuccessMessage) {
         setSaveSuccess("Host application draft saved.");
@@ -242,10 +256,7 @@ export const HostOnboardingPage: React.FC = () => {
             setSubmitError("");
           }}
           onAddDocument={() => {
-            setDocuments((current) => [
-              ...current,
-              { documentType: "", documentFront: "", documentBack: "" },
-            ]);
+            setDocuments((current) => [...current, getEmptyDocument()]);
             setFormError("");
             setSaveError("");
             setSaveSuccess("");
@@ -255,7 +266,7 @@ export const HostOnboardingPage: React.FC = () => {
             setDocuments((current) =>
               current.filter((_, currentIndex) => currentIndex !== index).length > 0
                 ? current.filter((_, currentIndex) => currentIndex !== index)
-                : [{ documentType: "", documentFront: "", documentBack: "" }],
+                : [getEmptyDocument()],
             );
             setFormError("");
             setSaveError("");

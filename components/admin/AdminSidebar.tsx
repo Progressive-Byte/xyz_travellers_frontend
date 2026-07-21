@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BrandLogo } from "@/components/branding/BrandLogo";
 import {
   adminNavigationGroups,
   adminNavigationItems,
@@ -65,36 +66,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate }) => {
   return (
     <div className="flex h-full flex-col overflow-hidden border border-border-light bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(255,252,247,0.94)_100%)] p-4 shadow-[0_20px_60px_rgba(26,27,18,0.08)]">
       <div className="border-b border-border-light/90 pb-4">
-        <Link
-          href="/admin"
-          onClick={onNavigate}
-          className="flex items-center gap-3 rounded-[20px] px-1 py-1 transition-all duration-200 hover:bg-white/70"
-        >
-          <span className="icon-chip h-11 w-11 rounded-[18px] shadow-soft">
-            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
-              <defs>
-                <linearGradient id="adminSidebarLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="var(--color-primary)" />
-                  <stop offset="100%" stopColor="var(--color-primary-hover)" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M6 5.5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-11a2 2 0 0 1 2-2Z"
-                fill="url(#adminSidebarLogoGradient)"
-              />
-              <path d="M8 9h8M8 12h8M8 15h5" stroke="var(--color-text-primary)" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
-          </span>
-
-          <span className="min-w-0">
-            <span className="block font-sora text-[20px] font-bold tracking-[-0.04em] text-text-primary">
-              XYZ Travellers
-            </span>
-            <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Admin workspace
-            </span>
-          </span>
-        </Link>
+        <BrandLogo href="/admin" onClick={onNavigate} subtitle="Admin workspace" variant="sidebar" />
       </div>
 
       <div className="scrollbar-hide flex-1 overflow-y-auto py-5">

@@ -1661,13 +1661,16 @@ const normalizeHostIdentityVerificationDocument = (
     documentType:
       asString(source.documentType ?? source.document_type) ||
       asString(source.type) ||
-      asString(source.category),
+      asString(source.category) ||
+      "",
     documentFront:
       asString(source.documentFront ?? source.document_front) ||
-      asString(source.front ?? source.frontUrl ?? source.front_url),
+      asString(source.front ?? source.frontUrl ?? source.front_url) ||
+      "",
     documentBack:
       asString(source.documentBack ?? source.document_back) ||
-      asString(source.back ?? source.backUrl ?? source.back_url),
+      asString(source.back ?? source.backUrl ?? source.back_url) ||
+      "",
   };
 };
 
@@ -2212,7 +2215,9 @@ export type HostIdentityVerification = HostIdentityVerificationStatus & {
 };
 
 export type UpsertHostIdentityVerificationPayload = {
-  documents: HostIdentityVerificationDocument[];
+  documentType: string;
+  documentFront: string;
+  documentBack: string;
 };
 
 const getNormalizedVerificationStatus = (value: string | null | undefined) => {
@@ -2245,7 +2250,11 @@ const getNormalizedVerificationStatus = (value: string | null | undefined) => {
 const normalizeHostIdentityVerification = (
   payload: HostIdentityVerificationApiData | unknown,
 ): HostIdentityVerification => {
-  const source = asRecord(payload);
+  // Unwrap the {success: true, data: ...} response
+  let source = asRecord(payload);
+  if (source.data) {
+    source = asRecord(source.data);
+  }
   const rawStatus =
     asOptionalString(source.status) ??
     asOptionalString(source.state) ??
@@ -2275,7 +2284,7 @@ const normalizeHostIdentityVerification = (
 };
 
 const normalizeHostIdentityVerificationStatus = (
-  payload: HostIdentityVerificationApiData,
+  payload: HostIdentityVerificationApiData | unknown,
 ): HostIdentityVerificationStatus => {
   const normalized = normalizeHostIdentityVerification(payload);
 
@@ -2802,16 +2811,7 @@ export async function getHostIdentityVerificationStatus(
   }
 }
 
-const normalizeIdentityVerificationDocumentsPayload = (
-  documents: HostIdentityVerificationDocument[],
-) =>
-  documents
-    .map((document) => ({
-      documentType: document.documentType.trim(),
-      documentFront: document.documentFront.trim(),
-      documentBack: document.documentBack.trim(),
-    }))
-    .filter((document) => document.documentType && document.documentFront);
+
 
 export async function getHostIdentityVerification(
   token: string,
@@ -2856,9 +2856,16 @@ export async function createHostIdentityVerificationDraft(
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       body: {
-        documents: normalizeIdentityVerificationDocumentsPayload(payload.documents),
+        documents: [
+          {
+            documentType: (payload.documentType || "").trim(),
+            documentFront: (payload.documentFront || "").trim(),
+            documentBack: (payload.documentBack || "").trim(),
+          },
+        ],
       },
       cache: "no-store",
     },
@@ -2881,9 +2888,16 @@ export async function updateHostIdentityVerificationDraft(
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       body: {
-        documents: normalizeIdentityVerificationDocumentsPayload(payload.documents),
+        documents: [
+          {
+            documentType: (payload.documentType || "").trim(),
+            documentFront: (payload.documentFront || "").trim(),
+            documentBack: (payload.documentBack || "").trim(),
+          },
+        ],
       },
       cache: "no-store",
     },
