@@ -30,7 +30,7 @@ const asNumber = (value: unknown) => {
   return null;
 };
 
-const buildQueryString = (params: Record<string, string | number | undefined>) => {
+const buildQueryString = (params: Record<string, string | number | boolean | undefined>) => {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {
@@ -175,6 +175,134 @@ export type GuestBookingRouteParams = {
   guests?: number | string | null;
 };
 
+export type GuestMessage = {
+  id: string;
+  threadId: string;
+  reservationId: string;
+  senderId: string;
+  senderRole: string;
+  body: string;
+  readByHostAt: string | null;
+  readByGuestAt: string | null;
+  createdAt: string | null;
+};
+
+export type GuestMessageThreadSummary = {
+  id: string;
+  reservationId: string;
+  propertyId: string;
+  unitId: string;
+  guestId: string;
+  lastMessagePreview: string;
+  lastMessageAt: string | null;
+  guestUnreadCount: number;
+};
+
+export type GuestMessageThreadDetail = GuestMessageThreadSummary & {
+  hostUnreadCount: number;
+  messages: GuestMessage[];
+};
+
+export type GuestMessageThreadFilters = {
+  reservationId?: string;
+  propertyId?: string;
+  unitId?: string;
+  hasUnread?: boolean;
+};
+
+export type GuestProfile = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  roles: string[];
+  profilePhoto: string;
+  preferredLanguage: string;
+  preferredCurrency: string;
+  dateOfBirth: string;
+  nationality: string;
+  bio: string;
+};
+
+export type UpdateGuestProfilePayload = {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  profilePhoto: string;
+  preferredLanguage: string;
+  preferredCurrency: string;
+  dateOfBirth: string;
+  nationality: string;
+  bio: string;
+};
+
+export type GuestWishlistItem = {
+  propertyId: string;
+  savedAt: string | null;
+};
+
+export type GuestPropertyReviewRatings = {
+  cleanliness: number;
+  accuracy: number;
+  communication: number;
+  checkIn: number;
+  value: number;
+  overall: number;
+};
+
+export type GuestPropertyReview = {
+  id: string;
+  reviewType: string;
+  reservationId: string;
+  propertyId: string;
+  unitId: string;
+  hostId: string;
+  guestId: string;
+  reviewerId: string;
+  reviewerRole: string;
+  targetUserId: string;
+  rating: number | null;
+  ratings: GuestPropertyReviewRatings;
+  title: string;
+  comment: string;
+  createdAt: string | null;
+};
+
+export type CreateGuestPropertyReviewPayload = {
+  bookingId: string;
+  ratings: GuestPropertyReviewRatings;
+  comment: string;
+};
+
+export type GuestSafetyReport = {
+  id: string;
+  reportType: string;
+  reporterId: string;
+  targetUserId: string;
+  propertyId: string;
+  reservationId: string;
+  reasonCode: string;
+  details: string;
+  createdAt: string | null;
+};
+
+export type ReportGuestListingPayload = {
+  propertyId: string;
+  reservationId: string;
+  reasonCode: string;
+  details: string;
+};
+
+export type ReportGuestUserPayload = {
+  userId: string;
+  reservationId: string;
+  reasonCode: string;
+  details: string;
+};
+
 export type GuestPropertyLookup = {
   propertyId: string;
   propertyTitle: string;
@@ -239,6 +367,128 @@ const normalizeGuestPaymentConfirmResult = (payload: unknown): GuestPaymentConfi
     transactionId: asString(source.transactionId),
     bookingId: asString(source.bookingId),
     status: asString(source.status),
+  };
+};
+
+const normalizeGuestMessage = (payload: unknown): GuestMessage => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id),
+    threadId: asString(source.threadId ?? source.thread_id),
+    reservationId: asString(source.reservationId ?? source.reservation_id),
+    senderId: asString(source.senderId ?? source.sender_id),
+    senderRole: asString(source.senderRole ?? source.sender_role),
+    body: asString(source.body),
+    readByHostAt: asOptionalString(source.readByHostAt ?? source.read_by_host_at),
+    readByGuestAt: asOptionalString(source.readByGuestAt ?? source.read_by_guest_at),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+  };
+};
+
+const normalizeGuestMessageThreadSummary = (payload: unknown): GuestMessageThreadSummary => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id),
+    reservationId: asString(source.reservationId ?? source.reservation_id),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    unitId: asString(source.unitId ?? source.unit_id),
+    guestId: asString(source.guestId ?? source.guest_id),
+    lastMessagePreview: asString(source.lastMessagePreview ?? source.last_message_preview),
+    lastMessageAt: asOptionalString(source.lastMessageAt ?? source.last_message_at),
+    guestUnreadCount: asNumber(source.guestUnreadCount ?? source.guest_unread_count) ?? 0,
+  };
+};
+
+const normalizeGuestMessageThreadDetail = (payload: unknown): GuestMessageThreadDetail => {
+  const source = asRecord(payload);
+  const summary = normalizeGuestMessageThreadSummary(source);
+
+  return {
+    ...summary,
+    hostUnreadCount: asNumber(source.hostUnreadCount ?? source.host_unread_count) ?? 0,
+    messages: asArray(source.messages).map(normalizeGuestMessage),
+  };
+};
+
+const normalizeGuestProfile = (payload: unknown): GuestProfile => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id),
+    firstName: asString(source.firstName ?? source.first_name),
+    lastName: asString(source.lastName ?? source.last_name),
+    email: asString(source.email),
+    phone: asString(source.phone),
+    address: asString(source.address),
+    roles: asArray(source.roles).map((item) => asString(item)).filter(Boolean),
+    profilePhoto: asString(source.profilePhoto ?? source.profile_photo),
+    preferredLanguage: asString(source.preferredLanguage ?? source.preferred_language),
+    preferredCurrency: asString(source.preferredCurrency ?? source.preferred_currency),
+    dateOfBirth: asString(source.dateOfBirth ?? source.date_of_birth),
+    nationality: asString(source.nationality),
+    bio: asString(source.bio),
+  };
+};
+
+const normalizeGuestWishlistItem = (payload: unknown): GuestWishlistItem => {
+  const source = asRecord(payload);
+
+  return {
+    propertyId: asString(source.propertyId ?? source.property_id),
+    savedAt: asOptionalString(source.savedAt ?? source.saved_at),
+  };
+};
+
+const normalizeGuestPropertyReviewRatings = (payload: unknown): GuestPropertyReviewRatings => {
+  const source = asRecord(payload);
+
+  return {
+    cleanliness: asNumber(source.cleanliness) ?? 0,
+    accuracy: asNumber(source.accuracy) ?? 0,
+    communication: asNumber(source.communication) ?? 0,
+    checkIn: asNumber(source.checkIn ?? source.check_in) ?? 0,
+    value: asNumber(source.value) ?? 0,
+    overall: asNumber(source.overall) ?? 0,
+  };
+};
+
+const normalizeGuestPropertyReview = (payload: unknown): GuestPropertyReview => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id),
+    reviewType: asString(source.reviewType ?? source.review_type),
+    reservationId: asString(source.reservationId ?? source.reservation_id),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    unitId: asString(source.unitId ?? source.unit_id),
+    hostId: asString(source.hostId ?? source.host_id),
+    guestId: asString(source.guestId ?? source.guest_id),
+    reviewerId: asString(source.reviewerId ?? source.reviewer_id),
+    reviewerRole: asString(source.reviewerRole ?? source.reviewer_role),
+    targetUserId: asString(source.targetUserId ?? source.target_user_id),
+    rating: asNumber(source.rating),
+    ratings: normalizeGuestPropertyReviewRatings(source.ratings),
+    title: asString(source.title),
+    comment: asString(source.comment),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+  };
+};
+
+const normalizeGuestSafetyReport = (payload: unknown): GuestSafetyReport => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id),
+    reportType: asString(source.reportType ?? source.report_type),
+    reporterId: asString(source.reporterId ?? source.reporter_id),
+    targetUserId: asString(source.targetUserId ?? source.target_user_id),
+    propertyId: asString(source.propertyId ?? source.property_id),
+    reservationId: asString(source.reservationId ?? source.reservation_id),
+    reasonCode: asString(source.reasonCode ?? source.reason_code),
+    details: asString(source.details),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
   };
 };
 
@@ -460,6 +710,227 @@ export async function getGuestTransactions(token: string): Promise<GuestTransact
   });
 
   return asArray(response).map(normalizeGuestTransaction);
+}
+
+export async function getGuestMessageThreads(
+  token: string,
+  filters: GuestMessageThreadFilters = {},
+): Promise<GuestMessageThreadSummary[]> {
+  const response = await apiRequest<unknown>(
+    `/api/v1/messages/threads${buildQueryString({
+      reservationId: filters.reservationId,
+      propertyId: filters.propertyId,
+      unitId: filters.unitId,
+      hasUnread: filters.hasUnread,
+    })}`,
+    {
+      method: "GET",
+      headers: createAuthHeaders(token),
+      cache: "no-store",
+    },
+  );
+
+  return asArray(response).map(normalizeGuestMessageThreadSummary);
+}
+
+export async function getGuestMessageThread(
+  token: string,
+  threadId: string,
+): Promise<GuestMessageThreadDetail> {
+  const response = await apiRequest<unknown>(`/api/v1/messages/threads/${threadId}`, {
+    method: "GET",
+    headers: createAuthHeaders(token),
+    cache: "no-store",
+  });
+
+  return normalizeGuestMessageThreadDetail(response);
+}
+
+export async function sendGuestMessage(
+  token: string,
+  threadId: string,
+  body: string,
+): Promise<GuestMessageThreadDetail> {
+  const response = await apiRequest<unknown>(`/api/v1/messages/threads/${threadId}/messages`, {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: {
+      body: body.trim(),
+    },
+  });
+
+  return normalizeGuestMessageThreadDetail(response);
+}
+
+export async function markGuestMessageThreadRead(
+  token: string,
+  threadId: string,
+): Promise<GuestMessageThreadDetail> {
+  const response = await apiRequest<unknown>(`/api/v1/messages/threads/${threadId}/read`, {
+    method: "PATCH",
+    headers: createAuthHeaders(token),
+    body: {},
+  });
+
+  return normalizeGuestMessageThreadDetail(response);
+}
+
+export async function getGuestProfile(token: string): Promise<GuestProfile> {
+  const response = await apiRequest<unknown>("/api/v1/users/me", {
+    method: "GET",
+    headers: createAuthHeaders(token),
+    cache: "no-store",
+  });
+
+  return normalizeGuestProfile(response);
+}
+
+export async function updateGuestProfile(
+  token: string,
+  payload: UpdateGuestProfilePayload,
+): Promise<GuestProfile> {
+  const response = await apiRequest<unknown>("/api/v1/users/me", {
+    method: "PATCH",
+    headers: createAuthHeaders(token),
+    body: {
+      firstName: payload.firstName.trim(),
+      lastName: payload.lastName.trim(),
+      phone: payload.phone.trim(),
+      address: payload.address.trim(),
+      profilePhoto: payload.profilePhoto.trim(),
+      preferredLanguage: payload.preferredLanguage.trim(),
+      preferredCurrency: payload.preferredCurrency.trim(),
+      dateOfBirth: payload.dateOfBirth.trim(),
+      nationality: payload.nationality.trim(),
+      bio: payload.bio.trim(),
+    },
+  });
+
+  return normalizeGuestProfile(response);
+}
+
+export async function getGuestWishlist(token: string): Promise<GuestWishlistItem[]> {
+  const response = await apiRequest<unknown>("/api/v1/users/me/wishlist", {
+    method: "GET",
+    headers: createAuthHeaders(token),
+    cache: "no-store",
+  });
+
+  return asArray(response).map(normalizeGuestWishlistItem);
+}
+
+export async function addGuestWishlistProperty(
+  token: string,
+  propertyId: string,
+): Promise<GuestWishlistItem> {
+  const response = await apiRequest<unknown>("/api/v1/users/me/wishlist", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: {
+      propertyId: propertyId.trim(),
+    },
+  });
+
+  return normalizeGuestWishlistItem(response);
+}
+
+export async function removeGuestWishlistProperty(
+  token: string,
+  propertyId: string,
+): Promise<GuestWishlistItem> {
+  const response = await apiRequest<unknown>(`/api/v1/users/me/wishlist/${propertyId}`, {
+    method: "DELETE",
+    headers: createAuthHeaders(token),
+  });
+
+  return normalizeGuestWishlistItem(response);
+}
+
+export async function getGuestReviews(token: string): Promise<GuestPropertyReview[]> {
+  const response = await apiRequest<unknown>("/api/v1/reviews/mine", {
+    method: "GET",
+    headers: createAuthHeaders(token),
+    cache: "no-store",
+  });
+
+  return asArray(response).map(normalizeGuestPropertyReview);
+}
+
+export async function createGuestPropertyReview(
+  token: string,
+  payload: CreateGuestPropertyReviewPayload,
+): Promise<GuestPropertyReview> {
+  const response = await apiRequest<unknown>("/api/v1/reviews/property", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: {
+      bookingId: payload.bookingId,
+      ratings: payload.ratings,
+      comment: payload.comment.trim(),
+    },
+  });
+
+  return normalizeGuestPropertyReview(response);
+}
+
+export async function reportGuestListing(
+  token: string,
+  payload: ReportGuestListingPayload,
+): Promise<GuestSafetyReport> {
+  const response = await apiRequest<unknown>("/api/v1/trust/report-listing", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: {
+      propertyId: payload.propertyId.trim(),
+      reservationId: payload.reservationId.trim(),
+      reasonCode: payload.reasonCode.trim(),
+      details: payload.details.trim(),
+    },
+  });
+
+  return normalizeGuestSafetyReport(response);
+}
+
+export async function reportGuestUser(
+  token: string,
+  payload: ReportGuestUserPayload,
+): Promise<GuestSafetyReport> {
+  const response = await apiRequest<unknown>("/api/v1/trust/report-user", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: {
+      userId: payload.userId.trim(),
+      reservationId: payload.reservationId.trim(),
+      reasonCode: payload.reasonCode.trim(),
+      details: payload.details.trim(),
+    },
+  });
+
+  return normalizeGuestSafetyReport(response);
+}
+
+export async function blockGuestUser(token: string, userId: string): Promise<{ userId: string }> {
+  const response = await apiRequest<unknown>("/api/v1/trust/block-user", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: {
+      userId: userId.trim(),
+    },
+  });
+
+  return { userId: asString(asRecord(response).userId ?? asRecord(response).user_id) };
+}
+
+export async function unblockGuestUser(
+  token: string,
+  userId: string,
+): Promise<{ userId: string }> {
+  const response = await apiRequest<unknown>(`/api/v1/trust/block-user/${userId}`, {
+    method: "DELETE",
+    headers: createAuthHeaders(token),
+  });
+
+  return { userId: asString(asRecord(response).userId ?? asRecord(response).user_id) };
 }
 
 export async function getGuestPropertyLookups(

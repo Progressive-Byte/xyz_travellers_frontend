@@ -41,7 +41,7 @@ export const guestNavigationItems: GuestNavItem[] = [
     href: "/guest/messages",
     icon: "messages",
     group: "Main",
-    isLive: false,
+    isLive: true,
     description: "Read and manage host conversations connected to your bookings.",
   },
   {
@@ -57,7 +57,7 @@ export const guestNavigationItems: GuestNavItem[] = [
     href: "/guest/profile",
     icon: "profile",
     group: "Account",
-    isLive: false,
+    isLive: true,
     description: "Update your guest profile details and guest-facing account preferences.",
   },
   {
@@ -65,7 +65,7 @@ export const guestNavigationItems: GuestNavItem[] = [
     href: "/guest/wishlist",
     icon: "wishlist",
     group: "Account",
-    isLive: false,
+    isLive: true,
     description: "Keep track of saved properties you want to revisit later.",
   },
   {
@@ -73,7 +73,7 @@ export const guestNavigationItems: GuestNavItem[] = [
     href: "/guest/reviews",
     icon: "reviews",
     group: "Account",
-    isLive: false,
+    isLive: true,
     description: "View and manage the reviews you have submitted after completed stays.",
   },
   {
@@ -81,7 +81,7 @@ export const guestNavigationItems: GuestNavItem[] = [
     href: "/guest/safety",
     icon: "safety",
     group: "Account",
-    isLive: false,
+    isLive: true,
     description: "Handle reports, blocked users, and guest safety actions.",
   },
 ];
