@@ -145,6 +145,33 @@ const buildAvailabilityNote = (detail: FrontPropertyDetail, stayError: string) =
   return "Add stay dates to see the best matching unit price and availability for this stay.";
 };
 
+const formatStayRuleLabel = (value: number | null, kind: "min" | "max") => {
+  if (!value || value < 1) {
+    return "";
+  }
+
+  return `${kind === "min" ? "Min" : "Max"} ${value} night${value === 1 ? "" : "s"}`;
+};
+
+const parseHouseRules = (value: string) => {
+  const normalized = value
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  const sourceItems =
+    normalized.length > 1
+      ? normalized
+      : value
+          .split(/(?:\s*[.;]\s+)|(?:\s*\|\s*)/)
+          .map((item) => item.trim())
+          .filter(Boolean);
+
+  return sourceItems
+    .map((item) => item.replace(/^[-*•\d.)\s]+/, "").trim())
+    .filter(Boolean);
+};
+
 const buildPropertyStayQuery = ({
   checkIn,
   checkOut,
@@ -258,6 +285,10 @@ export default async function PropertyPage({
   const reviewSummaryLabel = detail.reviews.summary?.displayLabel || "New";
   const reviewCount = detail.reviews.summary?.count ?? 0;
   const stayTotalLabel = detail.pricing.minStayTotalLabel || "";
+  const houseRules = parseHouseRules(detail.property.houseRules);
+  const unitsWithStayRules = detail.units.filter(
+    (unit) => unit.stayRules.minimumStay || unit.stayRules.maximumStay,
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -326,7 +357,7 @@ export default async function PropertyPage({
 
           <PropertyGallery title={detail.property.title} images={galleryImages} />
 
-          <section className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_360px]">
+          <section className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_336px] xl:grid-cols-[minmax(0,1.35fr)_348px]">
             <div className="space-y-8">
               <div className="surface-card-strong rounded-[30px] p-6 md:p-8">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
@@ -350,17 +381,77 @@ export default async function PropertyPage({
                     "Designed for a cleaner booking flow with real-time pricing, availability, and unit details."}
                 </p>
 
-                {detail.property.houseRules ? (
-                  <div className="mt-6 rounded-[22px] border border-border bg-card px-5 py-5 shadow-soft">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-                      House rules
-                    </p>
-                    <p className="mt-3 text-[15px] leading-7 text-text-secondary">
-                      {detail.property.houseRules}
-                    </p>
-                  </div>
-                ) : null}
               </div>
+
+              {houseRules.length || unitsWithStayRules.length ? (
+                <div className="surface-card rounded-[30px] p-6 md:p-8">
+                  <SectionTitle
+                    eyebrow="Stay Rules"
+                    title="Things to know before you book"
+                    description="Review the stay rules clearly before sending a booking request."
+                  />
+
+                  <div className="mt-7 grid gap-3">
+                    {unitsWithStayRules.length ? (
+                      <div className="rounded-[24px] border border-border-light bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,247,241,0.92)_100%)] px-5 py-5 shadow-soft">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                              Stay length limits
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 grid gap-3">
+                          {unitsWithStayRules.map((unit) => (
+                            <div
+                              key={unit.id}
+                              className="rounded-[22px] border border-border-light bg-white/90 px-4 py-4 shadow-soft"
+                            >
+                              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                                <div>
+                                  <p className="text-[15px] font-semibold text-text-primary">
+                                    {unit.unitName}
+                                    {unit.unitNumber ? ` · ${unit.unitNumber}` : ""}
+                                  </p>
+                                  <p className="mt-1 text-[13px] text-text-secondary">
+                                    {unit.unitType || "Selected stay unit"}
+                                  </p>
+                                </div>
+
+                                <div className="flex flex-wrap gap-2">
+                                  {unit.stayRules.minimumStay ? (
+                                    <span className="rounded-full border border-primary/25 bg-primary-light px-3.5 py-2 text-[12px] font-semibold text-text-primary">
+                                      {formatStayRuleLabel(unit.stayRules.minimumStay, "min")}
+                                    </span>
+                                  ) : null}
+                                  {unit.stayRules.maximumStay ? (
+                                    <span className="rounded-full border border-border bg-surface px-3.5 py-2 text-[12px] font-semibold text-text-primary">
+                                      {formatStayRuleLabel(unit.stayRules.maximumStay, "max")}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {houseRules.map((rule, index) => (
+                      <div
+                        key={`${rule}-${index}`}
+                        className="flex items-start gap-3 rounded-[22px] border border-border-light bg-card px-4 py-4 shadow-soft transition-all duration-200 hover:border-text-primary/12 hover:shadow-medium"
+                      >
+                        <span className="mt-0.5 flex h-7 w-7 flex-none items-center justify-center rounded-full bg-primary text-[12px] font-bold text-text-primary shadow-glow">
+                          {index + 1}
+                        </span>
+                        <p className="text-[14px] leading-6 text-text-secondary">{rule}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
 
               <div className="surface-card rounded-[30px] p-6 md:p-8">
                 <SectionTitle
@@ -437,6 +528,20 @@ export default async function PropertyPage({
                                   .filter(Boolean)
                                   .join(" • ")}
                               </p>
+                              {(unit.stayRules.minimumStay || unit.stayRules.maximumStay) ? (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {unit.stayRules.minimumStay ? (
+                                    <span className="rounded-full border border-border bg-surface px-3 py-1.5 text-[12px] font-medium text-text-secondary">
+                                      {formatStayRuleLabel(unit.stayRules.minimumStay, "min")}
+                                    </span>
+                                  ) : null}
+                                  {unit.stayRules.maximumStay ? (
+                                    <span className="rounded-full border border-border bg-surface px-3 py-1.5 text-[12px] font-medium text-text-secondary">
+                                      {formatStayRuleLabel(unit.stayRules.maximumStay, "max")}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              ) : null}
                             </div>
 
                             <div className="rounded-[20px] border border-border bg-surface px-4 py-4 text-right">

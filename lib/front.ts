@@ -154,6 +154,10 @@ export type FrontPropertyUnit = {
   bathrooms: number | null;
   beds: number | null;
   amenityIds: string[];
+  stayRules: {
+    minimumStay: number | null;
+    maximumStay: number | null;
+  };
   pricing: {
     nightlyAmount: number | null;
     currency: string;
@@ -347,6 +351,7 @@ const normalizeFrontPropertyGalleryImage = (
 const normalizeFrontPropertyUnit = (payload: unknown): FrontPropertyUnit => {
   const source = asRecord(payload);
   const pricingSource = asRecord(source.pricing);
+  const stayRulesSource = asRecord(source.stayRules);
   const nightlyAmount = asNumber(pricingSource.nightlyAmount);
   const currency = asString(pricingSource.currency) || "BDT";
   const nights = asNumber(pricingSource.nights);
@@ -362,6 +367,10 @@ const normalizeFrontPropertyUnit = (payload: unknown): FrontPropertyUnit => {
     bathrooms: asNumber(source.bathrooms),
     beds: asNumber(source.beds),
     amenityIds: asArray(source.amenityIds).map((item) => asString(item)).filter(Boolean),
+    stayRules: {
+      minimumStay: asNumber(stayRulesSource.minimumStay),
+      maximumStay: asNumber(stayRulesSource.maximumStay),
+    },
     pricing: {
       nightlyAmount,
       currency,
