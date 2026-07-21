@@ -545,7 +545,6 @@ export default async function PropertyPage({
                 <SectionTitle
                   eyebrow="Related Stays"
                   title="Continue exploring similar properties"
-                  description="Use the same card system from the homepage so discovery stays familiar and connected."
                 />
                 <Link
                   href="/"
