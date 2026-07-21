@@ -143,3 +143,18 @@
 - Built a new `/admin/property-applications` workspace with searchable status tabs, pagination, selection-based detail loading, and approve/reject moderation controls.
 - Wired the new section into the admin navigation, sidebar icon set, dashboard cards, and protected route tree.
 - Verified the new admin section with clean diagnostics and a successful `npm.cmd run build`.
+
+## Guest Portal Foundation
+
+- [completed] Wire guest route files and guest-only access gating for dashboard, bookings, booking detail, and booking create pages.
+- [completed] Connect the public property page to the guest booking flow with selected unit, stay filters, and booking CTA.
+- [completed] Build the guest booking request page and submit flow against `POST /api/v1/bookings`.
+- [completed] Run diagnostics and `npm.cmd run build`, then document the review result.
+
+### Review
+
+- Added the first live guest route family with `/guest/dashboard`, `/guest/bookings`, `/guest/bookings/[bookingId]`, and `/guest/bookings/new`, all protected by the shared guest route gate.
+- Tightened guest access behavior so guest-only routes now redirect unauthenticated users into auth with a safe return path, while host and admin accounts are redirected into their supported areas instead of landing in broken guest pages.
+- Connected the public property details experience to the guest portal by preserving `unitId`, `checkIn`, `checkOut`, and `guests`, adding explicit unit selection, and providing a real "Continue to booking" handoff from `PropertyBookingCard`.
+- Built the booking request workspace inside the guest shell, loading the selected property and unit context, collecting `adultGuests`, `childGuests`, `specialRequests`, and `couponCode`, and redirecting successful creates to the guest booking detail page.
+- Verified the guest foundation pass with clean diagnostics and a successful `npm.cmd run build`.

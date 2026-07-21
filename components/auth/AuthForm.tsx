@@ -13,6 +13,7 @@ type AuthIntent = "guest" | "host";
 type AuthFormProps = {
   mode: AuthMode;
   intent: AuthIntent;
+  returnTo?: string;
 };
 
 type FormValues = {
@@ -69,7 +70,21 @@ const Field: React.FC<{
   </label>
 );
 
-export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent }) => {
+const resolveSafeReturnTo = (value?: string) => {
+  if (!value) {
+    return "";
+  }
+
+  const trimmed = value.trim();
+
+  if (!trimmed.startsWith("/") || trimmed.startsWith("//")) {
+    return "";
+  }
+
+  return trimmed;
+};
+
+export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent, returnTo }) => {
   const router = useRouter();
   const { setSession } = useAuth();
   const [values, setValues] = useState<FormValues>(initialValues);
@@ -79,6 +94,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent }) => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const isRegisterMode = mode === "register";
+  const safeReturnTo = useMemo(() => resolveSafeReturnTo(returnTo), [returnTo]);
 
   const headerCopy = useMemo(() => {
     if (intent === "host") {
@@ -174,20 +190,24 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent }) => {
       const hasHostAccess = session.user.roles.includes("host");
       const shouldGoToHostArea = intent === "host";
       const hostDestination = hasHostAccess ? "/host/dashboard" : "/host/onboarding";
+      const guestDestination = safeReturnTo || "/guest/dashboard";
+      const redirectTarget = shouldGoToHostArea ? hostDestination : guestDestination;
 
       setSession(session);
       setSuccessMessage(
-        shouldGoToHostArea && hasHostAccess
+        safeReturnTo
+          ? "Login successful. Restoring your previous route. Redirecting..."
+          : shouldGoToHostArea && hasHostAccess
           ? "Host access confirmed. Redirecting..."
           : isRegisterMode && intent === "host"
             ? "Account created successfully. Continue your host onboarding. Redirecting..."
             : !isRegisterMode && intent === "host"
               ? "Login successful. Continue your host onboarding. Redirecting..."
             : isRegisterMode
-              ? "Account created successfully. Redirecting..."
-              : "Login successful. Redirecting...",
+              ? "Account created successfully. Opening your guest portal. Redirecting..."
+              : "Login successful. Opening your guest portal. Redirecting...",
       );
-      router.push(shouldGoToHostArea ? hostDestination : "/");
+      router.push(redirectTarget);
       router.refresh();
     } catch (error) {
       if (error instanceof ApiError) {
@@ -207,15 +227,29 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent }) => {
     }
   };
 
-  const switchModeHref = `/auth?mode=${isRegisterMode ? "login" : "register"}${
-    intent === "host" ? "&intent=host" : ""
-  }`;
+  const buildAuthHref = (nextMode: AuthMode) => {
+    const params = new URLSearchParams({
+      mode: nextMode,
+    });
+
+    if (intent === "host") {
+      params.set("intent", "host");
+    }
+
+    if (safeReturnTo) {
+      params.set("returnTo", safeReturnTo);
+    }
+
+    return `/auth?${params.toString()}`;
+  };
+
+  const switchModeHref = buildAuthHref(isRegisterMode ? "login" : "register");
 
   return (
     <div className="rounded-[30px] border border-border-light bg-surface p-5 shadow-soft md:p-6">
       <div className="flex flex-wrap items-center gap-3">
         <Link
-          href={`/auth?mode=login${intent === "host" ? "&intent=host" : ""}`}
+          href={buildAuthHref("login")}
           className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all duration-200 ${
             !isRegisterMode
               ? "bg-primary text-text-primary shadow-glow"
@@ -225,7 +259,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent }) => {
           Log in
         </Link>
         <Link
-          href={`/auth?mode=register${intent === "host" ? "&intent=host" : ""}`}
+          href={buildAuthHref("register")}
           className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all duration-200 ${
             isRegisterMode
               ? "bg-primary text-text-primary shadow-glow"

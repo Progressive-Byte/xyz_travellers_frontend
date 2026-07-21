@@ -7,6 +7,7 @@ type AuthIntent = "guest" | "host";
 type AuthLayoutProps = {
   mode: AuthMode;
   intent: AuthIntent;
+  returnTo?: string;
 };
 
 const contentByIntent: Record<
@@ -29,14 +30,14 @@ const contentByIntent: Record<
   },
 };
 
-export const AuthLayout: React.FC<AuthLayoutProps> = ({ mode, intent }) => {
+export const AuthLayout: React.FC<AuthLayoutProps> = ({ mode, intent, returnTo }) => {
   void contentByIntent[intent];
 
   return (
     <section className="section-shell overflow-hidden bg-background py-10 md:py-14">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl">
-          <AuthForm mode={mode} intent={intent} />
+          <AuthForm mode={mode} intent={intent} returnTo={returnTo} />
         </div>
       </div>
     </section>

@@ -13,15 +13,20 @@ export const Navbar: React.FC = () => {
   const router = useRouter();
   const { user, isHydrated, isAuthenticated, logout } = useAuth();
   const hasHostAccess = user?.roles?.includes("host") ?? false;
+  const guestPortalHref = "/guest/dashboard";
+  const hostEntryHref = hasHostAccess ? "/host/dashboard" : "/host/onboarding";
 
   const menuItems = useMemo(
     () =>
       isAuthenticated
         ? [
-            { label: "Browse stays", href: "/", emphasis: true },
+            ...(!hasHostAccess
+              ? [{ label: "Guest portal", href: guestPortalHref, emphasis: true }]
+              : []),
+            { label: "Browse stays", href: "/" },
             hasHostAccess
-              ? { label: "Host dashboard", href: "/host/dashboard" }
-              : { label: "Host onboarding", href: "/host/onboarding" },
+              ? { label: "Host dashboard", href: "/host/dashboard", emphasis: true }
+              : { label: "Become a host", href: "/host/onboarding" },
             { label: "Help Center", href: "/help" },
           ]
         : [
@@ -30,7 +35,7 @@ export const Navbar: React.FC = () => {
             { label: "Help Center", href: "/help" },
             { label: "About XYZ Travellers", href: "/about" },
           ],
-    [hasHostAccess, isAuthenticated],
+    [guestPortalHref, hasHostAccess, isAuthenticated],
   );
 
   useEffect(() => {
@@ -123,12 +128,12 @@ export const Navbar: React.FC = () => {
                 isAuthenticated
                   ? hasHostAccess
                     ? "/host/dashboard"
-                    : "/host/onboarding"
+                    : guestPortalHref
                   : "/auth?mode=register&intent=host"
               }
               className="hidden rounded-full border border-border bg-card px-4 py-2 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium md:inline-flex"
             >
-              {hasHostAccess ? "Host dashboard" : isAuthenticated ? "Host onboarding" : "Become a host"}
+              {hasHostAccess ? "Host dashboard" : isAuthenticated ? "Guest portal" : "Become a host"}
             </Link>
 
             <div className="relative" ref={dropdownRef}>
