@@ -49,7 +49,7 @@ export const guestNavigationItems: GuestNavItem[] = [
     href: "/guest/payments",
     icon: "payments",
     group: "Main",
-    isLive: false,
+    isLive: true,
     description: "Track payment summaries, completed transactions, and refunds.",
   },
   {

@@ -83,6 +83,21 @@ export type GuestTransaction = {
   processedAt: string | null;
 };
 
+export type GuestPaymentCheckout = {
+  checkoutId: string;
+  bookingId: string;
+  currency: string;
+  subtotal: number | null;
+  discountAmount: number | null;
+  totalPayable: number | null;
+};
+
+export type GuestPaymentConfirmResult = {
+  transactionId: string;
+  bookingId: string;
+  status: string;
+};
+
 export type GuestDashboardData = {
   bookings: {
     total: number;
@@ -191,16 +206,39 @@ const normalizeGuestTransaction = (payload: unknown): GuestTransaction => {
 
   return {
     id: asString(source.id),
-    reservationId: asString(source.reservationId),
+    reservationId: asString(source.reservationId ?? source.bookingId),
     propertyId: asString(source.propertyId),
     unitId: asString(source.unitId),
     transactionType: asString(source.transactionType),
     status: asString(source.status),
     currency: asString(source.currency) || "BDT",
-    grossAmount: asNumber(source.grossAmount),
+    grossAmount: asNumber(source.grossAmount ?? source.totalPayable ?? source.subtotal),
     netAmount: asNumber(source.netAmount),
     createdAt: asOptionalString(source.createdAt),
     processedAt: asOptionalString(source.processedAt),
+  };
+};
+
+const normalizeGuestPaymentCheckout = (payload: unknown): GuestPaymentCheckout => {
+  const source = asRecord(payload);
+
+  return {
+    checkoutId: asString(source.checkoutId),
+    bookingId: asString(source.bookingId),
+    currency: asString(source.currency) || "BDT",
+    subtotal: asNumber(source.subtotal),
+    discountAmount: asNumber(source.discountAmount),
+    totalPayable: asNumber(source.totalPayable),
+  };
+};
+
+const normalizeGuestPaymentConfirmResult = (payload: unknown): GuestPaymentConfirmResult => {
+  const source = asRecord(payload);
+
+  return {
+    transactionId: asString(source.transactionId),
+    bookingId: asString(source.bookingId),
+    status: asString(source.status),
   };
 };
 
@@ -380,6 +418,48 @@ export async function cancelGuestBooking(
   });
 
   return normalizeGuestBooking(response);
+}
+
+export async function createGuestPaymentCheckout(
+  token: string,
+  bookingId: string,
+): Promise<GuestPaymentCheckout> {
+  const response = await apiRequest<unknown>("/api/v1/payments/checkout", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: {
+      bookingId,
+    },
+  });
+
+  return normalizeGuestPaymentCheckout(response);
+}
+
+export async function confirmGuestPayment(
+  token: string,
+  bookingId: string,
+  paymentReference: string,
+): Promise<GuestPaymentConfirmResult> {
+  const response = await apiRequest<unknown>("/api/v1/payments/confirm", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: {
+      bookingId,
+      paymentReference: paymentReference.trim(),
+    },
+  });
+
+  return normalizeGuestPaymentConfirmResult(response);
+}
+
+export async function getGuestTransactions(token: string): Promise<GuestTransaction[]> {
+  const response = await apiRequest<unknown>("/api/v1/payments/my-transactions", {
+    method: "GET",
+    headers: createAuthHeaders(token),
+    cache: "no-store",
+  });
+
+  return asArray(response).map(normalizeGuestTransaction);
 }
 
 export async function getGuestPropertyLookups(

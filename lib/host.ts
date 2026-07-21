@@ -70,6 +70,8 @@ export type HostReservation = {
   unitName: string;
   guestId: string;
   guestName: string;
+  guestEmail: string;
+  guestPhone: string;
   checkInDate: string;
   checkOutDate: string;
   adultGuests: number;
@@ -701,6 +703,8 @@ const emptyHostReservation = (): HostReservation => ({
   unitName: "",
   guestId: "",
   guestName: "",
+  guestEmail: "",
+  guestPhone: "",
   checkInDate: "",
   checkOutDate: "",
   adultGuests: 0,
@@ -923,6 +927,9 @@ const normalizeHostReservation = (payload: unknown): HostReservation => {
   const propertySource = asRecord(source.property);
   const unitSource = asRecord(source.unit);
   const guestSource = asRecord(source.guest);
+  const guestFirstName = asString(guestSource.firstName ?? guestSource.first_name);
+  const guestLastName = asString(guestSource.lastName ?? guestSource.last_name);
+  const guestFullName = [guestFirstName, guestLastName].filter(Boolean).join(" ").trim();
 
   return {
     id: asString(source.id) || asString(source.reservationId ?? source.reservation_id),
@@ -938,7 +945,10 @@ const normalizeHostReservation = (payload: unknown): HostReservation => {
     guestId: asString(source.guestId ?? source.guest_id),
     guestName:
       asString(source.guestName ?? source.guest_name) ||
-      asString(guestSource.name ?? guestSource.fullName ?? guestSource.full_name),
+      asString(guestSource.name ?? guestSource.fullName ?? guestSource.full_name) ||
+      guestFullName,
+    guestEmail: asString(source.guestEmail ?? source.guest_email) || asString(guestSource.email),
+    guestPhone: asString(source.guestPhone ?? source.guest_phone) || asString(guestSource.phone),
     checkInDate: asString(source.checkInDate ?? source.check_in_date),
     checkOutDate: asString(source.checkOutDate ?? source.check_out_date),
     adultGuests: asNumber(source.adultGuests ?? source.adult_guests) ?? 0,
