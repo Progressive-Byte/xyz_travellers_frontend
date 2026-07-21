@@ -30,7 +30,7 @@ type PropertyBookingCardProps = {
 const FieldLabel: React.FC<{
   label: string;
 }> = ({ label }) => (
-  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+  <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-text-secondary">
     {label}
   </p>
 );
@@ -49,7 +49,7 @@ const DateInputButton = React.forwardRef<HTMLButtonElement, DateInputButtonProps
       onClick={onClick}
       className="w-full text-left outline-none focus:outline-none focus-visible:outline-none"
     >
-      <span className="block text-[14px] font-semibold text-text-primary">{value || label}</span>
+      <span className="block text-[13px] font-semibold text-text-primary">{value || label}</span>
     </button>
   ),
 );
@@ -60,9 +60,9 @@ const FieldShell: React.FC<{
   label: string;
   children: React.ReactNode;
 }> = ({ label, children }) => (
-  <div className="rounded-[20px] border border-border bg-card px-4 py-3 shadow-soft">
+  <div className="rounded-[18px] border border-border bg-card px-3.5 py-2.5 shadow-soft">
     <FieldLabel label={label} />
-    <div className="mt-1">{children}</div>
+    <div className="mt-0.5">{children}</div>
   </div>
 );
 
@@ -173,20 +173,22 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
   }, [initialUnitId, selectedUnitId, units]);
 
   return (
-    <aside className="relative z-20 surface-card-strong rounded-[30px] p-6">
-      <div className="flex items-end justify-between gap-4">
+    <aside className="relative z-20 surface-card-strong rounded-[28px] p-5">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[13px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-text-secondary">
             From
           </p>
-          <p className="mt-2 font-sora text-[34px] font-bold tracking-[-0.04em] text-text-primary">
+          <p className="mt-1.5 font-sora text-[28px] font-bold leading-[1.1] tracking-[-0.04em] text-text-primary">
             {priceLabel}
           </p>
         </div>
-        <p className="pb-1 text-[14px] font-medium text-text-secondary">best available rate</p>
+        <p className="max-w-[68px] pt-0.5 text-right text-[11px] leading-4 text-text-secondary">
+          best available rate
+        </p>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+      <div className="mt-4 grid grid-cols-2 gap-2.5">
         <FieldShell label="Check in">
           <DatePicker
             selected={checkInDate}
@@ -233,7 +235,9 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
             value={formatDateLabel(checkOutDate)}
           />
         </FieldShell>
+      </div>
 
+      <div className="mt-2.5 grid gap-2.5">
         <FieldShell label="Guests">
           <input
             type="number"
@@ -247,7 +251,7 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
               setError("");
             }}
             placeholder={guestPlaceholder}
-            className="w-full bg-transparent text-[14px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-secondary"
+            className="w-full bg-transparent text-[13px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-secondary"
           />
         </FieldShell>
 
@@ -258,7 +262,7 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
               setSelectedUnitId(event.target.value);
               setError("");
             }}
-            className="w-full bg-transparent text-[14px] font-semibold text-text-primary outline-none"
+            className="w-full bg-transparent text-[13px] font-semibold text-text-primary outline-none"
           >
             <option value="">Select a unit</option>
             {units.map((unit) => (
@@ -274,38 +278,40 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
         <p className="mt-3 text-[13px] font-medium text-[var(--color-danger,#b42318)]">{error}</p>
       ) : null}
 
-      <div className="mt-3 rounded-[22px] border border-border bg-surface px-4 py-3">
+      <div className="mt-2.5 rounded-[18px] border border-border bg-surface px-3.5 py-2.5">
         <FieldLabel label="Notes" />
-        <p className="mt-1 text-[14px] leading-6 text-text-secondary">
+        <p className="mt-1 text-[12px] leading-5 text-text-secondary">
           {availabilityLabel ||
             "Add stay dates to see the best matching unit price and availability for this stay."}
         </p>
       </div>
 
       {stayTotalLabel ? (
-        <div className="mt-3 rounded-[22px] border border-border-light bg-[rgba(245,243,237,0.66)] px-4 py-4">
-          <div className="flex items-center justify-between gap-3 text-[14px]">
+        <div className="mt-2.5 rounded-[18px] border border-border-light bg-[rgba(245,243,237,0.66)] px-3.5 py-3">
+          <div className="flex items-center justify-between gap-3 text-[12px]">
             <span className="text-text-secondary">Estimated stay total</span>
-            <span className="font-semibold text-text-primary">{stayTotalLabel}</span>
+            <span className="text-right font-semibold text-text-primary">{stayTotalLabel}</span>
           </div>
         </div>
       ) : null}
 
       {selectedUnit ? (
-        <div className="mt-3 rounded-[22px] border border-border-light bg-[rgba(245,243,237,0.66)] px-4 py-4">
-          <div className="flex items-center justify-between gap-3 text-[14px]">
+        <div className="mt-2.5 rounded-[18px] border border-border-light bg-[rgba(245,243,237,0.66)] px-3.5 py-3">
+          <div className="flex items-start justify-between gap-3 text-[12px]">
             <span className="text-text-secondary">Selected unit</span>
-            <span className="font-semibold text-text-primary">{selectedUnit.label}</span>
+            <span className="max-w-[160px] text-right font-semibold leading-4 text-text-primary">
+              {selectedUnit.label}
+            </span>
           </div>
           {selectedUnit.stayTotalLabel ? (
-            <div className="mt-3 flex items-center justify-between gap-3 text-[14px]">
+            <div className="mt-2.5 flex items-center justify-between gap-3 text-[12px]">
               <span className="text-text-secondary">Unit stay total</span>
-              <span className="font-semibold text-text-primary">{selectedUnit.stayTotalLabel}</span>
+              <span className="text-right font-semibold text-text-primary">{selectedUnit.stayTotalLabel}</span>
             </div>
           ) : selectedUnit.nightlyLabel ? (
-            <div className="mt-3 flex items-center justify-between gap-3 text-[14px]">
+            <div className="mt-2.5 flex items-center justify-between gap-3 text-[12px]">
               <span className="text-text-secondary">Unit nightly rate</span>
-              <span className="font-semibold text-text-primary">{selectedUnit.nightlyLabel}</span>
+              <span className="text-right font-semibold text-text-primary">{selectedUnit.nightlyLabel}</span>
             </div>
           ) : null}
         </div>
@@ -364,7 +370,7 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
           });
         }}
         disabled={isPending}
-        className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3.5 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
+        className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-[13px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
       >
         {isPending ? "Checking..." : "Check availability"}
       </button>
@@ -410,18 +416,18 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
             }),
           );
         }}
-        className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-border bg-white px-5 py-3.5 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+        className="mt-2.5 inline-flex w-full items-center justify-center rounded-full border border-border bg-white px-5 py-3 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
       >
         Continue to booking
       </button>
 
-      <div className="mt-5 rounded-[22px] border border-border-light bg-[rgba(245,243,237,0.66)] px-4 py-4">
-        <div className="flex items-center justify-between gap-3 text-[14px]">
+      <div className="mt-4 rounded-[18px] border border-border-light bg-[rgba(245,243,237,0.66)] px-3.5 py-3">
+        <div className="flex items-center justify-between gap-3 text-[12px]">
           <span className="text-text-secondary">Secure booking support</span>
           <span className="font-semibold text-text-primary">24/7</span>
         </div>
-        <div className="mt-3 h-px bg-border-light" />
-        <div className="mt-3 flex items-center justify-between gap-3 text-[14px]">
+        <div className="mt-2.5 h-px bg-border-light" />
+        <div className="mt-2.5 flex items-center justify-between gap-3 text-[12px]">
           <span className="text-text-secondary">Flexible stay guidance</span>
           <span className="font-semibold text-text-primary">Included</span>
         </div>
