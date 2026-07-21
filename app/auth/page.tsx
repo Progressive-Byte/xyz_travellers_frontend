@@ -5,6 +5,7 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 type SearchParams = Promise<{
   mode?: string;
   intent?: string;
+  returnTo?: string;
 }>;
 
 type AuthPageProps = {
@@ -18,12 +19,13 @@ export default async function AuthPage({ searchParams }: AuthPageProps) {
   const params = await searchParams;
   const mode = resolveMode(params.mode);
   const intent = resolveIntent(params.intent);
+  const returnTo = typeof params.returnTo === "string" ? params.returnTo : "";
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main>
-        <AuthLayout mode={mode} intent={intent} />
+        <AuthLayout mode={mode} intent={intent} returnTo={returnTo} />
       </main>
       <Footer />
     </div>

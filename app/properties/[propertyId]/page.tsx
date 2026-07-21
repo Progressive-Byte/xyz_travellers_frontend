@@ -21,6 +21,7 @@ type PropertyPageProps = {
     checkIn?: string;
     checkOut?: string;
     guests?: string;
+    unitId?: string;
   }>;
 };
 
@@ -144,6 +145,38 @@ const buildAvailabilityNote = (detail: FrontPropertyDetail, stayError: string) =
   return "Add stay dates to see the best matching unit price and availability for this stay.";
 };
 
+const buildPropertyStayQuery = ({
+  checkIn,
+  checkOut,
+  guests,
+  unitId,
+}: {
+  checkIn?: string;
+  checkOut?: string;
+  guests?: number | null;
+  unitId?: string;
+}) => {
+  const params = new URLSearchParams();
+
+  if (checkIn) {
+    params.set("checkIn", checkIn);
+  }
+
+  if (checkOut) {
+    params.set("checkOut", checkOut);
+  }
+
+  if (typeof guests === "number" && guests > 0) {
+    params.set("guests", String(guests));
+  }
+
+  if (unitId) {
+    params.set("unitId", unitId);
+  }
+
+  return params.toString();
+};
+
 const loadProperty = async (
   propertyId: string,
   stayFilters: ReturnType<typeof parseFrontStayFilters>,
@@ -199,6 +232,13 @@ export default async function PropertyPage({
     guests: query?.guests ?? null,
   });
   const detail = await loadProperty(propertyId, stayFilters);
+  const selectedUnitId =
+    query?.unitId && detail.units.some((unit) => unit.id === query.unitId)
+      ? query.unitId
+      : detail.units.length === 1
+        ? detail.units[0]?.id || ""
+        : "";
+  const selectedUnit = detail.units.find((unit) => unit.id === selectedUnitId) ?? null;
   const galleryImages = detail.gallery.items.length
     ? detail.gallery.items
     : detail.gallery.coverImageUrl
@@ -354,46 +394,95 @@ export default async function PropertyPage({
                 />
 
                 <div className="mt-7 grid gap-4">
-                  {detail.units.map((unit) => (
-                    <div
-                      key={unit.id}
-                      className="rounded-[24px] border border-border-light bg-card px-5 py-5 shadow-soft"
-                    >
-                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                        <div>
-                          <p className="text-[18px] font-semibold text-text-primary">
-                            {unit.unitName}
-                            {unit.unitNumber ? ` · ${unit.unitNumber}` : ""}
-                          </p>
-                          <p className="mt-2 text-[14px] text-text-secondary">
-                            {[
-                              unit.unitType,
-                              unit.capacity ? `${unit.capacity} guests` : "",
-                              unit.bedrooms ? `${unit.bedrooms} bedrooms` : "",
-                              unit.bathrooms ? `${unit.bathrooms} bathrooms` : "",
-                              unit.beds ? `${unit.beds} beds` : "",
-                            ]
-                              .filter(Boolean)
-                              .join(" • ")}
-                          </p>
-                        </div>
+                  {detail.units.length ? (
+                    detail.units.map((unit) => {
+                      const isSelected = unit.id === selectedUnitId;
+                      const unitQuery = buildPropertyStayQuery({
+                        checkIn: stayFilters.checkIn || undefined,
+                        checkOut: stayFilters.checkOut || undefined,
+                        guests: stayFilters.guests,
+                        unitId: unit.id,
+                      });
 
-                        <div className="rounded-[20px] border border-border bg-surface px-4 py-4 text-right">
-                          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-                            Nightly
-                          </p>
-                          <p className="mt-2 text-[16px] font-semibold text-text-primary">
-                            {unit.pricing.nightlyLabel || "Rate unavailable"}
-                          </p>
-                          {unit.pricing.stayTotalLabel ? (
-                            <p className="mt-1 text-[13px] text-text-secondary">
-                              Stay total: {unit.pricing.stayTotalLabel}
-                            </p>
-                          ) : null}
+                      return (
+                        <div
+                          key={unit.id}
+                          className={`rounded-[24px] border px-5 py-5 shadow-soft transition-all duration-200 ${
+                            isSelected
+                              ? "border-primary/50 bg-primary-light"
+                              : "border-border-light bg-card"
+                          }`}
+                        >
+                          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                            <div>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-[18px] font-semibold text-text-primary">
+                                  {unit.unitName}
+                                  {unit.unitNumber ? ` · ${unit.unitNumber}` : ""}
+                                </p>
+                                {isSelected ? (
+                                  <span className="rounded-full bg-primary px-3 py-1 text-[11px] font-semibold text-text-primary shadow-glow">
+                                    Selected
+                                  </span>
+                                ) : null}
+                              </div>
+                              <p className="mt-2 text-[14px] text-text-secondary">
+                                {[
+                                  unit.unitType,
+                                  unit.capacity ? `${unit.capacity} guests` : "",
+                                  unit.bedrooms ? `${unit.bedrooms} bedrooms` : "",
+                                  unit.bathrooms ? `${unit.bathrooms} bathrooms` : "",
+                                  unit.beds ? `${unit.beds} beds` : "",
+                                ]
+                                  .filter(Boolean)
+                                  .join(" • ")}
+                              </p>
+                            </div>
+
+                            <div className="rounded-[20px] border border-border bg-surface px-4 py-4 text-right">
+                              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                                Nightly
+                              </p>
+                              <p className="mt-2 text-[16px] font-semibold text-text-primary">
+                                {unit.pricing.nightlyLabel || "Rate unavailable"}
+                              </p>
+                              {unit.pricing.stayTotalLabel ? (
+                                <p className="mt-1 text-[13px] text-text-secondary">
+                                  Stay total: {unit.pricing.stayTotalLabel}
+                                </p>
+                              ) : null}
+                            </div>
+                          </div>
+
+                          <div className="mt-4 flex flex-wrap gap-3">
+                            <Link
+                              href={
+                                unitQuery
+                                  ? `/properties/${propertyId}?${unitQuery}#request-booking`
+                                  : `/properties/${propertyId}#request-booking`
+                              }
+                              className={`inline-flex items-center justify-center rounded-full px-4 py-2.5 text-[13px] font-semibold transition-all duration-200 ${
+                                isSelected
+                                  ? "bg-text-primary text-white shadow-medium hover:bg-text-primary/90"
+                                  : "border border-border bg-white text-text-primary shadow-soft hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                              }`}
+                            >
+                              {isSelected ? "Selected for booking" : "Choose this unit"}
+                            </Link>
+                          </div>
                         </div>
-                      </div>
+                      );
+                    })
+                  ) : (
+                    <div className="rounded-[24px] border border-dashed border-border bg-card px-5 py-8 text-center">
+                      <p className="text-[15px] font-semibold text-text-primary">
+                        No eligible units found for this stay
+                      </p>
+                      <p className="mt-2 text-[14px] leading-6 text-text-secondary">
+                        Adjust your dates or guest count to see more available unit options.
+                      </p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
 
@@ -523,18 +612,26 @@ export default async function PropertyPage({
               </div>
             </div>
 
-            <div className="self-start lg:sticky lg:top-28">
+            <div id="request-booking" className="self-start lg:sticky lg:top-28">
               <PropertyBookingCard
                 propertyId={propertyId}
                 priceLabel={detail.pricing.minNightlyLabel || "Rate unavailable"}
                 initialCheckIn={stayFilters.checkIn || undefined}
                 initialCheckOut={stayFilters.checkOut || undefined}
                 initialGuests={stayFilters.guests}
+                initialUnitId={selectedUnitId || undefined}
+                units={detail.units.map((unit) => ({
+                  id: unit.id,
+                  label: unit.unitNumber ? `${unit.unitName} · ${unit.unitNumber}` : unit.unitName,
+                  capacity: unit.capacity,
+                  nightlyLabel: unit.pricing.nightlyLabel,
+                  stayTotalLabel: unit.pricing.stayTotalLabel,
+                }))}
                 guestPlaceholder={
                   stats[0]?.value === "Flexible" ? "Enter guests" : `Up to ${stats[0]?.value} guests`
                 }
                 availabilityLabel={buildAvailabilityNote(detail, stayFilters.error)}
-                stayTotalLabel={stayTotalLabel}
+                stayTotalLabel={selectedUnit?.pricing.stayTotalLabel || stayTotalLabel}
               />
             </div>
           </section>

@@ -1,9 +1,18 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { buildGuestBookingCreateHref } from "@/lib/guest";
+
+type PropertyBookingUnitOption = {
+  id: string;
+  label: string;
+  capacity: number | null;
+  nightlyLabel: string;
+  stayTotalLabel: string;
+};
 
 type PropertyBookingCardProps = {
   propertyId: string;
@@ -11,6 +20,8 @@ type PropertyBookingCardProps = {
   initialCheckIn?: string;
   initialCheckOut?: string;
   initialGuests?: number | null;
+  initialUnitId?: string;
+  units: PropertyBookingUnitOption[];
   guestPlaceholder?: string;
   availabilityLabel?: string;
   stayTotalLabel?: string;
@@ -116,6 +127,8 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
   initialCheckIn,
   initialCheckOut,
   initialGuests,
+  initialUnitId,
+  units,
   guestPlaceholder = "Enter guests",
   availabilityLabel,
   stayTotalLabel,
@@ -129,7 +142,35 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
   const [guests, setGuests] = useState<string>(
     initialGuests && initialGuests > 0 ? String(initialGuests) : "",
   );
+  const [selectedUnitId, setSelectedUnitId] = useState<string>(
+    initialUnitId && units.some((unit) => unit.id === initialUnitId)
+      ? initialUnitId
+      : units.length === 1
+        ? units[0]?.id || ""
+        : "",
+  );
   const [error, setError] = useState("");
+  const selectedUnit = useMemo(
+    () => units.find((unit) => unit.id === selectedUnitId) ?? null,
+    [selectedUnitId, units],
+  );
+
+  useEffect(() => {
+    const hasSelectedUnit = selectedUnitId && units.some((unit) => unit.id === selectedUnitId);
+
+    if (hasSelectedUnit) {
+      return;
+    }
+
+    const nextSelectedUnitId =
+      initialUnitId && units.some((unit) => unit.id === initialUnitId)
+        ? initialUnitId
+        : units.length === 1
+          ? units[0]?.id || ""
+          : "";
+
+    setSelectedUnitId(nextSelectedUnitId);
+  }, [initialUnitId, selectedUnitId, units]);
 
   return (
     <aside className="relative z-20 surface-card-strong rounded-[30px] p-6">
@@ -209,6 +250,24 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
             className="w-full bg-transparent text-[14px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-secondary"
           />
         </FieldShell>
+
+        <FieldShell label="Unit">
+          <select
+            value={selectedUnitId}
+            onChange={(event) => {
+              setSelectedUnitId(event.target.value);
+              setError("");
+            }}
+            className="w-full bg-transparent text-[14px] font-semibold text-text-primary outline-none"
+          >
+            <option value="">Select a unit</option>
+            {units.map((unit) => (
+              <option key={unit.id} value={unit.id}>
+                {unit.label}
+              </option>
+            ))}
+          </select>
+        </FieldShell>
       </div>
 
       {error ? (
@@ -229,6 +288,26 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
             <span className="text-text-secondary">Estimated stay total</span>
             <span className="font-semibold text-text-primary">{stayTotalLabel}</span>
           </div>
+        </div>
+      ) : null}
+
+      {selectedUnit ? (
+        <div className="mt-3 rounded-[22px] border border-border-light bg-[rgba(245,243,237,0.66)] px-4 py-4">
+          <div className="flex items-center justify-between gap-3 text-[14px]">
+            <span className="text-text-secondary">Selected unit</span>
+            <span className="font-semibold text-text-primary">{selectedUnit.label}</span>
+          </div>
+          {selectedUnit.stayTotalLabel ? (
+            <div className="mt-3 flex items-center justify-between gap-3 text-[14px]">
+              <span className="text-text-secondary">Unit stay total</span>
+              <span className="font-semibold text-text-primary">{selectedUnit.stayTotalLabel}</span>
+            </div>
+          ) : selectedUnit.nightlyLabel ? (
+            <div className="mt-3 flex items-center justify-between gap-3 text-[14px]">
+              <span className="text-text-secondary">Unit nightly rate</span>
+              <span className="font-semibold text-text-primary">{selectedUnit.nightlyLabel}</span>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -265,6 +344,10 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
             params.set("guests", String(Math.floor(guestCount)));
           }
 
+          if (selectedUnitId && units.some((unit) => unit.id === selectedUnitId)) {
+            params.set("unitId", selectedUnitId);
+          }
+
           const query = params.toString();
           const nextPath = `/properties/${propertyId}`;
           const nextUrl = query ? `${nextPath}?${query}` : nextPath;
@@ -284,6 +367,52 @@ export const PropertyBookingCard: React.FC<PropertyBookingCardProps> = ({
         className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3.5 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
       >
         {isPending ? "Checking..." : "Check availability"}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          if (!selectedUnitId || !units.some((unit) => unit.id === selectedUnitId)) {
+            setError("Choose a unit before continuing.");
+            return;
+          }
+
+          if (!checkInDate || !checkOutDate) {
+            setError("Select both check-in and check-out dates.");
+            return;
+          }
+
+          if (checkOutDate <= checkInDate) {
+            setError("Check-out must be later than check-in.");
+            return;
+          }
+
+          const guestCount = Number(guests);
+
+          if (!guests.trim() || !Number.isFinite(guestCount) || guestCount < 1) {
+            setError("Enter at least 1 guest before continuing.");
+            return;
+          }
+
+          if (selectedUnit?.capacity && guestCount > selectedUnit.capacity) {
+            setError(`This unit supports up to ${selectedUnit.capacity} guests.`);
+            return;
+          }
+
+          setError("");
+          router.push(
+            buildGuestBookingCreateHref({
+              propertyId,
+              unitId: selectedUnitId,
+              checkIn: formatDateValue(checkInDate),
+              checkOut: formatDateValue(checkOutDate),
+              guests: Math.floor(guestCount),
+            }),
+          );
+        }}
+        className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-border bg-white px-5 py-3.5 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+      >
+        Continue to booking
       </button>
 
       <div className="mt-5 rounded-[22px] border border-border-light bg-[rgba(245,243,237,0.66)] px-4 py-4">
