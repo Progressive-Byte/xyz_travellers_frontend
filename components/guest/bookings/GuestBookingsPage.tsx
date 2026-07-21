@@ -145,55 +145,57 @@ export const GuestBookingsPage: React.FC = () => {
         </Link>
       }
     >
-      <div className="space-y-6">
-        <section className="surface-card rounded-panel p-5">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                Booking workspace
-              </p>
-              <h2 className="mt-2 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-                Manage requests, confirmed stays, and past trips
-              </h2>
-              <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-                This view keeps your booking activity compact and easy to scan from one table.
-              </p>
-            </div>
+      <div className="space-y-0">
+        <section className="surface-card overflow-hidden rounded-panel">
+          <div className="p-5">
+            <div className="flex flex-col gap-5">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                  Booking workspace
+                </p>
+                <h2 className="mt-2 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
+                  Manage requests, confirmed stays, and past trips
+                </h2>
+                <p className="mt-2 text-[14px] leading-6 text-text-secondary">
+                  This view keeps your booking activity compact and easy to scan from one table.
+                </p>
+              </div>
 
-            <div className="grid gap-3 sm:grid-cols-[220px_auto]">
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search booking or property"
-                className="w-full rounded-[18px] border border-border bg-card px-4 py-3 text-[14px] text-text-primary shadow-soft outline-none transition-all duration-200 placeholder:text-text-secondary/70 focus:-translate-y-0.5 focus:border-text-primary/15 focus:shadow-medium"
-              />
+              <div className="border-t border-border-light pt-5">
+                <div className="grid gap-3 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Search booking or property"
+                    className="w-full rounded-[18px] border border-border bg-card px-4 py-3 text-[14px] text-text-primary shadow-soft outline-none transition-all duration-200 placeholder:text-text-secondary/70 focus:-translate-y-0.5 focus:border-text-primary/15 focus:shadow-medium"
+                  />
 
-              <div className="flex flex-wrap gap-2">
-                {bookingFilters.map((filter) => {
-                  const isActive = selectedFilter === filter.value;
+                  <div className="flex flex-wrap gap-2">
+                    {bookingFilters.map((filter) => {
+                      const isActive = selectedFilter === filter.value;
 
-                  return (
-                    <button
-                      key={filter.value}
-                      type="button"
-                      onClick={() => setSelectedFilter(filter.value)}
-                      className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all duration-200 ${
-                        isActive
-                          ? "bg-primary text-text-primary shadow-glow"
-                          : "border border-border bg-card text-text-secondary shadow-soft hover:border-text-primary/15 hover:text-text-primary"
-                      }`}
-                    >
-                      {filter.label}
-                    </button>
-                  );
-                })}
+                      return (
+                        <button
+                          key={filter.value}
+                          type="button"
+                          onClick={() => setSelectedFilter(filter.value)}
+                          className={`rounded-full px-4 py-2 text-[13px] font-semibold transition-all duration-200 ${
+                            isActive
+                              ? "bg-primary text-text-primary shadow-glow"
+                              : "border border-border bg-card text-text-secondary shadow-soft hover:border-text-primary/15 hover:text-text-primary"
+                          }`}
+                        >
+                          {filter.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </section>
 
-        <section className="surface-card overflow-hidden rounded-panel">
           {error ? (
             <div className="border-b border-border-light bg-[rgba(180,35,24,0.04)] px-5 py-4">
               <p className="text-[14px] text-[var(--color-danger,#b42318)]">{error}</p>
@@ -209,64 +211,67 @@ export const GuestBookingsPage: React.FC = () => {
 
           {filteredBookings.length ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border-light">
-                <thead className="bg-surface/80">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                      Booking
-                    </th>
-                    <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                      Stay
-                    </th>
-                    <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                      Guests
-                    </th>
-                    <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                      Price
-                    </th>
-                    <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                      Status
-                    </th>
-                    <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
-                      Action
-                    </th>
+              <table className="min-w-[860px] w-full border-collapse">
+                <thead className="bg-[rgba(245,243,237,0.92)]">
+                  <tr className="border-b border-border-light">
+                    {["Booking", "Stay", "Guests", "Price", "Status", "Action"].map((heading) => (
+                      <th
+                        key={heading}
+                        scope="col"
+                        className={`px-4 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary ${
+                          heading === "Action" ? "text-right" : "text-left"
+                        }`}
+                      >
+                        {heading}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-border-light bg-white/85">
+                <tbody>
                   {filteredBookings.map((booking) => {
                     const property = propertyLookup[booking.propertyId];
                     const totalGuests = booking.adultGuests + booking.childGuests;
 
                     return (
-                      <tr key={booking.id} className="align-top">
-                        <td className="px-4 py-4">
-                          <p className="text-[14px] font-semibold text-text-primary">
-                            {property?.propertyTitle || `Booking ${booking.id.slice(-6).toUpperCase()}`}
-                          </p>
-                          <p className="mt-1 text-[12px] text-text-secondary">
-                            {property?.unitNamesById[booking.unitId] || booking.unitId}
-                          </p>
+                      <tr
+                        key={booking.id}
+                        className="border-b border-border-light last:border-b-0 odd:bg-white even:bg-[rgba(255,252,247,0.45)] hover:bg-[rgba(255,252,247,0.9)]"
+                      >
+                        <td className="px-4 py-3.5 align-middle">
+                          <div className="min-w-0 max-w-[360px]">
+                            <p className="truncate text-[14px] font-semibold text-text-primary">
+                              {property?.propertyTitle ||
+                                `Booking ${booking.id.slice(-6).toUpperCase()}`}
+                            </p>
+                            <p className="mt-1 truncate text-[12px] leading-5 text-text-secondary">
+                              {property?.unitNamesById[booking.unitId] || booking.unitId}
+                            </p>
+                          </div>
                         </td>
-                        <td className="px-4 py-4 text-[13px] text-text-secondary">
-                          {formatDate(booking.checkInDate)} to {formatDate(booking.checkOutDate)}
+                        <td className="px-4 py-3.5 align-middle text-[13px] text-text-primary">
+                          <span className="text-text-secondary">
+                            {formatDate(booking.checkInDate)} to {formatDate(booking.checkOutDate)}
+                          </span>
                         </td>
-                        <td className="px-4 py-4 text-[13px] text-text-secondary">
-                          {totalGuests} guest{totalGuests === 1 ? "" : "s"}
+                        <td className="px-4 py-3.5 align-middle text-[13px] text-text-primary">
+                          <span className="text-text-secondary">
+                            {totalGuests} guest{totalGuests === 1 ? "" : "s"}
+                          </span>
                         </td>
-                        <td className="px-4 py-4 text-[13px] font-semibold text-text-primary">
+                        <td className="px-4 py-3.5 align-middle text-[13px] font-semibold text-text-primary">
                           {formatCurrency(
                             booking.pricingSnapshot.subtotal ?? booking.pricing.subtotal ?? 0,
                             booking.pricingSnapshot.currency || booking.pricing.currency || "BDT",
                           )}
                         </td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-3.5 align-middle">
                           <GuestBookingStatusPill status={booking.status} />
                         </td>
-                        <td className="px-4 py-4 text-right">
+                        <td className="px-4 py-3.5 align-middle text-right">
                           <Link
                             href={`/guest/bookings/${booking.id}`}
-                            className="inline-flex items-center justify-center rounded-[14px] border border-border bg-white px-3.5 py-2 text-[12px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                            className="inline-flex items-center justify-center rounded-[12px] border border-border bg-white px-3 py-1.5 text-[12px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
                           >
                             Open
                           </Link>

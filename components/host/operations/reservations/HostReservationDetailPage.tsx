@@ -43,6 +43,21 @@ const DetailCard: React.FC<{ label: string; value: string }> = ({ label, value }
   </div>
 );
 
+const GuestDetailCard: React.FC<{ reservation: HostReservation }> = ({ reservation }) => {
+  const guestLabel = reservation.guestName || "Guest details unavailable";
+  const guestReference = reservation.guestId
+    ? `Guest ref · ${reservation.guestId.slice(-6).toUpperCase()}`
+    : "Guest reference pending";
+
+  return (
+    <div className="rounded-[20px] border border-border-light bg-white/80 px-4 py-4">
+      <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">Guest</p>
+      <p className="mt-2 text-[15px] font-semibold text-text-primary">{guestLabel}</p>
+      <p className="mt-1 text-[12px] text-text-secondary">{guestReference}</p>
+    </div>
+  );
+};
+
 export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps> = ({
   reservationId,
 }) => {
@@ -310,7 +325,7 @@ export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps>
                 label="Subtotal"
                 value={formatHostCurrency(reservation.pricingSnapshot.subtotal, currency)}
               />
-              <DetailCard label="Guest ID" value={reservation.guestId || "Not available"} />
+              <GuestDetailCard reservation={reservation} />
             </div>
           </div>
         </div>
