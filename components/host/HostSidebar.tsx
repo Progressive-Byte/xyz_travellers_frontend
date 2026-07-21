@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BrandLogo } from "@/components/branding/BrandLogo";
 import {
   hostNavigationGroups,
   hostNavigationItems,
@@ -102,36 +103,7 @@ export const HostSidebar: React.FC<HostSidebarProps> = ({ onNavigate }) => {
   return (
     <div className="flex h-full flex-col overflow-hidden border border-border-light bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(255,252,247,0.94)_100%)] p-4 shadow-[0_20px_60px_rgba(26,27,18,0.08)]">
       <div className="border-b border-border-light/90 pb-4">
-        <Link
-          href="/"
-          onClick={onNavigate}
-          className="flex items-center gap-3 rounded-[20px] px-1 py-1 transition-all duration-200 hover:bg-white/70"
-        >
-          <span className="icon-chip h-11 w-11 rounded-[18px] shadow-soft">
-            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
-              <defs>
-                <linearGradient id="hostSidebarLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="var(--color-primary)" />
-                  <stop offset="100%" stopColor="var(--color-primary-hover)" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z"
-                fill="url(#hostSidebarLogoGradient)"
-              />
-              <path d="M10 14H14V17H10V14Z" fill="var(--color-text-primary)" />
-            </svg>
-          </span>
-
-          <span className="min-w-0">
-            <span className="block font-sora text-[20px] font-bold tracking-[-0.04em] text-text-primary">
-              XYZ Travellers
-            </span>
-            <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Host workspace
-            </span>
-          </span>
-        </Link>
+        <BrandLogo href="/" onClick={onNavigate} subtitle="Host workspace" variant="sidebar" />
       </div>
 
       <div className="scrollbar-hide flex-1 overflow-y-auto py-5">

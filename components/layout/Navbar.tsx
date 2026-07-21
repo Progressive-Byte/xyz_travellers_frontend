@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { BrandLogo } from "@/components/branding/BrandLogo";
 import { useAuth } from "@/context/AuthContext";
 
 export const Navbar: React.FC = () => {
@@ -91,35 +92,10 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-[rgba(245,243,237,0.82)] backdrop-blur-xl">
-      <div className="mx-auto max-w-7xl px-6 py-4">
+      <div className="mx-auto max-w-7xl px-6 py-1">
         <div className="flex items-center justify-between gap-6">
           <div className="flex min-w-0 items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="icon-chip h-11 w-11 rounded-2xl shadow-soft">
-                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                  <defs>
-                    <linearGradient id="navbarLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="var(--color-primary)" />
-                      <stop offset="100%" stopColor="var(--color-primary-hover)" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z"
-                    fill="url(#navbarLogoGradient)"
-                  />
-                  <path d="M10 14H14V17H10V14Z" fill="var(--color-text-primary)" />
-                </svg>
-              </span>
-
-              <span className="min-w-0">
-                <span className="block font-sora text-[27px] font-bold tracking-[-0.04em] text-text-primary">
-                  XYZ Travellers
-                </span>
-                <span className="hidden text-[11px] font-medium tracking-[0.18em] text-text-secondary md:block">
-                  STAY BETTER IN BANGLADESH
-                </span>
-              </span>
-            </Link>
+            <BrandLogo href="/" variant="navbar" />
           </div>
 
           <div className="flex items-center gap-3 sm:gap-4">
