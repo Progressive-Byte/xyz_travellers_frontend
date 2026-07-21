@@ -29,6 +29,14 @@ const dashboardCards = [
     href: "/admin/homepage-sections",
     cta: "Open homepage curation",
   },
+  {
+    label: "Commission",
+    title: "Set payment commission",
+    description:
+      "Manage the active default commission configuration used when guest booking payments are confirmed.",
+    href: "/admin/commission",
+    cta: "Open commission settings",
+  },
 ];
 
 export const AdminDashboardPage: React.FC = () => {
@@ -38,7 +46,7 @@ export const AdminDashboardPage: React.FC = () => {
       title="Dashboard"
       subtitle="Start from the moderation or curation workspace you need right now."
     >
-      <section className="mt-4 grid gap-4 xl:grid-cols-3">
+      <section className="mt-4 grid gap-4 xl:grid-cols-4">
         {dashboardCards.map((card) => (
           <div key={card.href} className="surface-card rounded-[28px] p-5 sm:p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">

@@ -33,6 +33,20 @@ const formatCurrency = (value: number, currency: string) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+const getGuestPaymentErrorMessage = (error: unknown) => {
+  if (!(error instanceof ApiError)) {
+    return "Unable to process payment right now.";
+  }
+
+  const normalized = error.message.trim().toLowerCase();
+
+  if (normalized.includes("commission configuration is missing")) {
+    return "Payment is temporarily unavailable because the platform commission configuration is missing on the backend.";
+  }
+
+  return error.message || "Unable to process payment right now.";
+};
+
 const DetailCard: React.FC<{ label: string; value: string }> = ({ label, value }) => (
   <div className="rounded-[22px] border border-border bg-card px-4 py-4 shadow-soft">
     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
@@ -401,11 +415,7 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
                               );
                               router.refresh();
                             } catch (requestError) {
-                              setPaymentError(
-                                requestError instanceof ApiError
-                                  ? requestError.message || "Unable to process payment right now."
-                                  : "Unable to process payment right now.",
-                              );
+                              setPaymentError(getGuestPaymentErrorMessage(requestError));
                             } finally {
                               setIsPaying(false);
                             }

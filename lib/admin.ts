@@ -65,6 +65,51 @@ export async function loginAdmin(payload: AdminLoginPayload): Promise<AuthSucces
   });
 }
 
+export type AdminCommissionConfig = {
+  defaultCommissionPercent: number | null;
+  notes: string;
+};
+
+export type UpdateAdminCommissionPayload = {
+  defaultCommissionPercent: number;
+  notes?: string;
+};
+
+const normalizeAdminCommissionConfig = (payload: unknown): AdminCommissionConfig => {
+  const source = asRecord(payload);
+
+  return {
+    defaultCommissionPercent: asNumber(source.defaultCommissionPercent ?? source.default_commission_percent),
+    notes: asString(source.notes),
+  };
+};
+
+export async function getAdminCommission(token: string): Promise<AdminCommissionConfig> {
+  const data = await apiRequest<unknown>("/api/v1/admin/commission", {
+    method: "GET",
+    headers: authHeaders(token),
+    cache: "no-store",
+  });
+
+  return normalizeAdminCommissionConfig(data);
+}
+
+export async function updateAdminCommission(
+  token: string,
+  payload: UpdateAdminCommissionPayload,
+): Promise<AdminCommissionConfig> {
+  const data = await apiRequest<unknown>("/api/v1/admin/commission", {
+    method: "PUT",
+    headers: authHeaders(token),
+    body: {
+      defaultCommissionPercent: payload.defaultCommissionPercent,
+      notes: payload.notes?.trim() || undefined,
+    },
+  });
+
+  return normalizeAdminCommissionConfig(data);
+}
+
 export type AdminHostApplicationReviewAction = "approve" | "reject";
 
 export type ReviewAdminHostApplicationPayload = {

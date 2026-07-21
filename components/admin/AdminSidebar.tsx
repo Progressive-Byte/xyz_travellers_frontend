@@ -47,6 +47,13 @@ const AdminNavIconMark: React.FC<{ icon: AdminNavIcon; isActive: boolean }> = ({
           <circle cx="17" cy="17" r="1.25" fill="currentColor" stroke="none" />
         </svg>
       );
+    case "commission":
+      return (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">
+          <circle cx="12" cy="12" r="7" strokeLinecap="round" />
+          <path d="M12 8.25v7.5M14.5 10.25c0-1.1-1.12-2-2.5-2s-2.5.9-2.5 2 1.12 2 2.5 2 2.5.9 2.5 2-1.12 2-2.5 2-2.5-.9-2.5-2" strokeLinecap="round" />
+        </svg>
+      );
     default:
       return null;
   }
