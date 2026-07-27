@@ -154,161 +154,157 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="mx-auto max-w-7xl px-6">
         <div className="relative z-30 mx-auto mt-4 flex w-full max-w-[980px] justify-center md:mt-6">
           <div className="surface-card-strong w-full rounded-[26px] p-1.5">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
-              <div className="flex-1 rounded-[18px] px-4 py-1.5 transition-colors duration-200 hover:bg-surface">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
-                  Where
-                </p>
-                <input
-                  type="text"
-                  value={destination}
-                  onChange={(event) => setDestination(event.target.value)}
-                  placeholder="Search destinations"
-                  className="mt-1 w-full bg-transparent text-[14px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-primary"
-                />
-              </div>
+            <div className="flex flex-col lg:flex-row lg:items-stretch">
+              <div className="flex flex-col divide-y divide-border lg:flex-1 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0">
+                <div className="flex-1 rounded-[18px] px-4 py-3 transition-colors duration-200 hover:bg-surface lg:py-1.5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                    Where
+                  </p>
+                  <input
+                    type="text"
+                    value={destination}
+                    onChange={(event) => setDestination(event.target.value)}
+                    placeholder="Search destinations"
+                    className="mt-1 w-full bg-transparent text-[14px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-primary"
+                  />
+                </div>
 
-              <div className="hidden h-auto w-px bg-border lg:block" />
+                <div className="flex-1 rounded-[18px] px-4 py-3 transition-colors duration-200 hover:bg-surface lg:py-1.5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                    Check in
+                  </p>
+                  <DatePicker
+                    selected={checkInDate}
+                    onChange={(date: Date | null) => setCheckInDate(date)}
+                    onCalendarOpen={() => setShowGuestDropdown(false)}
+                    selectsStart
+                    startDate={checkInDate}
+                    endDate={checkOutDate}
+                    minDate={new Date()}
+                    placeholderText="Add dates"
+                    popperPlacement="bottom-start"
+                    popperClassName={heroDatePickerClassName}
+                    showPopperArrow={false}
+                    wrapperClassName="block"
+                    customInput={
+                      <DateInputButton label="Add dates" />
+                    }
+                  />
+                </div>
 
-              <div className="flex-1 rounded-[18px] px-4 py-1.5 transition-colors duration-200 hover:bg-surface">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
-                  Check in
-                </p>
-                <DatePicker
-                  selected={checkInDate}
-                  onChange={(date: Date | null) => setCheckInDate(date)}
-                  onCalendarOpen={() => setShowGuestDropdown(false)}
-                  selectsStart
-                  startDate={checkInDate}
-                  endDate={checkOutDate}
-                  minDate={new Date()}
-                  placeholderText="Add dates"
-                  popperPlacement="bottom-start"
-                  popperClassName={heroDatePickerClassName}
-                  showPopperArrow={false}
-                  wrapperClassName="block"
-                  customInput={
-                    <DateInputButton label="Add dates" />
-                  }
-                />
-              </div>
+                <div className="flex-1 rounded-[18px] px-4 py-3 transition-colors duration-200 hover:bg-surface lg:py-1.5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                    Check out
+                  </p>
+                  <DatePicker
+                    selected={checkOutDate}
+                    onChange={(date: Date | null) => setCheckOutDate(date)}
+                    onCalendarOpen={() => setShowGuestDropdown(false)}
+                    selectsEnd
+                    startDate={checkInDate}
+                    endDate={checkOutDate}
+                    minDate={checkInDate || new Date()}
+                    placeholderText="Add dates"
+                    popperPlacement="bottom-start"
+                    popperClassName={heroDatePickerClassName}
+                    showPopperArrow={false}
+                    wrapperClassName="block"
+                    customInput={
+                      <DateInputButton label="Add dates" />
+                    }
+                  />
+                </div>
 
-              <div className="hidden h-auto w-px bg-border lg:block" />
-
-              <div className="flex-1 rounded-[18px] px-4 py-1.5 transition-colors duration-200 hover:bg-surface">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
-                  Check out
-                </p>
-                <DatePicker
-                  selected={checkOutDate}
-                  onChange={(date: Date | null) => setCheckOutDate(date)}
-                  onCalendarOpen={() => setShowGuestDropdown(false)}
-                  selectsEnd
-                  startDate={checkInDate}
-                  endDate={checkOutDate}
-                  minDate={checkInDate || new Date()}
-                  placeholderText="Add dates"
-                  popperPlacement="bottom-start"
-                  popperClassName={heroDatePickerClassName}
-                  showPopperArrow={false}
-                  wrapperClassName="block"
-                  customInput={
-                    <DateInputButton label="Add dates" />
-                  }
-                />
-              </div>
-
-              <div className="hidden h-auto w-px bg-border lg:block" />
-
-              <div className="relative flex-1" ref={guestDropdownRef}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchError("");
-                    setShowGuestDropdown((open) => !open);
-                  }}
-                  className="flex w-full items-center justify-between rounded-[18px] px-4 py-1.5 text-left outline-none transition-colors duration-200 hover:bg-surface focus:outline-none focus-visible:outline-none"
-                >
-                  <span>
-                    <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
-                      Who
-                    </span>
-                    <span className="mt-1 block text-[13px] font-semibold text-text-primary">
-                      {totalGuests} {totalGuests === 1 ? "guest" : "guests"}
-                      {infants > 0 ? `, ${infants} infant${infants > 1 ? "s" : ""}` : ""}
-                    </span>
-                  </span>
-                  <span className="rounded-full bg-surface px-2 py-0.5 text-[10px] font-semibold text-text-secondary">
-                    Edit
-                  </span>
-                </button>
-
-                <div
-                  className={`absolute right-0 top-full z-50 mt-3 w-full min-w-[300px] rounded-panel border border-border bg-[rgba(255,255,255,0.97)] p-5 shadow-strong backdrop-blur-xl transition-all duration-250 lg:w-[360px] ${
-                    showGuestDropdown
-                      ? "pointer-events-auto translate-y-0 opacity-100"
-                      : "pointer-events-none -translate-y-2 opacity-0"
-                  }`}
-                >
-                  <div className="space-y-4">
-                    {guestTypes.map((guestType, index) => (
-                      <div key={guestType.key}>
-                        <div className="flex items-center justify-between gap-5">
-                          <div>
-                            <p className="text-[15px] font-semibold text-text-primary">
-                              {guestType.label}
-                            </p>
-                            <p className="mt-1 text-[13px] text-text-secondary">
-                              {guestType.caption}
-                            </p>
-                          </div>
-
-                          <div className="flex items-center gap-3">
-                            <button
-                              type="button"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                guestType.onDecrease();
-                              }}
-                              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-text-primary transition-all duration-200 hover:bg-surface"
-                              disabled={guestType.count <= guestType.min}
-                            >
-                              -
-                            </button>
-                            <span className="w-6 text-center text-[15px] font-semibold text-text-primary">
-                              {guestType.count}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                guestType.onIncrease();
-                              }}
-                              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-text-primary transition-all duration-200 hover:bg-surface"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-
-                        {index < guestTypes.length - 1 ? (
-                          <div className="mt-4 h-px bg-border-light" />
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-
+                <div className="relative flex-1" ref={guestDropdownRef}>
                   <button
                     type="button"
                     onClick={() => {
-                      setAdults(2);
-                      setChildren(0);
-                      setInfants(0);
+                      setSearchError("");
+                      setShowGuestDropdown((open) => !open);
                     }}
-                    className="mt-5 text-[13px] font-semibold text-text-secondary transition-colors duration-200 hover:text-text-primary"
+                    className="flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left outline-none transition-colors duration-200 hover:bg-surface focus:outline-none focus-visible:outline-none lg:py-1.5"
                   >
-                    Reset guests
+                    <span>
+                      <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                        Who
+                      </span>
+                      <span className="mt-1 block text-[13px] font-semibold text-text-primary">
+                        {totalGuests} {totalGuests === 1 ? "guest" : "guests"}
+                        {infants > 0 ? `, ${infants} infant${infants > 1 ? "s" : ""}` : ""}
+                      </span>
+                    </span>
+                    <span className="rounded-full bg-surface px-2 py-0.5 text-[10px] font-semibold text-text-secondary">
+                      Edit
+                    </span>
                   </button>
+
+                  <div
+                    className={`absolute right-0 top-full z-50 mt-3 w-full min-w-[300px] rounded-panel border border-border bg-[rgba(255,255,255,0.97)] p-5 shadow-strong backdrop-blur-xl transition-all duration-250 lg:w-[360px] ${
+                      showGuestDropdown
+                        ? "pointer-events-auto translate-y-0 opacity-100"
+                        : "pointer-events-none -translate-y-2 opacity-0"
+                    }`}
+                  >
+                    <div className="space-y-4">
+                      {guestTypes.map((guestType, index) => (
+                        <div key={guestType.key}>
+                          <div className="flex items-center justify-between gap-5">
+                            <div>
+                              <p className="text-[15px] font-semibold text-text-primary">
+                                {guestType.label}
+                              </p>
+                              <p className="mt-1 text-[13px] text-text-secondary">
+                                {guestType.caption}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  guestType.onDecrease();
+                                }}
+                                className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-text-primary transition-all duration-200 hover:bg-surface"
+                                disabled={guestType.count <= guestType.min}
+                              >
+                                -
+                              </button>
+                              <span className="w-6 text-center text-[15px] font-semibold text-text-primary">
+                                {guestType.count}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  guestType.onIncrease();
+                                }}
+                                className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-text-primary transition-all duration-200 hover:bg-surface"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          {index < guestTypes.length - 1 ? (
+                            <div className="mt-4 h-px bg-border-light" />
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAdults(2);
+                        setChildren(0);
+                        setInfants(0);
+                      }}
+                      className="mt-5 text-[13px] font-semibold text-text-secondary transition-colors duration-200 hover:text-text-primary"
+                    >
+                      Reset guests
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -343,9 +339,9 @@ export const Hero: React.FC<HeroProps> = ({
 
                   router.push(`/search?${query.toString()}`);
                 }}
-                className="flex items-center justify-center gap-2 rounded-[18px] bg-primary px-5 py-1.5 text-[13px] font-semibold text-text-primary shadow-glow outline-none transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover focus:outline-none focus-visible:outline-none lg:min-w-[112px]"
+                className="mt-3 flex items-center justify-center gap-2 rounded-[24px] bg-primary px-4 py-4 text-[16px] font-semibold text-text-primary shadow-glow outline-none transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover focus:outline-none focus-visible:outline-none mx-2 mb-1 lg:mx-0 lg:mb-0 lg:mt-0 lg:ml-3 lg:min-w-[112px] lg:rounded-[18px] lg:px-5 lg:py-1.5 lg:text-[13px]"
               >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 lg:h-4 lg:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
