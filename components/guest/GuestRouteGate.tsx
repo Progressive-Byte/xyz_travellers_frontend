@@ -44,10 +44,6 @@ export const GuestRouteGate: React.FC<GuestRouteGateProps> = ({
       return "/admin";
     }
 
-    if (user.roles.includes("host")) {
-      return "/host/dashboard";
-    }
-
     return null;
   }, [isAuthenticated, isHydrated, pathname, user]);
 

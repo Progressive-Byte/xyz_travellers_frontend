@@ -165,7 +165,7 @@ export const GuestDashboardPage: React.FC = () => {
               <MetricCard
                 label="Upcoming"
                 value={data.bookings.upcomingCount}
-                helper="Upcoming accepted stays that are currently closest to check-in."
+                helper="Confirmed and paid stays that are currently closest to check-in."
               />
               <MetricCard
                 label="Unread"
@@ -298,7 +298,7 @@ export const GuestDashboardPage: React.FC = () => {
                         No payment records yet
                       </p>
                       <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-                        Payments will appear here after accepted stays move into the payment step.
+                        Payments will appear here after confirmed stays move into the payment step.
                       </p>
                     </div>
                   )}

@@ -92,6 +92,7 @@ export const HostBusinessesPage: React.FC = () => {
   );
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
+  const [isCreateModeActive, setIsCreateModeActive] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -267,6 +268,7 @@ export const HostBusinessesPage: React.FC = () => {
     }
 
     setEditingBusinessId(match.id);
+    setIsCreateModeActive(false);
     setFormValues({
       businessName: match.name,
       registrationNumber: match.registrationNumber,
@@ -285,6 +287,7 @@ export const HostBusinessesPage: React.FC = () => {
     const empty = createEmptyHostBusiness();
 
     setEditingBusinessId("");
+    setIsCreateModeActive(false);
     setFormValues({
       businessName: empty.businessName,
       registrationNumber: empty.registrationNumber,
@@ -301,6 +304,7 @@ export const HostBusinessesPage: React.FC = () => {
 
   const beginCreate = () => {
     resetForm();
+    setIsCreateModeActive(true);
   };
 
   const handleBusinessSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -504,26 +508,68 @@ export const HostBusinessesPage: React.FC = () => {
       ) : null}
 
       {businesses.length === 0 ? (
-        <div className="surface-card rounded-panel p-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-            No businesses yet
-          </p>
-          <h2 className="mt-2.5 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-            Start your first business profile
-          </h2>
-          <p className="mt-3 max-w-3xl text-[14px] leading-6 text-text-secondary">
-            Create one reusable business record so commercial properties can reuse the same identity and document library.
-          </p>
-          <div className="mt-5">
-            <button
-              type="button"
-              onClick={beginCreate}
-              className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
-            >
-              Create business
-            </button>
+        isCreateModeActive ? (
+          <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+            <div className="space-y-6">
+              <HostBusinessForm
+                values={formValues}
+                errors={formErrors}
+                successMessage=""
+                isSubmitting={isSavingBusiness}
+                mode="create"
+                onChange={updateFormValue}
+                onSubmit={handleBusinessSubmit}
+                onCancel={resetForm}
+              />
+            </div>
+
+            <div className="space-y-6">
+              <div className="surface-card rounded-panel p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                  First business profile
+                </p>
+                <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+                  Create the reusable business record first
+                </h2>
+                <div className="mt-5 space-y-3">
+                  {[
+                    "Use the legal business name and registered address.",
+                    "Add the main business contact details you want to manage later.",
+                    "After the record is created, the document library panel will open automatically.",
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-[20px] border border-border-light bg-white/80 px-4 py-3 text-[14px] leading-6 text-text-primary"
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="surface-card rounded-panel p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+              No businesses yet
+            </p>
+            <h2 className="mt-2.5 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
+              Start your first business profile
+            </h2>
+            <p className="mt-3 max-w-3xl text-[14px] leading-6 text-text-secondary">
+              Create one reusable business record so commercial properties can reuse the same identity and document library.
+            </p>
+            <div className="mt-5">
+              <button
+                type="button"
+                onClick={beginCreate}
+                className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+              >
+                Create business
+              </button>
+            </div>
+          </div>
+        )
       ) : filteredBusinesses.length === 0 ? (
         <div className="surface-card rounded-panel p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">

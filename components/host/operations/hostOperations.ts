@@ -70,9 +70,13 @@ export const getGuestCountLabel = (adults: number, children: number) => {
 export const getReservationStatusLabel = (status: HostReservationStatus) => {
   switch (status) {
     case "pending":
-      return "Pending response";
-    case "accepted":
-      return "Accepted";
+      return "Under review";
+    case "host_confirmed":
+      return "Host confirmed";
+    case "confirmed":
+      return "Confirmed";
+    case "paid":
+      return "Paid";
     case "rejected":
       return "Rejected";
     case "cancelled":
@@ -88,7 +92,11 @@ export const getReservationStatusClasses = (status: HostReservationStatus) => {
   switch (status) {
     case "pending":
       return "bg-primary-light text-text-primary";
-    case "accepted":
+    case "host_confirmed":
+      return "bg-[rgba(214,167,44,0.12)] text-[rgb(120,91,41)]";
+    case "confirmed":
+      return "bg-[rgba(54,96,150,0.14)] text-[rgb(44,78,123)]";
+    case "paid":
       return "bg-[rgba(64,145,108,0.14)] text-[rgb(35,92,69)]";
     case "rejected":
       return "bg-[rgba(184,82,82,0.12)] text-[rgb(140,50,50)]";

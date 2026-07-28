@@ -884,3 +884,314 @@ export const createEmptyAdminHomepageSectionItemForm = (): CreateAdminHomepageSe
   sortOrder: "",
   isActive: true,
 });
+
+export type AdminBookingStatus =
+  | "pending"
+  | "host_confirmed"
+  | "confirmed"
+  | "paid"
+  | "rejected"
+  | "cancelled"
+  | "completed";
+
+export type AdminBookingContact = {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  profilePhoto: string;
+};
+
+export type AdminBookingProperty = {
+  id: string;
+  propertyName: string;
+  city: string;
+  country: string;
+  address: string;
+  propertyTypeName: string;
+};
+
+export type AdminBookingUnit = {
+  id: string;
+  unitName: string;
+  capacity: number | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+};
+
+export type AdminBookingPricingSnapshot = {
+  currency: string;
+  basePrice: number | null;
+  discountedPrice: number | null;
+  pricePerNightApplied: number | null;
+  nights: number | null;
+  subtotal: number | null;
+};
+
+export type AdminBookingTransaction = {
+  id: string;
+  status: string;
+  transactionType: string;
+  currency: string;
+  grossAmount: number | null;
+  createdAt: string | null;
+  processedAt: string | null;
+};
+
+export type AdminBookingSummary = {
+  id: string;
+  status: AdminBookingStatus;
+  checkInDate: string;
+  checkOutDate: string;
+  adultGuests: number;
+  childGuests: number;
+  createdAt: string | null;
+  hostConfirmedAt: string | null;
+  confirmedAt: string | null;
+  paidAt: string | null;
+  cancelledAt: string | null;
+  completedAt: string | null;
+  statusReason: string;
+  guest: AdminBookingContact;
+  host: AdminBookingContact;
+  property: AdminBookingProperty;
+  unit: AdminBookingUnit;
+  pricingSnapshot: AdminBookingPricingSnapshot;
+};
+
+export type AdminBookingDetail = AdminBookingSummary & {
+  specialRequests: string;
+  couponCode: string;
+  recentTransactions: AdminBookingTransaction[];
+};
+
+export type AdminBookingFilters = {
+  status?: AdminBookingStatus;
+};
+
+export type UpdateAdminBookingStatusPayload = {
+  status: Exclude<AdminBookingStatus, "paid">;
+  reason?: string;
+};
+
+const normalizeAdminBookingStatus = (value: unknown): AdminBookingStatus => {
+  const normalized = asString(value).trim().toLowerCase();
+
+  switch (normalized) {
+    case "host_confirmed":
+    case "confirmed":
+    case "paid":
+    case "rejected":
+    case "cancelled":
+    case "completed":
+      return normalized;
+    case "accepted":
+      return "confirmed";
+    default:
+      return "pending";
+  }
+};
+
+const normalizeAdminBookingContact = (payload: unknown): AdminBookingContact => {
+  const source = asRecord(payload);
+  const firstName = asString(source.firstName ?? source.first_name);
+  const lastName = asString(source.lastName ?? source.last_name);
+
+  return {
+    id: asString(source.id),
+    fullName:
+      asString(source.fullName ?? source.full_name ?? source.name) ||
+      [firstName, lastName].filter(Boolean).join(" ").trim(),
+    email: asString(source.email),
+    phone: asString(source.phone),
+    profilePhoto: resolveApiUrl(asString(source.profilePhoto ?? source.profile_photo)),
+  };
+};
+
+const normalizeAdminBookingProperty = (payload: unknown): AdminBookingProperty => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id),
+    propertyName: asString(source.propertyName ?? source.property_name ?? source.name),
+    city: asString(source.city),
+    country: asString(source.country),
+    address: asString(source.address),
+    propertyTypeName: asString(source.propertyTypeName ?? source.property_type_name),
+  };
+};
+
+const normalizeAdminBookingUnit = (payload: unknown): AdminBookingUnit => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id),
+    unitName: asString(source.unitName ?? source.unit_name ?? source.name),
+    capacity: asNumber(source.capacity),
+    bedrooms: asNumber(source.bedrooms),
+    bathrooms: asNumber(source.bathrooms),
+  };
+};
+
+const normalizeAdminBookingPricingSnapshot = (payload: unknown): AdminBookingPricingSnapshot => {
+  const source = asRecord(payload);
+
+  return {
+    currency: asString(source.currency) || "BDT",
+    basePrice: asNumber(source.basePrice ?? source.base_price),
+    discountedPrice: asNumber(source.discountedPrice ?? source.discounted_price),
+    pricePerNightApplied: asNumber(source.pricePerNightApplied ?? source.price_per_night_applied),
+    nights: asNumber(source.nights),
+    subtotal: asNumber(source.subtotal),
+  };
+};
+
+const normalizeAdminBookingTransaction = (payload: unknown): AdminBookingTransaction => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id),
+    status: asString(source.status),
+    transactionType: asString(source.transactionType ?? source.transaction_type),
+    currency: asString(source.currency) || "BDT",
+    grossAmount: asNumber(source.grossAmount ?? source.gross_amount ?? source.totalPayable),
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    processedAt: asOptionalString(source.processedAt ?? source.processed_at),
+  };
+};
+
+const normalizeAdminBookingSummary = (payload: unknown): AdminBookingSummary => {
+  const source = asRecord(payload);
+  const guestSource = asRecord(source.guest);
+  const hostSource = asRecord(source.host);
+  const propertySource = asRecord(source.property);
+  const unitSource = asRecord(source.unit);
+
+  return {
+    id: asString(source.id),
+    status: normalizeAdminBookingStatus(source.status),
+    checkInDate: asString(source.checkInDate ?? source.check_in_date),
+    checkOutDate: asString(source.checkOutDate ?? source.check_out_date),
+    adultGuests: asNumber(source.adultGuests ?? source.adult_guests) ?? 0,
+    childGuests: asNumber(source.childGuests ?? source.child_guests) ?? 0,
+    createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    hostConfirmedAt: asOptionalString(source.hostConfirmedAt ?? source.host_confirmed_at),
+    confirmedAt: asOptionalString(source.confirmedAt ?? source.confirmed_at),
+    paidAt: asOptionalString(source.paidAt ?? source.paid_at),
+    cancelledAt: asOptionalString(source.cancelledAt ?? source.cancelled_at),
+    completedAt: asOptionalString(source.completedAt ?? source.completed_at),
+    statusReason: asString(source.statusReason ?? source.status_reason),
+    guest: normalizeAdminBookingContact(
+      Object.keys(guestSource).length
+        ? guestSource
+        : {
+            id: source.guestId ?? source.guest_id,
+            fullName: source.guestName ?? source.guest_name,
+            email: source.guestEmail ?? source.guest_email,
+            phone: source.guestPhone ?? source.guest_phone,
+            profilePhoto: source.guestProfilePhoto ?? source.guest_profile_photo,
+          },
+    ),
+    host: normalizeAdminBookingContact(
+      Object.keys(hostSource).length
+        ? hostSource
+        : {
+            id: source.hostId ?? source.host_id,
+            fullName: source.hostName ?? source.host_name,
+            email: source.hostEmail ?? source.host_email,
+            phone: source.hostPhone ?? source.host_phone,
+            profilePhoto: source.hostProfilePhoto ?? source.host_profile_photo,
+          },
+    ),
+    property: normalizeAdminBookingProperty(
+      Object.keys(propertySource).length
+        ? propertySource
+        : {
+            id: source.propertyId ?? source.property_id,
+            propertyName: source.propertyName ?? source.property_name,
+            city: source.city,
+            country: source.country,
+            address: source.address,
+            propertyTypeName: source.propertyTypeName ?? source.property_type_name,
+          },
+    ),
+    unit: normalizeAdminBookingUnit(
+      Object.keys(unitSource).length
+        ? unitSource
+        : {
+            id: source.unitId ?? source.unit_id,
+            unitName: source.unitName ?? source.unit_name,
+            capacity: source.capacity,
+            bedrooms: source.bedrooms,
+            bathrooms: source.bathrooms,
+          },
+    ),
+    pricingSnapshot: normalizeAdminBookingPricingSnapshot(
+      source.pricingSnapshot ?? source.pricing_snapshot,
+    ),
+  };
+};
+
+const normalizeAdminBookingDetail = (payload: unknown): AdminBookingDetail => {
+  const source = asRecord(payload);
+  const summary = normalizeAdminBookingSummary(source);
+
+  return {
+    ...summary,
+    specialRequests: asString(source.specialRequests ?? source.special_requests),
+    couponCode: asString(source.couponCode ?? source.coupon_code),
+    recentTransactions: asArray(
+      source.recentTransactions ??
+        source.recent_transactions ??
+        asRecord(source.payments).recentTransactions ??
+        asRecord(source.payments).recent_transactions,
+    ).map(normalizeAdminBookingTransaction),
+  };
+};
+
+export async function getAdminBookings(
+  token: string,
+  filters: AdminBookingFilters = {},
+): Promise<AdminBookingSummary[]> {
+  const searchParams = new URLSearchParams();
+
+  if (filters.status?.trim()) {
+    searchParams.set("status", filters.status.trim());
+  }
+
+  const query = searchParams.toString();
+  const data = await apiRequest<unknown[]>(`/api/v1/admin/bookings${query ? `?${query}` : ""}`, {
+    method: "GET",
+    headers: authHeaders(token),
+    cache: "no-store",
+  });
+
+  return data.map(normalizeAdminBookingSummary);
+}
+
+export async function getAdminBooking(token: string, bookingId: string): Promise<AdminBookingDetail> {
+  const data = await apiRequest<unknown>(`/api/v1/admin/bookings/${bookingId}`, {
+    method: "GET",
+    headers: authHeaders(token),
+    cache: "no-store",
+  });
+
+  return normalizeAdminBookingDetail(data);
+}
+
+export async function updateAdminBookingStatus(
+  token: string,
+  bookingId: string,
+  payload: UpdateAdminBookingStatusPayload,
+): Promise<AdminBookingDetail> {
+  const data = await apiRequest<unknown>(`/api/v1/admin/bookings/${bookingId}/status`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body: {
+      status: payload.status,
+      reason: payload.reason?.trim() || undefined,
+    },
+  });
+
+  return normalizeAdminBookingDetail(data);
+}

@@ -218,8 +218,8 @@ export const GuestBookingCreatePage: React.FC<GuestBookingCreatePageProps> = ({
               Confirm your stay details
             </h1>
             <p className="mt-2 max-w-3xl text-[14px] leading-6 text-text-secondary">
-              Review the selected unit, set your final guest counts, and send the booking request to
-              the host.
+              Review the selected unit, set your final guest counts, and send the booking request for
+              team review.
             </p>
           </div>
 
@@ -520,9 +520,9 @@ export const GuestBookingCreatePage: React.FC<GuestBookingCreatePageProps> = ({
             </p>
             <div className="mt-4 space-y-3">
               {[
-                "Your booking request is created immediately with a pending status.",
-                "The host reviews the request and can accept or reject it.",
-                "Payment and messaging steps continue from the guest portal after booking creation.",
+                "Your booking request is created immediately with an under-review status.",
+                "Our team checks availability with the host and confirms the final stay details.",
+                "Once the booking is confirmed, the payment step appears in your guest portal.",
               ].map((item) => (
                 <div
                   key={item}
