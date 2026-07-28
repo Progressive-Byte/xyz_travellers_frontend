@@ -47,7 +47,9 @@ export type HostDashboardData = {
 export type HostReservationStatus =
   | ""
   | "pending"
-  | "accepted"
+  | "host_confirmed"
+  | "confirmed"
+  | "paid"
   | "rejected"
   | "cancelled"
   | "completed";
@@ -77,6 +79,9 @@ export type HostReservation = {
   adultGuests: number;
   childGuests: number;
   createdAt: string | null;
+  hostConfirmedAt: string | null;
+  confirmedAt: string | null;
+  paidAt: string | null;
   respondedAt: string | null;
   responseReason: string;
   cancelledAt: string | null;
@@ -710,6 +715,9 @@ const emptyHostReservation = (): HostReservation => ({
   adultGuests: 0,
   childGuests: 0,
   createdAt: null,
+  hostConfirmedAt: null,
+  confirmedAt: null,
+  paidAt: null,
   respondedAt: null,
   responseReason: "",
   cancelledAt: null,
@@ -896,12 +904,18 @@ const normalizeHostReservationStatus = (value: unknown): HostReservationStatus =
 
   if (
     normalized === "pending" ||
-    normalized === "accepted" ||
+    normalized === "host_confirmed" ||
+    normalized === "confirmed" ||
+    normalized === "paid" ||
     normalized === "rejected" ||
     normalized === "cancelled" ||
     normalized === "completed"
   ) {
     return normalized;
+  }
+
+  if (normalized === "accepted") {
+    return "confirmed";
   }
 
   return "";
@@ -954,6 +968,9 @@ const normalizeHostReservation = (payload: unknown): HostReservation => {
     adultGuests: asNumber(source.adultGuests ?? source.adult_guests) ?? 0,
     childGuests: asNumber(source.childGuests ?? source.child_guests) ?? 0,
     createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    hostConfirmedAt: asOptionalString(source.hostConfirmedAt ?? source.host_confirmed_at),
+    confirmedAt: asOptionalString(source.confirmedAt ?? source.confirmed_at),
+    paidAt: asOptionalString(source.paidAt ?? source.paid_at),
     respondedAt: asOptionalString(source.respondedAt ?? source.responded_at),
     responseReason: asString(source.responseReason ?? source.response_reason),
     cancelledAt: asOptionalString(source.cancelledAt ?? source.cancelled_at),

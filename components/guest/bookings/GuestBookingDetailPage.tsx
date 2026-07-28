@@ -138,7 +138,9 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
 
   const property = booking ? propertyLookup[booking.propertyId] : null;
   const totalGuests = (booking?.adultGuests ?? 0) + (booking?.childGuests ?? 0);
-  const canCancel = booking ? ["pending", "accepted"].includes(booking.status) : false;
+  const canCancel = booking
+    ? ["pending", "host_confirmed", "confirmed"].includes(booking.status)
+    : false;
   const settledTransaction = useMemo(
     () =>
       transactions.find((item) => {
@@ -147,7 +149,8 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
       }) ?? null,
     [transactions],
   );
-  const needsPayment = booking ? booking.status === "accepted" && !settledTransaction : false;
+  const needsPayment = booking ? booking.status === "confirmed" && !settledTransaction : false;
+  const hasPaidState = booking ? booking.status === "paid" || Boolean(settledTransaction) : false;
   const totalPrice = booking
     ? booking.pricingSnapshot.subtotal ?? booking.pricing.subtotal ?? 0
     : 0;
@@ -160,11 +163,19 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
 
     return [
       booking.createdAt ? `Created on ${formatDate(booking.createdAt)}` : "",
-      booking.respondedAt ? `Host responded on ${formatDate(booking.respondedAt)}` : "",
+      booking.hostConfirmedAt ? `Availability checked on ${formatDate(booking.hostConfirmedAt)}` : "",
+      (booking.confirmedAt || booking.respondedAt)
+        ? `Confirmed for payment on ${formatDate(booking.confirmedAt || booking.respondedAt || "")}`
+        : "",
+      (booking.paidAt || settledTransaction?.processedAt || settledTransaction?.createdAt)
+        ? `Payment recorded on ${formatDate(
+            booking.paidAt || settledTransaction?.processedAt || settledTransaction?.createdAt || "",
+          )}`
+        : "",
       booking.cancelledAt ? `Cancelled on ${formatDate(booking.cancelledAt)}` : "",
       booking.completedAt ? `Completed on ${formatDate(booking.completedAt)}` : "",
     ].filter(Boolean);
-  }, [booking]);
+  }, [booking, settledTransaction]);
 
   if (isLoading) {
     return <BookingDetailSkeleton />;
@@ -210,6 +221,15 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
                   <p className="mt-2 text-[14px] leading-6 text-text-secondary">
                     {property?.unitNamesById[booking.unitId] || booking.unitId} ·{" "}
                     {property?.locationLabel || booking.propertyId}
+                  </p>
+                  <p className="mt-3 max-w-2xl text-[14px] leading-6 text-text-secondary">
+                    {booking.status === "pending" || booking.status === "host_confirmed"
+                      ? "Our team is reviewing this booking and coordinating final availability details."
+                      : booking.status === "confirmed"
+                        ? "Your booking is confirmed and ready for payment."
+                        : booking.status === "paid"
+                          ? "Payment is complete and your stay is secured."
+                          : "Keep the stay details, status notes, and payment history in one place."}
                   </p>
                 </div>
 
@@ -321,18 +341,18 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
                   </div>
                 </section>
 
-                {needsPayment || settledTransaction ? (
+                {needsPayment || hasPaidState ? (
                   <section className="surface-card rounded-panel p-5">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
                       Payment
                     </p>
                     <h2 className="mt-2 font-sora text-[22px] font-bold tracking-[-0.04em] text-text-primary">
-                      {settledTransaction ? "Payment completed" : "Complete your stay payment"}
+                      {hasPaidState ? "Payment completed" : "Complete your stay payment"}
                     </h2>
                     <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-                      {settledTransaction
-                        ? "This accepted booking already has a settled payment record."
-                        : "Your host has accepted this reservation. Finish the one-click payment step to confirm the ledger entry for this stay."}
+                      {hasPaidState
+                        ? "This booking already has a recorded payment and is ready for the rest of your stay journey."
+                        : "Your booking is confirmed. Complete the payment step to secure the stay and record the transaction."}
                     </p>
 
                     <div className="mt-4 space-y-3">
@@ -353,11 +373,13 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
                           </span>
                         </div>
                       ) : null}
-                      {settledTransaction ? (
+                      {hasPaidState ? (
                         <div className="flex items-center justify-between gap-3 rounded-[18px] border border-border bg-card px-4 py-3">
                           <span className="text-[14px] text-text-secondary">Transaction</span>
                           <span className="text-[15px] font-semibold text-text-primary">
-                            {settledTransaction.id.slice(-6).toUpperCase()}
+                            {settledTransaction?.id
+                              ? settledTransaction.id.slice(-6).toUpperCase()
+                              : "Recorded"}
                           </span>
                         </div>
                       ) : null}
@@ -373,7 +395,7 @@ export const GuestBookingDetailPage: React.FC<{ bookingId: string }> = ({ bookin
                     ) : null}
 
                     <div className="mt-4 flex flex-wrap gap-3">
-                      {!settledTransaction ? (
+                      {needsPayment ? (
                         <button
                           type="button"
                           disabled={isPaying}

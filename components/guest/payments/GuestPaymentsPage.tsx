@@ -154,7 +154,7 @@ export const GuestPaymentsPage: React.FC = () => {
               Track settled payments and booking charges
             </h1>
             <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-              Accepted bookings can be paid from booking details. Every successful payment shows up here.
+              Confirmed bookings can be paid from booking details. Every successful payment shows up here.
             </p>
           </div>
 
@@ -258,7 +258,7 @@ export const GuestPaymentsPage: React.FC = () => {
           <div className="border-t border-border-light px-5 py-10 text-center">
             <p className="text-[15px] font-semibold text-text-primary">No payment records yet</p>
             <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-              Once an accepted booking is paid, the settled transaction will appear here.
+              Once a confirmed booking is paid, the settled transaction will appear here.
             </p>
             <Link
               href="/guest/bookings"

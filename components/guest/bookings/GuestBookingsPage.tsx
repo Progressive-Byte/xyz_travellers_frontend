@@ -3,23 +3,35 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { GuestShell } from "@/components/guest/GuestShell";
-import { GuestBookingStatusPill } from "@/components/guest/bookings/GuestBookingStatusPill";
+import {
+  getGuestBookingStatusLabel,
+  GuestBookingStatusPill,
+} from "@/components/guest/bookings/GuestBookingStatusPill";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
   getGuestBookings,
   getGuestPropertyLookups,
   type GuestBooking,
-  type GuestBookingStatus,
 } from "@/lib/guest";
 
-const bookingFilters: Array<{ label: string; value: "all" | GuestBookingStatus }> = [
+type BookingFilterValue =
+  | "all"
+  | "under_review"
+  | "payment_pending"
+  | "paid"
+  | "completed"
+  | "cancelled"
+  | "rejected";
+
+const bookingFilters: Array<{ label: string; value: BookingFilterValue }> = [
   { label: "All bookings", value: "all" },
-  { label: "Pending", value: "pending" },
-  { label: "Accepted", value: "accepted" },
+  { label: "Under Review", value: "under_review" },
+  { label: "Payment Pending", value: "payment_pending" },
+  { label: "Paid", value: "paid" },
   { label: "Completed", value: "completed" },
   { label: "Cancelled", value: "cancelled" },
-  { label: "Rejected", value: "rejected" },
+  { label: "Declined", value: "rejected" },
 ];
 
 const formatDate = (value: string) =>
@@ -51,7 +63,7 @@ export const GuestBookingsPage: React.FC = () => {
   const [propertyLookup, setPropertyLookup] = useState<
     Awaited<ReturnType<typeof getGuestPropertyLookups>>
   >({});
-  const [selectedFilter, setSelectedFilter] = useState<"all" | GuestBookingStatus>("all");
+  const [selectedFilter, setSelectedFilter] = useState<BookingFilterValue>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -106,8 +118,25 @@ export const GuestBookingsPage: React.FC = () => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
 
     return bookings.filter((booking) => {
-      if (selectedFilter !== "all" && booking.status !== selectedFilter) {
-        return false;
+      if (selectedFilter !== "all") {
+        if (
+          selectedFilter === "under_review" &&
+          !["pending", "host_confirmed"].includes(booking.status)
+        ) {
+          return false;
+        }
+
+        if (selectedFilter === "payment_pending" && booking.status !== "confirmed") {
+          return false;
+        }
+
+        if (
+          selectedFilter !== "under_review" &&
+          selectedFilter !== "payment_pending" &&
+          booking.status !== selectedFilter
+        ) {
+          return false;
+        }
       }
 
       if (!normalizedQuery) {
@@ -119,7 +148,7 @@ export const GuestBookingsPage: React.FC = () => {
         booking.id,
         property?.propertyTitle,
         property?.unitNamesById[booking.unitId],
-        booking.status,
+        getGuestBookingStatusLabel(booking.status),
       ]
         .filter(Boolean)
         .join(" ")
@@ -154,10 +183,10 @@ export const GuestBookingsPage: React.FC = () => {
                   Booking workspace
                 </p>
                 <h2 className="mt-2 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-                  Manage requests, confirmed stays, and past trips
+                  Manage review steps, payment-ready bookings, and past trips
                 </h2>
                 <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-                  This view keeps your booking activity compact and easy to scan from one table.
+                  Keep every booking request, payment step, and stay history easy to scan from one table.
                 </p>
               </div>
 
