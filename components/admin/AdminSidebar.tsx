@@ -39,6 +39,14 @@ const AdminNavIconMark: React.FC<{ icon: AdminNavIcon; isActive: boolean }> = ({
           <path d="M9 20v-5h6v5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       );
+    case "bookings":
+      return (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">
+          <path d="M7 4v4M17 4v4M4 9h16" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="4" y="6" width="16" height="14" rx="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M8 13h3M8 16h5M15.5 15.5l1 1 2-2.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
     case "homepage":
       return (
         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.8">

@@ -84,6 +84,80 @@ const resolveSafeReturnTo = (value?: string) => {
   return trimmed;
 };
 
+const getDefaultPortalDestination = (
+  roles: string[],
+  intent: AuthIntent,
+  safeReturnTo: string,
+) => {
+  if (safeReturnTo) {
+    return safeReturnTo;
+  }
+
+  const hasAdminAccess = roles.includes("admin");
+  const hasHostAccess = roles.includes("host");
+
+  if (intent === "host") {
+    return hasHostAccess ? "/host/dashboard" : "/host/onboarding";
+  }
+
+  if (hasAdminAccess) {
+    return "/admin";
+  }
+
+  if (hasHostAccess) {
+    return "/host/dashboard";
+  }
+
+  return "/guest/dashboard";
+};
+
+const getSuccessMessage = ({
+  intent,
+  isRegisterMode,
+  safeReturnTo,
+  roles,
+}: {
+  intent: AuthIntent;
+  isRegisterMode: boolean;
+  safeReturnTo: string;
+  roles: string[];
+}) => {
+  const hasAdminAccess = roles.includes("admin");
+  const hasHostAccess = roles.includes("host");
+
+  if (safeReturnTo) {
+    return "Login successful. Restoring your previous route. Redirecting...";
+  }
+
+  if (intent === "host") {
+    if (hasHostAccess) {
+      return isRegisterMode
+        ? "Account created successfully. Opening your host dashboard. Redirecting..."
+        : "Host access confirmed. Redirecting...";
+    }
+
+    return isRegisterMode
+      ? "Account created successfully. Continue your host onboarding. Redirecting..."
+      : "Login successful. Continue your host onboarding. Redirecting...";
+  }
+
+  if (hasAdminAccess) {
+    return isRegisterMode
+      ? "Account created successfully. Opening your admin workspace. Redirecting..."
+      : "Login successful. Opening your admin workspace. Redirecting...";
+  }
+
+  if (hasHostAccess) {
+    return isRegisterMode
+      ? "Account created successfully. Opening your host dashboard. Redirecting..."
+      : "Login successful. Opening your host dashboard. Redirecting...";
+  }
+
+  return isRegisterMode
+    ? "Account created successfully. Opening your guest portal. Redirecting..."
+    : "Login successful. Opening your guest portal. Redirecting...";
+};
+
 export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent, returnTo }) => {
   const router = useRouter();
   const { setSession } = useAuth();
@@ -187,25 +261,16 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent, returnTo }) =>
             password: values.password,
           });
 
-      const hasHostAccess = session.user.roles.includes("host");
-      const shouldGoToHostArea = intent === "host";
-      const hostDestination = hasHostAccess ? "/host/dashboard" : "/host/onboarding";
-      const guestDestination = safeReturnTo || "/guest/dashboard";
-      const redirectTarget = shouldGoToHostArea ? hostDestination : guestDestination;
+      const redirectTarget = getDefaultPortalDestination(session.user.roles, intent, safeReturnTo);
 
       setSession(session);
       setSuccessMessage(
-        safeReturnTo
-          ? "Login successful. Restoring your previous route. Redirecting..."
-          : shouldGoToHostArea && hasHostAccess
-          ? "Host access confirmed. Redirecting..."
-          : isRegisterMode && intent === "host"
-            ? "Account created successfully. Continue your host onboarding. Redirecting..."
-            : !isRegisterMode && intent === "host"
-              ? "Login successful. Continue your host onboarding. Redirecting..."
-            : isRegisterMode
-              ? "Account created successfully. Opening your guest portal. Redirecting..."
-              : "Login successful. Opening your guest portal. Redirecting...",
+        getSuccessMessage({
+          intent,
+          isRegisterMode,
+          safeReturnTo,
+          roles: session.user.roles,
+        }),
       );
       router.push(redirectTarget);
       router.refresh();

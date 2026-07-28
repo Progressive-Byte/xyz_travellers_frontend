@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HostShell } from "@/components/host/HostShell";
 import {
   formatHostCurrency,
@@ -15,8 +15,6 @@ import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
   getHostReservation,
-  respondHostReservation,
-  updateHostReservationStatus,
   type HostReservation,
 } from "@/lib/host";
 
@@ -65,12 +63,8 @@ export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps>
 }) => {
   const { token } = useAuth();
   const [reservation, setReservation] = useState<HostReservation | null>(null);
-  const [actionReason, setActionReason] = useState("");
   const [pageError, setPageError] = useState("");
-  const [actionError, setActionError] = useState("");
-  const [actionSuccess, setActionSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
@@ -83,8 +77,6 @@ export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps>
     const loadReservation = async () => {
       setIsLoading(true);
       setPageError("");
-      setActionError("");
-      setActionSuccess("");
 
       try {
         const result = await getHostReservation(token, reservationId);
@@ -117,63 +109,6 @@ export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps>
       isActive = false;
     };
   }, [reservationId, retryKey, token]);
-
-  const availableActions = useMemo(() => {
-    if (!reservation) {
-      return [];
-    }
-
-    if (reservation.status === "pending") {
-      return [
-        { key: "accept", label: "Accept request" },
-        { key: "reject", label: "Reject request" },
-      ] as const;
-    }
-
-    if (reservation.status === "accepted") {
-      return [
-        { key: "completed", label: "Mark completed" },
-        { key: "cancelled", label: "Cancel reservation" },
-      ] as const;
-    }
-
-    return [] as const;
-  }, [reservation]);
-
-  const handleAction = async (action: "accept" | "reject" | "completed" | "cancelled") => {
-    if (!token || !reservation) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    setActionError("");
-    setActionSuccess("");
-
-    try {
-      const nextReservation =
-        action === "accept" || action === "reject"
-          ? await respondHostReservation(token, reservation.id, {
-              action,
-              reason: actionReason,
-            })
-          : await updateHostReservationStatus(token, reservation.id, {
-              status: action,
-              reason: actionReason,
-            });
-
-      setReservation(nextReservation);
-      setActionReason("");
-      setActionSuccess("Reservation status updated successfully.");
-    } catch (requestError) {
-      setActionError(
-        requestError instanceof ApiError
-          ? requestError.message || "We couldn't update this reservation right now."
-          : "We couldn't update this reservation right now.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   if (isLoading) {
     return <ReservationDetailSkeleton />;
@@ -217,7 +152,7 @@ export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps>
     <HostShell
       badge="Operations"
       title={`Reservation #${reservation.id.slice(-6).toUpperCase()}`}
-      subtitle="Review stay timing, guest context, pricing snapshot, and any actions still available on this reservation."
+      subtitle="Review stay timing, guest context, pricing snapshot, and admin-managed booking progress from one read-only page."
       headerAside={
         <>
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
@@ -342,6 +277,15 @@ export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps>
             </h2>
 
             <div className="mt-5 space-y-3">
+              <DetailCard
+                label="Host confirmed at"
+                value={formatHostDateTime(reservation.hostConfirmedAt)}
+              />
+              <DetailCard
+                label="Confirmed at"
+                value={formatHostDateTime(reservation.confirmedAt || reservation.respondedAt)}
+              />
+              <DetailCard label="Paid at" value={formatHostDateTime(reservation.paidAt)} />
               <DetailCard label="Responded at" value={formatHostDateTime(reservation.respondedAt)} />
               <DetailCard label="Cancelled at" value={formatHostDateTime(reservation.cancelledAt)} />
               <DetailCard label="Completed at" value={formatHostDateTime(reservation.completedAt)} />
@@ -359,49 +303,19 @@ export const HostReservationDetailPage: React.FC<HostReservationDetailPageProps>
 
           <div className="surface-card rounded-panel p-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Available actions
+              Reservation workflow
             </p>
             <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-              Update booking status
+              Admin-managed lifecycle
             </h2>
             <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-              Direct actions appear only when the current backend contract allows them.
+              Booking decisions now happen through the admin portal after direct coordination with the guest and host.
             </p>
-
-            {availableActions.length > 0 ? (
-              <>
-                <textarea
-                  value={actionReason}
-                  onChange={(event) => setActionReason(event.target.value)}
-                  rows={4}
-                  placeholder="Optional note or reason for this update"
-                  className="mt-5 w-full rounded-[22px] border border-border bg-white px-4 py-3 text-[14px] text-text-primary outline-none transition-colors duration-200 placeholder:text-text-secondary focus:border-text-primary/25"
-                />
-
-                <div className="mt-4 flex flex-wrap gap-3">
-                  {availableActions.map((action) => (
-                    <button
-                      key={action.key}
-                      type="button"
-                      onClick={() => void handleAction(action.key)}
-                      disabled={isSubmitting}
-                      className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {isSubmitting ? "Saving..." : action.label}
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="mt-5 rounded-[20px] border border-dashed border-border-light bg-white/80 px-4 py-4 text-[14px] leading-7 text-text-secondary">
-                {reservation.status === "completed"
-                  ? "This stay is completed. Use the review handoff above if you want to leave a guest review from the correct reservation context."
-                  : "This reservation is already in a final operational state, so no further host action is shown here."}
-              </div>
-            )}
-
-            {actionError ? <p className="mt-4 text-[14px] text-[rgb(140,50,50)]">{actionError}</p> : null}
-            {actionSuccess ? <p className="mt-4 text-[14px] text-[rgb(35,92,69)]">{actionSuccess}</p> : null}
+            <div className="mt-5 rounded-[20px] border border-dashed border-border-light bg-white/80 px-4 py-4 text-[14px] leading-7 text-text-secondary">
+              {reservation.status === "completed"
+                ? "This stay is completed. Use the review handoff above if you want to leave a guest review from the correct reservation context."
+                : "Hosts can keep track of reservation context here, while admin staff handle confirmation, payment readiness, cancellations, and completion updates."}
+            </div>
           </div>
         </div>
       </div>

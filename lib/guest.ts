@@ -53,7 +53,9 @@ const buildQueryString = (params: Record<string, string | number | boolean | und
 
 export type GuestBookingStatus =
   | "pending"
-  | "accepted"
+  | "host_confirmed"
+  | "confirmed"
+  | "paid"
   | "rejected"
   | "cancelled"
   | "completed";
@@ -126,6 +128,9 @@ export type GuestBooking = {
   adultGuests: number;
   childGuests: number;
   createdAt: string | null;
+  hostConfirmedAt: string | null;
+  confirmedAt: string | null;
+  paidAt: string | null;
   guestId: string;
   respondedAt: string | null;
   responseReason: string;
@@ -319,11 +324,15 @@ const normalizeGuestBookingStatus = (value: unknown): GuestBookingStatus => {
   const normalized = asString(value).trim().toLowerCase();
 
   switch (normalized) {
-    case "accepted":
+    case "host_confirmed":
+    case "confirmed":
+    case "paid":
     case "rejected":
     case "cancelled":
     case "completed":
       return normalized;
+    case "accepted":
+      return "confirmed";
     default:
       return "pending";
   }
@@ -524,6 +533,9 @@ const normalizeGuestBooking = (payload: unknown): GuestBooking => {
     adultGuests: asNumber(source.adultGuests) ?? 0,
     childGuests: asNumber(source.childGuests) ?? 0,
     createdAt: asOptionalString(source.createdAt),
+    hostConfirmedAt: asOptionalString(source.hostConfirmedAt ?? source.host_confirmed_at),
+    confirmedAt: asOptionalString(source.confirmedAt ?? source.confirmed_at),
+    paidAt: asOptionalString(source.paidAt ?? source.paid_at),
     guestId: asString(source.guestId),
     respondedAt: asOptionalString(source.respondedAt),
     responseReason: asString(source.responseReason),
