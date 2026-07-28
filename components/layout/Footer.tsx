@@ -27,9 +27,9 @@ export const Footer: React.FC = () => {
     {
       title: "Hosting",
       links: [
-        { label: "Earn by Hosting", href: "/auth?mode=register&intent=host" },
-        { label: "Host Resources", href: "/auth?mode=register&intent=host" },
-        { label: "Responsible Hosting", href: "/auth?mode=register&intent=host" },
+        { label: "Earn by Hosting", href: "/host" },
+        { label: "Host Resources", href: "/host" },
+        { label: "Responsible Hosting", href: "/host" },
         ...serviceLinks,
       ],
     },

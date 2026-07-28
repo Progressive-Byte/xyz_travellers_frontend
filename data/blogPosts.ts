@@ -206,7 +206,7 @@ export const blogPosts: BlogPost[] = [
       description:
         "See how a more polished short-stay experience can help turn available space into a smarter hosting opportunity.",
       primaryLabel: "Become a host",
-      primaryHref: "/auth?mode=register&intent=host",
+      primaryHref: "/host",
       secondaryLabel: "Read more blogs",
       secondaryHref: "/blogs",
     },
