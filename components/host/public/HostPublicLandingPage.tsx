@@ -12,32 +12,22 @@ const hostBenefits = [
   {
     title: "Faster hosting setup",
     description:
-      "Move from account creation to onboarding, property setup, and review with a cleaner path built around the current host workflow.",
+      "A calmer, structured path from account creation to onboarding, listing setup, and review.",
   },
   {
     title: "Support that stays practical",
     description:
-      "Get help with listing structure, pricing setup, property submission, and the operational pieces that make hosting easier to sustain.",
+      "Guidance for listing setup, pricing readiness, and the steps that matter before you go live.",
   },
   {
     title: "Built for trusted short stays",
     description:
-      "Present your space through a calmer, more credible booking experience designed for apartments, rooms, hotels, and premium city stays.",
+      "Present your property with a booking experience designed to feel clearer and more trustworthy.",
   },
   {
-    title: "Better visibility for your space",
+    title: "One portal after approval",
     description:
-      "Bring your property into a platform that already connects discovery, booking, hosting, transport, and travel services in one system.",
-  },
-  {
-    title: "Clearer host operations",
-    description:
-      "Keep reservations, guest coordination, reviews, payouts, and profile setup inside one host workspace after approval.",
-  },
-  {
-    title: "A workflow that grows with you",
-    description:
-      "Start with one listing, then expand into units, pricing, business documents, and multi-step property management as needed.",
+      "Manage properties, reservations, messages, earnings, and payouts from a single host workspace.",
   },
 ];
 
@@ -68,15 +58,15 @@ const hostingCategoryDetails: Record<
 const supportHighlights = [
   {
     label: "Onboarding guidance",
-    value: "Identity verification, draft recovery, submitted status, and next-step clarity.",
+    value: "Clear status for draft, submitted, rejected, and approved application states.",
   },
   {
     label: "Property readiness",
-    value: "Help structure listing basics, media, units, calendar rules, pricing, and verification before submission.",
+    value: "Make the listing ready: details, media, units, pricing, and verification before submit.",
   },
   {
     label: "Operational continuity",
-    value: "Move from onboarding into reservations, messages, payouts, earnings, reviews, and verification status with less friction.",
+    value: "A consistent workflow from onboarding into day-to-day host operations after approval.",
   },
 ];
 
@@ -84,29 +74,23 @@ const processSteps = [
   {
     title: "Create your host account",
     description:
-      "Start with registration or sign in if you already have an account and want to continue toward hosting access.",
+      "Register or sign in, then enter the host onboarding flow.",
   },
   {
     title: "Complete host onboarding",
     description:
-      "Submit identity verification and keep track of draft, submitted, rejected, or approved status from the onboarding journey.",
+      "Submit identity verification and track review status without guessing.",
   },
   {
     title: "Add and prepare your property",
     description:
-      "Set up details, photos, units, pricing, business support where needed, and verification before submission.",
+      "Finish listing details, photos, units, and pricing before submission.",
   },
   {
     title: "Go live and manage hosting",
     description:
-      "After approval, operate from the host portal with reservations, messages, payouts, reviews, and listing management.",
+      "Use the host portal for daily operations after approval.",
   },
-];
-
-const quickStats = [
-  { label: "Host-ready categories", value: `${homeCategories.length}+` },
-  { label: "Portal stages covered", value: "Onboarding to payouts" },
-  { label: "Support style", value: "Practical and local" },
 ];
 
 const LoggedInRedirectState = () => (
@@ -180,17 +164,6 @@ export const HostPublicLandingPage: React.FC = () => {
                     Host sign in
                   </Link>
                 </div>
-
-                <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                  {quickStats.map((stat) => (
-                    <div key={stat.label} className="surface-card rounded-[24px] px-4 py-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                        {stat.label}
-                      </p>
-                      <p className="mt-2 text-[15px] font-semibold text-text-primary">{stat.value}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               <div className="relative">
@@ -242,28 +215,6 @@ export const HostPublicLandingPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="mt-4 rounded-[28px] bg-[linear-gradient(135deg,rgba(26,27,18,0.96),rgba(26,27,18,0.84))] px-5 py-5 text-white shadow-strong">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-                      Hosting made simpler
-                    </p>
-                    <div className="mt-4 space-y-3">
-                      {[
-                        "Create your account and submit onboarding",
-                        "Prepare your property details, media, units, and pricing",
-                        "Get approved and manage reservations from the host portal",
-                      ].map((item, index) => (
-                        <div
-                          key={item}
-                          className="flex items-start gap-3 rounded-[20px] border border-white/10 bg-white/6 px-4 py-3"
-                        >
-                          <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-[12px] font-bold text-text-primary">
-                            {index + 1}
-                          </span>
-                          <p className="text-[14px] leading-6 text-white/84">{item}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -281,7 +232,7 @@ export const HostPublicLandingPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-2">
               {hostBenefits.map((benefit, index) => (
                 <article key={benefit.title} className="surface-card-strong hover-lift rounded-panel p-6">
                   <div className="flex items-center justify-between gap-4">
@@ -386,8 +337,7 @@ export const HostPublicLandingPage: React.FC = () => {
                   Ready to start earning from your space?
                 </h3>
                 <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                  Begin with account setup, move through onboarding, and open the full host portal
-                  once your approval and property flow are ready.
+                  If you want help before you start, reach out. If you are ready, use the CTA at the top to begin hosting.
                 </p>
 
                 <div className="mt-6 space-y-3">
@@ -407,20 +357,6 @@ export const HostPublicLandingPage: React.FC = () => {
                   </a>
                 </div>
 
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Link
-                    href="/auth?mode=register&intent=host"
-                    className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover"
-                  >
-                    Start hosting
-                  </Link>
-                  <Link
-                    href="/auth?mode=login&intent=host"
-                    className="inline-flex items-center justify-center rounded-full border border-border bg-card px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:bg-surface"
-                  >
-                    Host sign in
-                  </Link>
-                </div>
               </div>
             </div>
           </div>
@@ -470,12 +406,6 @@ export const HostPublicLandingPage: React.FC = () => {
                   className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3.5 text-[15px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:-translate-y-0.5 hover:bg-primary-hover"
                 >
                   Start hosting
-                </Link>
-                <Link
-                  href="/auth?mode=login&intent=host"
-                  className="inline-flex items-center justify-center rounded-full border border-border bg-card px-6 py-3.5 text-[15px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:bg-surface"
-                >
-                  Host sign in
                 </Link>
               </div>
             </div>
