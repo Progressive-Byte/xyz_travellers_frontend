@@ -15,7 +15,9 @@ import {
 const reservationFilters: Array<{ label: string; value: "all" | HostReservationStatus }> = [
   { label: "All stays", value: "all" },
   { label: "Pending", value: "pending" },
-  { label: "Accepted", value: "accepted" },
+  { label: "Host Confirmed", value: "host_confirmed" },
+  { label: "Confirmed", value: "confirmed" },
+  { label: "Paid", value: "paid" },
   { label: "Completed", value: "completed" },
   { label: "Cancelled", value: "cancelled" },
   { label: "Rejected", value: "rejected" },
@@ -114,7 +116,9 @@ export const HostReservationsPage: React.FC = () => {
     () => ({
       total: reservations.length,
       pending: reservations.filter((reservation) => reservation.status === "pending").length,
-      accepted: reservations.filter((reservation) => reservation.status === "accepted").length,
+      active: reservations.filter((reservation) =>
+        ["host_confirmed", "confirmed", "paid"].includes(reservation.status),
+      ).length,
       completed: reservations.filter((reservation) => reservation.status === "completed").length,
     }),
     [reservations],
@@ -128,20 +132,20 @@ export const HostReservationsPage: React.FC = () => {
     <HostShell
       badge="Operations"
       title="Reservations"
-      subtitle="Review booking flow, stay timing, and guest readiness from one operational workspace."
+      subtitle="Review reservation visibility, stay timing, and guest readiness from one read-only workspace."
       headerAside={
         <>
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Attention now
+              Under review
             </p>
             <p className="mt-3 text-[17px] font-semibold text-text-primary">{counts.pending} pending</p>
           </div>
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Accepted stays
+              Confirmed pipeline
             </p>
-            <p className="mt-3 text-[17px] font-semibold text-text-primary">{counts.accepted} active</p>
+            <p className="mt-3 text-[17px] font-semibold text-text-primary">{counts.active} active</p>
           </div>
         </>
       }
@@ -153,9 +157,9 @@ export const HostReservationsPage: React.FC = () => {
           helper="All booking records tied to your host inventory."
         />
         <MetricCard
-          label="Pending response"
+          label="Under review"
           value={counts.pending}
-          helper="Requests that still need a host decision."
+          helper="Requests still moving through the admin review workflow."
         />
         <MetricCard
           label="Completed stays"

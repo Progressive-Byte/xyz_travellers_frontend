@@ -1,4 +1,10 @@
-export type AdminNavIcon = "dashboard" | "applications" | "properties" | "homepage" | "commission";
+export type AdminNavIcon =
+  | "dashboard"
+  | "applications"
+  | "properties"
+  | "bookings"
+  | "homepage"
+  | "commission";
 export type AdminNavGroupKey = "Main";
 
 export type AdminNavItem = {
@@ -30,6 +36,13 @@ export const adminNavigationItems: AdminNavItem[] = [
     icon: "properties",
     group: "Main",
     description: "Review draft, submitted, approved, and rejected properties from one compact moderation inventory.",
+  },
+  {
+    label: "Bookings",
+    href: "/admin/bookings",
+    icon: "bookings",
+    group: "Main",
+    description: "Coordinate the guest booking lifecycle, review host and guest contact details, and update booking statuses.",
   },
   {
     label: "Homepage Curation",
