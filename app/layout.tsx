@@ -17,7 +17,33 @@ const instrumentSans = Instrument_Sans({
 
 export const metadata: Metadata = {
   title: "XYZ Travellers",
-  description: "Travel booking site clone",
+  description:
+    "Book rooms, apartments, hotels, tours, transport, and event services with XYZ Travellers across Bangladesh.",
+  applicationName: "XYZ Travellers",
+  keywords: [
+    "XYZ Travellers",
+    "Bangladesh travel booking",
+    "apartments booking",
+    "rooms booking",
+    "hotels booking",
+    "tour booking",
+    "transport booking",
+    "event management",
+  ],
+  openGraph: {
+    title: "XYZ Travellers",
+    description:
+      "Discover rooms, apartments, hotels, tours, transport, and event services with XYZ Travellers.",
+    siteName: "XYZ Travellers",
+    type: "website",
+    locale: "en_BD",
+  },
+  twitter: {
+    card: "summary",
+    title: "XYZ Travellers",
+    description:
+      "Discover rooms, apartments, hotels, tours, transport, and event services with XYZ Travellers.",
+  },
 };
 
 export default function RootLayout({
