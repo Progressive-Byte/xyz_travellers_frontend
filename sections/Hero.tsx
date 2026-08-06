@@ -36,6 +36,23 @@ const categoryIcons: Record<FrontHomepageTabKey, React.ReactNode> = {
   ),
 };
 
+const SUGGESTED_DESTINATIONS = [
+  "Dhaka",
+  "Gulshan",
+  "Dhanmondi",
+  "Mohammadpur",
+  "Bashundhara Residential Area",
+  "Mirpur",
+  "Chittagong",
+  "Sundarbans",
+  "Sreemangal",
+  "Sylhet",
+  "Sajek",
+  "Rangamati",
+  "Bandarban",
+  "Coxs bazar"
+];
+
 type GuestType = {
   key: "adults" | "children" | "infants";
   label: string;
@@ -99,13 +116,18 @@ export const Hero: React.FC<HeroProps> = ({
   const [children, setChildren] = useState(0);
   const [infants, setInfants] = useState(0);
   const [showGuestDropdown, setShowGuestDropdown] = useState(false);
+  const [showDestinationDropdown, setShowDestinationDropdown] = useState(false);
   const [searchError, setSearchError] = useState("");
   const guestDropdownRef = useRef<HTMLDivElement>(null);
+  const destinationDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (guestDropdownRef.current && !guestDropdownRef.current.contains(event.target as Node)) {
         setShowGuestDropdown(false);
+      }
+      if (destinationDropdownRef.current && !destinationDropdownRef.current.contains(event.target as Node)) {
+        setShowDestinationDropdown(false);
       }
     };
 
@@ -115,6 +137,12 @@ export const Hero: React.FC<HeroProps> = ({
 
   const totalGuests = adults + children;
   const homepageTabs = tabs.length ? tabs : [...defaultFrontHomepageTabs];
+
+  const filteredDestinations = useMemo(() => {
+    const query = destination.trim().toLowerCase();
+    if (!query) return SUGGESTED_DESTINATIONS;
+    return SUGGESTED_DESTINATIONS.filter((d) => d.toLowerCase().includes(query));
+  }, [destination]);
 
   const guestTypes = useMemo<GuestType[]>(
     () => [
@@ -156,27 +184,80 @@ export const Hero: React.FC<HeroProps> = ({
           <div className="surface-card-strong w-full rounded-[26px] p-1.5">
             <div className="flex flex-col lg:flex-row lg:items-stretch">
               <div className="flex flex-col divide-y divide-border lg:flex-1 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0">
-                <div className="flex-1 rounded-[18px] px-4 py-3 transition-colors duration-200 hover:bg-surface lg:py-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
-                    Where
-                  </p>
-                  <input
-                    type="text"
-                    value={destination}
-                    onChange={(event) => setDestination(event.target.value)}
-                    placeholder="Search destinations"
-                    className="mt-1 w-full bg-transparent text-[14px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-primary"
-                  />
+                <div className="relative flex-1" ref={destinationDropdownRef}>
+                  <div className="rounded-[18px] px-4 py-3 transition-colors duration-200 hover:bg-surface lg:py-1.5">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
+                      Where
+                    </p>
+                    <input
+                      type="text"
+                      value={destination}
+                      onChange={(event) => {
+                        setDestination(event.target.value);
+                        setShowDestinationDropdown(true);
+                      }}
+                      onFocus={() => setShowDestinationDropdown(true)}
+                      onClick={() => setShowDestinationDropdown(true)}
+                      placeholder="Search destinations"
+                      className="mt-1 w-full bg-transparent text-[14px] font-semibold text-text-primary outline-none placeholder:font-semibold placeholder:text-text-primary"
+                    />
+                  </div>
+
+                  <div
+                    className={`absolute left-0 right-0 top-full z-50 mt-3 w-full min-w-[280px] rounded-panel border border-border bg-[rgba(255,255,255,0.97)] shadow-strong backdrop-blur-xl transition-all duration-250 lg:w-[380px] ${
+                      showDestinationDropdown
+                        ? "pointer-events-auto translate-y-0 opacity-100"
+                        : "pointer-events-none -translate-y-2 opacity-0"
+                    }`}
+                  >
+                    <div className="px-5 pt-4 pb-2">
+                      <p className="text-[14px] font-semibold text-text-secondary">
+                        Suggested destinations
+                      </p>
+                    </div>
+                    <div className="max-h-[360px] overflow-y-auto px-2 pb-2">
+                      {filteredDestinations.length > 0 ? (
+                        filteredDestinations.map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            type="button"
+                            onClick={() => {
+                              setDestination(suggestion);
+                              setShowDestinationDropdown(false);
+                            }}
+                            className="flex w-full items-center gap-4 rounded-[14px] px-3 py-3 text-left transition-colors duration-150 hover:bg-surface"
+                          >
+                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-light text-text-primary">
+                              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                              </svg>
+                            </span>
+                            <span className="truncate text-[15px] font-semibold text-text-primary">
+                              {suggestion}
+                            </span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-5 py-6 text-center text-[14px] text-text-secondary">
+                          No matching destinations
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex-1 rounded-[18px] px-4 py-3 transition-colors duration-200 hover:bg-surface lg:py-1.5">
+                <div className="flex-1 px-4 py-3 transition-colors duration-200 hover:bg-surface lg:py-1.5">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                     Check in
                   </p>
                   <DatePicker
                     selected={checkInDate}
                     onChange={(date: Date | null) => setCheckInDate(date)}
-                    onCalendarOpen={() => setShowGuestDropdown(false)}
+                    onCalendarOpen={() => {
+                      setShowGuestDropdown(false);
+                      setShowDestinationDropdown(false);
+                    }}
                     selectsStart
                     startDate={checkInDate}
                     endDate={checkOutDate}
@@ -192,14 +273,17 @@ export const Hero: React.FC<HeroProps> = ({
                   />
                 </div>
 
-                <div className="flex-1 rounded-[18px] px-4 py-3 transition-colors duration-200 hover:bg-surface lg:py-1.5">
+                <div className="flex-1 px-4 py-3 transition-colors duration-200 hover:bg-surface lg:py-1.5">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-text-secondary">
                     Check out
                   </p>
                   <DatePicker
                     selected={checkOutDate}
                     onChange={(date: Date | null) => setCheckOutDate(date)}
-                    onCalendarOpen={() => setShowGuestDropdown(false)}
+                    onCalendarOpen={() => {
+                      setShowGuestDropdown(false);
+                      setShowDestinationDropdown(false);
+                    }}
                     selectsEnd
                     startDate={checkInDate}
                     endDate={checkOutDate}
@@ -220,6 +304,7 @@ export const Hero: React.FC<HeroProps> = ({
                     type="button"
                     onClick={() => {
                       setSearchError("");
+                      setShowDestinationDropdown(false);
                       setShowGuestDropdown((open) => !open);
                     }}
                     className="flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left outline-none transition-colors duration-200 hover:bg-surface focus:outline-none focus-visible:outline-none lg:py-1.5"
