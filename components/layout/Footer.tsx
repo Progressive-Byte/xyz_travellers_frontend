@@ -19,6 +19,7 @@ export const Footer: React.FC = () => {
     {
       title: "Explore",
       links: [
+        { label: "Destinations", href: "/destinations" },
         { label: "Apartments", href: "/apartments" },
         { label: "Rooms", href: "/rooms" },
         { label: "Hotels", href: "/hotels" },

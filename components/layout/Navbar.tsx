@@ -24,6 +24,7 @@ export const Navbar: React.FC = () => {
               ? [{ label: "Guest portal", href: guestPortalHref, emphasis: true }]
               : []),
             { label: "Browse stays", href: "/" },
+            { label: "Destinations", href: "/destinations" },
             hasHostAccess
               ? { label: "Host dashboard", href: "/host/dashboard", emphasis: true }
               : { label: "Become a host", href: "/host/onboarding" },
@@ -31,6 +32,7 @@ export const Navbar: React.FC = () => {
           ]
         : [
             { label: "Log in or sign up", href: "/auth?mode=login", emphasis: true },
+            { label: "Destinations", href: "/destinations" },
             { label: "Earn by Hosting", href: "/host" },
             { label: "Help Center", href: "/help" },
             { label: "About XYZ Travellers", href: "/about" },

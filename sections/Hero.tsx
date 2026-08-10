@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { LocationPillStrip } from "@/components/destinations/LocationPillStrip";
 import {
   defaultFrontHomepageTabs,
   type FrontHomepageTab,
@@ -152,7 +153,8 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section className="section-shell overflow-visible bg-background pt-6">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="relative z-30 mx-auto mt-4 flex w-full max-w-[980px] justify-center md:mt-6">
+        <div className="relative z-30 mx-auto mt-4 flex w-full max-w-[980px] flex-col justify-center md:mt-6">
+          <LocationPillStrip />
           <div className="surface-card-strong w-full rounded-[26px] p-1.5">
             <div className="flex flex-col lg:flex-row lg:items-stretch">
               <div className="flex flex-col divide-y divide-border lg:flex-1 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0">
