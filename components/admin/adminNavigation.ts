@@ -4,6 +4,7 @@ export type AdminNavIcon =
   | "properties"
   | "bookings"
   | "homepage"
+  | "destinations"
   | "commission";
 export type AdminNavGroupKey = "Main";
 
@@ -50,6 +51,14 @@ export const adminNavigationItems: AdminNavItem[] = [
     icon: "homepage",
     group: "Main",
     description: "Manage homepage sections and curate approved properties into them.",
+  },
+  {
+    label: "Quick Locations",
+    href: "/admin/locations",
+    icon: "destinations",
+    group: "Main",
+    description:
+      "Manage quick-location pills, transport services and restaurants for public destination pages.",
   },
   {
     label: "Commission",
