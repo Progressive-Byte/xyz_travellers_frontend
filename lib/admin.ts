@@ -1,5 +1,10 @@
 import { apiRequest, resolveApiUrl } from "@/lib/api";
 import type { AuthSuccessData } from "@/lib/auth";
+import {
+  getAdminPropertyApplications as storeGetAdminPropertyApplications,
+  getAdminPropertyApplicationDetail as storeGetAdminPropertyApplicationDetail,
+  reviewAdminPropertyApplication as storeReviewAdminPropertyApplication,
+} from "@/lib/properties-store";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -377,6 +382,7 @@ export type GetAdminPropertyApplicationsFilters = {
   hostId?: string;
 };
 
+
 const normalizeAdminPropertyApplicationHost = (payload: unknown): AdminPropertyApplicationHost => {
   const source = asRecord(payload);
 
@@ -600,6 +606,8 @@ export async function getAdminPropertyApplications(
   token: string,
   filters: GetAdminPropertyApplicationsFilters = {},
 ): Promise<AdminPropertyApplicationSummary[]> {
+
+
   const searchParams = new URLSearchParams();
 
   if (filters.status?.trim()) {
@@ -1194,4 +1202,304 @@ export async function updateAdminBookingStatus(
   });
 
   return normalizeAdminBookingDetail(data);
+}
+
+// ---------------------------------------------------------------------------
+// Admin Locations / Quick Locations
+// ---------------------------------------------------------------------------
+
+export type AdminLocationSummary = {
+  id: string;
+  name: string;
+  slug: string;
+  city: string;
+  country: string;
+  heroImage: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  description: string | null;
+  transportSectionTitle: string;
+  transportSectionSubtitle: string;
+  foodSectionTitle: string;
+  foodSectionSubtitle: string;
+  transportHeroImage: string | null;
+  foodHeroImage: string | null;
+  transportServicesCount: number;
+  foodRestaurantsCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminTransportItem = {
+  id: string;
+  companyName: string;
+  contactNumber: string;
+  description: string;
+  heroImage: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type AdminFoodItem = {
+  id: string;
+  restaurantName: string;
+  phoneNumber: string;
+  location: string;
+  description: string;
+  heroImage: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type AdminLocationDetail = AdminLocationSummary & {
+  transportItems: AdminTransportItem[];
+  foodItems: AdminFoodItem[];
+};
+
+export type UpsertAdminLocationPayload = {
+  name?: string;
+  slug?: string;
+  city?: string;
+  country?: string;
+  description?: string | null;
+  heroImage?: string | null;
+  isActive?: boolean;
+  sortOrder?: number;
+  transportSectionTitle?: string;
+  transportSectionSubtitle?: string;
+  foodSectionTitle?: string;
+  foodSectionSubtitle?: string;
+  transportHeroImage?: string | null;
+  foodHeroImage?: string | null;
+};
+
+export type UpsertAdminTransportPayload = {
+  companyName?: string;
+  contactNumber?: string;
+  description?: string;
+  heroImage?: string | null;
+  sortOrder?: number;
+  isActive?: boolean;
+};
+
+export type UpsertAdminFoodPayload = {
+  restaurantName?: string;
+  phoneNumber?: string;
+  location?: string;
+  description?: string;
+  heroImage?: string | null;
+  sortOrder?: number;
+  isActive?: boolean;
+};
+
+const buildQuery = (entries: Record<string, string | undefined | null>) => {
+  const params = new URLSearchParams();
+  Object.entries(entries).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && String(v).trim() !== "") {
+      params.set(k, String(v));
+    }
+  });
+  const qs = params.toString();
+  return qs ? `?${qs}` : "";
+};
+
+const normalizeAdminLocationSummary = (payload: unknown): AdminLocationSummary => {
+  const s = asRecord(payload);
+  return {
+    id: asString(s.id),
+    name: asString(s.name),
+    slug: asString(s.slug),
+    city: asString(s.city),
+    country: asString(s.country),
+    heroImage: asOptionalString(s.heroImage),
+    isActive: asBoolean(s.isActive ?? true),
+    sortOrder: asNumber(s.sortOrder) ?? 0,
+    description: asOptionalString(s.description),
+    transportSectionTitle: asString(s.transportSectionTitle ?? s.transport_section_title ?? "Transportation Services"),
+    transportSectionSubtitle: asString(s.transportSectionSubtitle ?? s.transport_section_subtitle ?? "Local transport companies and contact details"),
+    foodSectionTitle: asString(s.foodSectionTitle ?? s.food_section_title ?? "Food & Restaurant"),
+    foodSectionSubtitle: asString(s.foodSectionSubtitle ?? s.food_section_subtitle ?? "Recommended restaurants near this location"),
+    transportHeroImage: asOptionalString(s.transportHeroImage ?? s.transport_hero_image),
+    foodHeroImage: asOptionalString(s.foodHeroImage ?? s.food_hero_image),
+    transportServicesCount: asNumber(s.transportServicesCount ?? s.transport_services_count) ?? 0,
+    foodRestaurantsCount: asNumber(s.foodRestaurantsCount ?? s.food_restaurants_count) ?? 0,
+    createdAt: asOptionalString(s.createdAt ?? s.created_at) ?? new Date().toISOString(),
+    updatedAt: asOptionalString(s.updatedAt ?? s.updated_at) ?? new Date().toISOString(),
+  };
+};
+
+const normalizeAdminTransportItem = (payload: unknown): AdminTransportItem => {
+  const s = asRecord(payload);
+  return {
+    id: asString(s.id),
+    companyName: asString(s.companyName ?? s.company_name),
+    contactNumber: asString(s.contactNumber ?? s.contact_number),
+    description: asString(s.description),
+    heroImage: asOptionalString(s.heroImage),
+    sortOrder: asNumber(s.sortOrder) ?? 0,
+    isActive: asBoolean(s.isActive ?? true),
+    createdAt: asOptionalString(s.createdAt ?? s.created_at) ?? undefined,
+    updatedAt: asOptionalString(s.updatedAt ?? s.updated_at) ?? undefined,
+  };
+};
+
+const normalizeAdminFoodItem = (payload: unknown): AdminFoodItem => {
+  const s = asRecord(payload);
+  return {
+    id: asString(s.id),
+    restaurantName: asString(s.restaurantName ?? s.restaurant_name),
+    phoneNumber: asString(s.phoneNumber ?? s.phone_number),
+    location: asString(s.location),
+    description: asString(s.description),
+    heroImage: asOptionalString(s.heroImage),
+    sortOrder: asNumber(s.sortOrder) ?? 0,
+    isActive: asBoolean(s.isActive ?? true),
+    createdAt: asOptionalString(s.createdAt ?? s.created_at) ?? undefined,
+    updatedAt: asOptionalString(s.updatedAt ?? s.updated_at) ?? undefined,
+  };
+};
+
+const unwrap = (payload: unknown): unknown => {
+  const r = asRecord(payload);
+  if ("success" in r && "data" in r) return r.data;
+  return payload;
+};
+
+export async function getAdminLocations(
+  token: string,
+  params: { isActive?: boolean } = {},
+): Promise<AdminLocationSummary[]> {
+  const query = buildQuery({
+    isActive: params.isActive === undefined ? "" : String(params.isActive),
+  });
+  const raw = await apiRequest<unknown>(`/api/v1/admin/locations${query}`, {
+    method: "GET",
+    headers: authHeaders(token),
+  });
+  const data = unwrap(raw);
+  return asArray(data).map(normalizeAdminLocationSummary);
+}
+
+export async function getAdminLocation(
+  token: string,
+  locationId: string,
+): Promise<AdminLocationDetail | null> {
+  if (!locationId) return null;
+  const raw = await apiRequest<unknown>(`/api/v1/admin/locations/${locationId}`, {
+    method: "GET",
+    headers: authHeaders(token),
+  });
+  const data = unwrap(raw);
+  if (!data) return null;
+  const summary = normalizeAdminLocationSummary(data);
+  const source = asRecord(data);
+  const transportItems = asArray(source.transportServices ?? source.transport_services ?? source.transportItems ?? []).map(normalizeAdminTransportItem);
+  const foodItems = asArray(source.foodRestaurants ?? source.food_restaurants ?? source.foodItems ?? []).map(normalizeAdminFoodItem);
+  return { ...summary, transportItems, foodItems };
+}
+
+export async function upsertAdminLocation(
+  token: string,
+  id: string | null | undefined,
+  payload: UpsertAdminLocationPayload,
+): Promise<AdminLocationSummary> {
+  const body: Record<string, unknown> = { ...payload };
+  const raw = id
+    ? await apiRequest<unknown>(`/api/v1/admin/locations/${id}`, {
+        method: "PATCH",
+        headers: authHeaders(token),
+        body,
+      })
+    : await apiRequest<unknown>(`/api/v1/admin/locations`, {
+        method: "POST",
+        headers: authHeaders(token),
+        body,
+      });
+  return normalizeAdminLocationSummary(unwrap(raw));
+}
+
+export async function deleteAdminLocation(token: string, id: string): Promise<void> {
+  await apiRequest<unknown>(`/api/v1/admin/locations/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+}
+
+export async function upsertTransport(
+  token: string,
+  locationId: string,
+  id: string | null | undefined,
+  payload: UpsertAdminTransportPayload,
+): Promise<AdminTransportItem> {
+  const body: Record<string, unknown> = { ...payload };
+  const raw = id
+    ? await apiRequest<unknown>(`/api/v1/admin/locations/${locationId}/transport/${id}`, {
+        method: "PATCH",
+        headers: authHeaders(token),
+        body,
+      })
+    : await apiRequest<unknown>(`/api/v1/admin/locations/${locationId}/transport`, {
+        method: "POST",
+        headers: authHeaders(token),
+        body,
+      });
+  const unwrapped = unwrap(raw);
+  const r = asRecord(unwrapped);
+  if (r && "item" in r) return normalizeAdminTransportItem(r.item);
+  return normalizeAdminTransportItem(unwrapped);
+}
+
+export async function deleteTransport(
+  token: string,
+  locationId: string,
+  id: string,
+): Promise<void> {
+  await apiRequest<unknown>(`/api/v1/admin/locations/${locationId}/transport/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+}
+
+export async function upsertFood(
+  token: string,
+  locationId: string,
+  id: string | null | undefined,
+  payload: UpsertAdminFoodPayload,
+): Promise<AdminFoodItem> {
+  const body: Record<string, unknown> = { ...payload };
+  const raw = id
+    ? await apiRequest<unknown>(`/api/v1/admin/locations/${locationId}/food/${id}`, {
+        method: "PATCH",
+        headers: authHeaders(token),
+        body,
+      })
+    : await apiRequest<unknown>(`/api/v1/admin/locations/${locationId}/food`, {
+        method: "POST",
+        headers: authHeaders(token),
+        body,
+      });
+  const unwrapped = unwrap(raw);
+  const r = asRecord(unwrapped);
+  if (r && "item" in r) return normalizeAdminFoodItem(r.item);
+  return normalizeAdminFoodItem(unwrapped);
+}
+
+export async function deleteFood(
+  token: string,
+  locationId: string,
+  id: string,
+): Promise<void> {
+  await apiRequest<unknown>(`/api/v1/admin/locations/${locationId}/food/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+}
+
+export function subscribeLocations(callback: () => void): () => void {
+  void callback;
+  return () => {};
 }

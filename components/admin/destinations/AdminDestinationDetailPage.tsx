@@ -9,7 +9,7 @@ import {
   deleteFood,
   deleteTransport,
   getAdminLocation,
-  subscribe,
+  subscribeLocations,
   upsertAdminLocation,
   upsertFood,
   upsertTransport,
@@ -19,7 +19,7 @@ import {
   type UpsertAdminFoodPayload,
   type UpsertAdminLocationPayload,
   type UpsertAdminTransportPayload,
-} from "@/lib/locations-store";
+} from "@/lib/admin";
 
 const inputClassName =
   "w-full rounded-[20px] border border-border bg-card px-4 py-3 text-[14px] text-text-primary shadow-soft outline-none transition-all duration-200 placeholder:text-text-secondary/70 focus:-translate-y-0.5 focus:border-text-primary/20 focus:shadow-medium";
@@ -173,12 +173,12 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
   };
 
   const loadLocation = async () => {
+    if (!token) return;
     setIsLoading(true);
     setPageError("");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 250));
-      const data = getAdminLocation(locationId);
+      const data = await getAdminLocation(token, locationId);
       setLocation(data);
       if (data) {
         setLocationForm(mapDetailToLocationForm(data));
@@ -192,13 +192,13 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
 
   useEffect(() => {
     void loadLocation();
-  }, [locationId]);
+  }, [locationId, token]);
 
   useEffect(() => {
-    return subscribe(() => {
+    return subscribeLocations(() => {
       void loadLocation();
     });
-  }, [locationId]);
+  }, [locationId, token]);
 
   const syncLocationState = (next: AdminLocationDetail) => {
     setLocation(next);
@@ -241,6 +241,7 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
     setPageError("");
 
     try {
+      if (!token) throw new Error("Admin authentication required.");
       const payload: UpsertAdminLocationPayload = { ...locationForm };
       if (!payload.slug || !payload.slug.trim()) {
         payload.slug = slugify(payload.name || "");
@@ -248,8 +249,8 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
       if (typeof payload.sortOrder === "string") {
         payload.sortOrder = parseInt(payload.sortOrder, 10) || 0;
       }
-      upsertAdminLocation(locationId, payload);
-      const refreshed = getAdminLocation(locationId);
+      await upsertAdminLocation(token, locationId, payload);
+      const refreshed = await getAdminLocation(token, locationId);
       if (refreshed) syncLocationState(refreshed);
       setSuccessMessage("Quick location information updated successfully.");
     } catch (error) {
@@ -268,7 +269,8 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
     setPageError("");
 
     try {
-      deleteAdminLocation(locationId);
+      if (!token) throw new Error("Admin authentication required.");
+      await deleteAdminLocation(token, locationId);
       router.replace("/admin/locations");
     } catch (error) {
       setPageError(error instanceof Error ? error.message : "Unable to delete quick location.");
@@ -286,12 +288,13 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
     setPageError("");
 
     try {
+      if (!token) throw new Error("Admin authentication required.");
       const payload: UpsertAdminTransportPayload = { ...transportForm };
       if (typeof payload.sortOrder === "string") {
         payload.sortOrder = parseInt(payload.sortOrder, 10) || 0;
       }
-      upsertTransport(locationId, editingTransportId, payload);
-      const refreshed = getAdminLocation(locationId);
+      await upsertTransport(token, locationId, editingTransportId, payload);
+      const refreshed = await getAdminLocation(token, locationId);
       if (refreshed) syncLocationState(refreshed);
       setTransportForm(createEmptyTransportForm());
       setEditingTransportId(null);
@@ -323,8 +326,9 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
     setSuccessMessage("");
 
     try {
-      deleteTransport(locationId, id);
-      const refreshed = getAdminLocation(locationId);
+      if (!token) throw new Error("Admin authentication required.");
+      await deleteTransport(token, locationId, id);
+      const refreshed = await getAdminLocation(token, locationId);
       if (refreshed) syncLocationState(refreshed);
       if (editingTransportId === id) {
         handleCancelEditTransport();
@@ -347,12 +351,13 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
     setPageError("");
 
     try {
+      if (!token) throw new Error("Admin authentication required.");
       const payload: UpsertAdminFoodPayload = { ...foodForm };
       if (typeof payload.sortOrder === "string") {
         payload.sortOrder = parseInt(payload.sortOrder, 10) || 0;
       }
-      upsertFood(locationId, editingFoodId, payload);
-      const refreshed = getAdminLocation(locationId);
+      await upsertFood(token, locationId, editingFoodId, payload);
+      const refreshed = await getAdminLocation(token, locationId);
       if (refreshed) syncLocationState(refreshed);
       setFoodForm(createEmptyFoodForm());
       setEditingFoodId(null);
@@ -384,8 +389,9 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
     setSuccessMessage("");
 
     try {
-      deleteFood(locationId, id);
-      const refreshed = getAdminLocation(locationId);
+      if (!token) throw new Error("Admin authentication required.");
+      await deleteFood(token, locationId, id);
+      const refreshed = await getAdminLocation(token, locationId);
       if (refreshed) syncLocationState(refreshed);
       if (editingFoodId === id) {
         handleCancelEditFood();

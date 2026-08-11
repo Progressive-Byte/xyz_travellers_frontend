@@ -7,11 +7,11 @@ import { useAuth } from "@/context/AuthContext";
 import {
   deleteAdminLocation,
   getAdminLocations,
-  subscribe,
+  subscribeLocations,
   upsertAdminLocation,
   type AdminLocationSummary,
   type UpsertAdminLocationPayload,
-} from "@/lib/locations-store";
+} from "@/lib/admin";
 
 const inputClassName =
   "w-full rounded-[20px] border border-border bg-card px-4 py-3 text-[14px] text-text-primary shadow-soft outline-none transition-all duration-200 placeholder:text-text-secondary/70 focus:-translate-y-0.5 focus:border-text-primary/20 focus:shadow-medium";
@@ -50,9 +50,7 @@ export const AdminDestinationsPage: React.FC = () => {
   const { token } = useAuth();
   const [locations, setLocations] = useState<AdminLocationSummary[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [formValues, setFormValues] = useState<UpsertAdminLocationPayload>(
-    createEmptyForm(getAdminLocations().length + 1),
-  );
+  const [formValues, setFormValues] = useState<UpsertAdminLocationPayload>(createEmptyForm(1));
   const [errors, setErrors] = useState<FormErrors>({});
   const [pageError, setPageError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -61,12 +59,12 @@ export const AdminDestinationsPage: React.FC = () => {
   const [deletingLocationId, setDeletingLocationId] = useState("");
 
   const loadLocations = async () => {
+    if (!token) return;
     setIsLoading(true);
     setPageError("");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const data = getAdminLocations();
+      const data = await getAdminLocations(token);
       setLocations(data);
     } catch (error) {
       setPageError("Unable to load quick locations.");
@@ -78,7 +76,7 @@ export const AdminDestinationsPage: React.FC = () => {
   useEffect(() => {
     void loadLocations();
 
-    const unsubscribe = subscribe(() => {
+    const unsubscribe = subscribeLocations(() => {
       void loadLocations();
     });
 
@@ -144,10 +142,10 @@ export const AdminDestinationsPage: React.FC = () => {
     setSuccessMessage("");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const created = upsertAdminLocation(null, formValues);
+      if (!token) throw new Error("Admin authentication required.");
+      await upsertAdminLocation(token, null, formValues);
 
-      const updated = getAdminLocations();
+      const updated = await getAdminLocations(token);
       setLocations(updated);
       setFormValues(createEmptyForm(updated.length + 1));
       setSuccessMessage("Quick location created successfully.");
@@ -168,9 +166,9 @@ export const AdminDestinationsPage: React.FC = () => {
     setSuccessMessage("");
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      deleteAdminLocation(locationId);
-      const updated = getAdminLocations();
+      if (!token) throw new Error("Admin authentication required.");
+      await deleteAdminLocation(token, locationId);
+      const updated = await getAdminLocations(token);
       setLocations(updated);
       setSuccessMessage("Quick location deleted successfully.");
     } catch (error) {
