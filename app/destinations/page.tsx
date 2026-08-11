@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
@@ -22,48 +21,27 @@ const DestinationsGridCard: React.FC<{
   name: string;
   slug: string;
   locationLabel: string;
-  heroImageUrl: string | null;
-}> = ({ rank, name, slug, locationLabel, heroImageUrl }) => {
+}> = ({ rank, name, slug, locationLabel }) => {
   return (
     <li>
       <Link
         href={buildFrontDestinationHref(slug)}
-        className="surface-card-strong group relative flex h-full min-h-[260px] flex-col overflow-hidden rounded-[26px] border border-border p-0 shadow-soft transition-all duration-200 hover:-translate-y-1 hover:shadow-medium"
+        className="surface-card-strong group relative flex h-full min-h-[180px] flex-col overflow-hidden rounded-[26px] border border-border shadow-soft transition-all duration-200 hover:-translate-y-1 hover:shadow-medium"
         aria-label={`Explore ${name} destination guide`}
       >
-        <div className="relative min-h-[180px] w-full overflow-hidden bg-surface">
-          {heroImageUrl ? (
-            <Image
-              src={heroImageUrl}
-              alt={name}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-primary-light/70 text-text-primary">
-              <svg className="h-12 w-12 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-                <path d="M12 21s-6-4.35-6-10a6 6 0 1112 0c0 5.65-6 10-6 10z" />
-                <circle cx="12" cy="11" r="2.5" />
-              </svg>
-            </div>
-          )}
-
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/0" />
-
-          <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-text-primary shadow-soft backdrop-blur-md">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            #{rank}
-          </span>
-        </div>
-
         <div className="flex flex-1 flex-col justify-between gap-4 p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-                Destination
-              </p>
-              <h3 className="mt-2 font-sora text-[20px] font-bold leading-tight tracking-[-0.03em] text-text-primary">
+              <div className="flex items-center gap-3">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                  Destination
+                </p>
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary-light px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-text-primary">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  #{rank}
+                </span>
+              </div>
+              <h3 className="mt-3 font-sora text-[20px] font-bold leading-tight tracking-[-0.03em] text-text-primary">
                 {name || "Destination"}
               </h3>
               {locationLabel ? (
@@ -253,7 +231,6 @@ export default async function DestinationsIndexPage({ searchParams }: Destinatio
                       name={pill.name}
                       slug={pill.slug}
                       locationLabel={locationLabel}
-                      heroImageUrl={pill.heroImageUrl}
                     />
                   );
                 })}

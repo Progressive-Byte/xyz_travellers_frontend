@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
@@ -188,21 +187,6 @@ const DestinationHero: React.FC<{
                     {page.foodSection.pagination.total}
                   </p>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative z-0 mt-2 h-[200px] overflow-hidden rounded-[24px] border border-border bg-gradient-to-br from-primary/10 via-surface to-primary-light/40 md:h-[280px] lg:h-[320px]">
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-5 pb-5 text-white">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/80">
-                  Destination guide
-                </p>
-                <p className="mt-2 text-[18px] font-semibold md:text-[22px]">
-                  Stay, move, and eat — everything in one curated page.
-                </p>
               </div>
             </div>
           </div>
