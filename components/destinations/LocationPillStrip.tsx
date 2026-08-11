@@ -10,32 +10,6 @@ import {
 } from "@/lib/front";
 import { subscribe as subscribeDestinations } from "@/lib/locations-store";
 
-type ScrollButtonProps = {
-  direction: "left" | "right";
-  onClick: () => void;
-  disabled?: boolean;
-};
-
-const ScrollButton: React.FC<ScrollButtonProps> = ({ direction, onClick, disabled = false }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={disabled}
-    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-soft"
-    aria-label={`Scroll ${direction}`}
-  >
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
-      <path
-        d={direction === "left" ? "M15 18l-6-6 6-6" : "M9 6l6 6-6 6"}
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  </button>
-);
-
 export const LocationPillStrip: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const pathname = usePathname();
@@ -143,62 +117,85 @@ export const LocationPillStrip: React.FC = () => {
   const pillCount = Math.max(6, pills.length);
 
   return (
-    <div className="mb-5 w-full">
+    <div className="mb-4 w-full md:mb-6">
+      <div className="mb-3 flex items-end justify-between gap-3 md:mb-4">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-text-secondary">
+            Quick locations
+          </p>
+          <p className="mt-1.5 text-[13px] leading-5 text-text-secondary/90">
+            Jump straight to a popular destination.
+          </p>
+        </div>
+      </div>
+
       <div className="relative">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background via-background/95 to-transparent md:w-16" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background via-background/95 to-transparent md:w-16" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-background via-background/95 to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-background via-background/95 to-transparent" />
 
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 md:gap-3">
-            <ScrollButton
-              direction="left"
-              onClick={() => scroll("left")}
-              disabled={!canScrollLeft}
-            />
-            <div
-              ref={scrollRef}
-              className="scrollbar-hide flex max-w-[calc(100%-88px)] items-center gap-2 overflow-x-auto scroll-smooth pb-1 md:max-w-[calc(100%-104px)]"
-              role="list"
-              aria-label="Destination shortcuts"
-            >
-              {isLoading
-                ? Array.from({ length: pillCount }).map((_, index) => (
-                    <div
-                      key={`pill-skeleton-${index}`}
+        <div className="relative flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => scroll("left")}
+            disabled={!canScrollLeft}
+            className="relative z-30 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-soft"
+            aria-label="Scroll left"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+
+          <div
+            ref={scrollRef}
+            className="scrollbar-hide flex min-w-0 flex-1 items-center gap-3 overflow-x-auto scroll-smooth px-1 py-1"
+            role="list"
+            aria-label="Destination shortcuts"
+          >
+            {isLoading
+              ? Array.from({ length: pillCount }).map((_, index) => (
+                  <div
+                    key={`pill-skeleton-${index}`}
+                    role="listitem"
+                    className="h-11 w-28 shrink-0 animate-pulse rounded-full bg-surface-muted/90 md:h-12 md:w-32"
+                    aria-hidden
+                  />
+                ))
+              : pills.map((pill) => {
+                  const isActive = pill.slug && pill.slug === activeSlug;
+
+                  return (
+                    <Link
+                      key={pill.id || pill.slug}
+                      href={pill.href}
                       role="listitem"
-                      className="h-10 w-28 shrink-0 animate-pulse rounded-full bg-surface-muted/90 md:h-11 md:w-32"
-                      aria-hidden
-                    />
-                  ))
-                : pills.map((pill) => {
-                    const isActive = pill.slug && pill.slug === activeSlug;
-
-                    return (
-                      <Link
-                        key={pill.id || pill.slug}
-                        href={pill.href}
-                        role="listitem"
-                        aria-current={isActive ? "page" : undefined}
-                        aria-label={`Explore ${pill.name}`}
-                        className={`group inline-flex shrink-0 items-center rounded-full border px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.18em] transition-all duration-200 hover:-translate-y-0.5 ${
-                          isActive
-                            ? "border-primary bg-primary text-text-primary shadow-glow"
-                            : "border-border bg-card text-text-primary shadow-soft hover:border-primary hover:shadow-medium"
-                        }`}
-                      >
-                        <span className="truncate max-w-[180px] md:max-w-[220px]">
-                          {pill.name}
-                        </span>
-                      </Link>
-                    );
-                  })}
-            </div>
-            <ScrollButton
-              direction="right"
-              onClick={() => scroll("right")}
-              disabled={!canScrollRight}
-            />
+                      aria-current={isActive ? "page" : undefined}
+                      aria-label={`Explore ${pill.name}`}
+                      className={`group inline-flex shrink-0 items-center rounded-full border px-5 py-2.5 text-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 ${
+                        isActive
+                          ? "border-primary bg-primary text-text-primary shadow-glow"
+                          : "border-border bg-card text-text-primary shadow-soft hover:border-primary/50 hover:shadow-medium"
+                      }`}
+                    >
+                      <span className="whitespace-nowrap max-w-[240px]">
+                        {pill.name}
+                      </span>
+                    </Link>
+                  );
+                })}
           </div>
+
+          <button
+            type="button"
+            onClick={() => scroll("right")}
+            disabled={!canScrollRight}
+            className="relative z-30 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-soft"
+            aria-label="Scroll right"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
