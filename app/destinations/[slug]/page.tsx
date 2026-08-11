@@ -207,7 +207,9 @@ export default async function DestinationPage({ params, searchParams }: Destinat
     page = await getFrontDestinationPage(slug, {
       listingsPage,
       transportPage,
+      transportLimit: 6,
       foodPage,
+      foodLimit: 6,
     });
   } catch (error) {
     if (error instanceof ApiError && [404, 400].includes(error.status)) {
@@ -246,7 +248,7 @@ export default async function DestinationPage({ params, searchParams }: Destinat
         heroImage: null,
         heroImageUrl: null,
         items: [],
-        pagination: { page: transportPage, pageSize: 5, total: 0, totalPages: 1 },
+        pagination: { page: transportPage, pageSize: 6, total: 0, totalPages: 1 },
       },
       foodSection: {
         title: "Food & Restaurant",
@@ -254,7 +256,7 @@ export default async function DestinationPage({ params, searchParams }: Destinat
         heroImage: null,
         heroImageUrl: null,
         items: [],
-        pagination: { page: foodPage, pageSize: 5, total: 0, totalPages: 1 },
+        pagination: { page: foodPage, pageSize: 6, total: 0, totalPages: 1 },
       },
     };
   }
