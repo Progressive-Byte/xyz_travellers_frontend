@@ -104,17 +104,14 @@ const DestinationHero: React.FC<{
           <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="min-w-0">
               <Link
-                href={buildFrontDestinationHref(
-                  location.slug,
-                  { listingsPage, transportPage, foodPage },
-                )}
+                href="/"
                 className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary transition-colors duration-200 hover:text-primary"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M19 12H5" strokeLinecap="round" />
                   <path d="M12 5l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                All destinations
+                Back to home
               </Link>
 
               <div className="mt-5 flex flex-wrap items-center gap-3">
