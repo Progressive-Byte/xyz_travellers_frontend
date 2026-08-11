@@ -201,6 +201,35 @@ textarea {
   display: none;
 }
 
+@keyframes pill-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.pill-marquee-track {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: pill-marquee 60s linear infinite;
+  will-change: transform;
+}
+
+.pill-marquee-wrap:hover .pill-marquee-track,
+.pill-marquee-wrap:focus-within .pill-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-marquee-track {
+    animation-duration: 180s;
+  }
+}
+
 /* Custom react-datepicker styles */
 .react-datepicker {
   font-family: var(--font-instrument-sans), sans-serif;
