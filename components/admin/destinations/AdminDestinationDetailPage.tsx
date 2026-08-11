@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { AdminShell } from "@/components/admin/AdminShell";
 import {
   deleteAdminLocation,
   deleteFood,
@@ -421,23 +422,35 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link
-            href="/admin/locations"
-            className="inline-flex items-center justify-center rounded-[14px] border border-border bg-white px-3 py-2 text-[12px] font-semibold text-text-primary shadow-soft"
-          >
-            Back
-          </Link>
-        </div>
-
-        <div className="surface-card rounded-[28px] p-5 sm:p-6">
-          <div className="flex flex-col gap-3">
-            <h1 className="font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-              {isLoading ? "Loading quick location..." : location ? location.name : "Quick Location Detail"}
-            </h1>
-            {location && !isLoading ? (
+    <AdminShell
+      badge="Admin Operations"
+      title={isLoading ? "Loading quick location..." : location ? location.name : "Quick Location Detail"}
+      subtitle="Manage the destination information, transport services, and local food spots."
+      topbarAction={
+        <Link
+          href="/admin/locations"
+          className="inline-flex items-center justify-center rounded-[16px] border border-border bg-white px-3 py-2 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+        >
+          Back to quick locations
+        </Link>
+      }
+    >
+      <div className="space-y-6">
+        {location && !isLoading ? (
+          <section className="surface-card rounded-[28px] p-5 sm:p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                  Quick location
+                </p>
+                <h1 className="mt-2 font-sora text-[30px] font-bold tracking-[-0.05em] text-text-primary">
+                  {location.name}
+                </h1>
+                <p className="mt-2 text-[14px] leading-6 text-text-secondary">
+                  {location.city}
+                  {location.country ? `, ${location.country}` : ""}
+                </p>
+              </div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center rounded-full border border-border-light bg-surface px-3 py-1 text-[12px] font-semibold text-text-secondary">
                   {location.city}
@@ -446,11 +459,11 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
                   {location.country}
                 </span>
               </div>
-            ) : null}
-          </div>
-        </div>
+            </div>
+          </section>
+        ) : null}
 
-        <div className="surface-card rounded-[24px] px-4 py-3 sm:px-5">
+        <section className="surface-card rounded-[28px] p-5 sm:p-6">
           <div className="flex flex-wrap gap-2">
             {tabDefinitions.map((tab) => {
               const isActive = activeTab === tab.value;
@@ -470,71 +483,70 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
               );
             })}
           </div>
-        </div>
-      </div>
+        </section>
 
-      {pageError ? (
-        <div className="rounded-[22px] border border-red-200 bg-red-50/80 px-4 py-4 text-[14px] leading-6 text-red-700">
-          {pageError}
-        </div>
-      ) : null}
+        {pageError ? (
+          <div className="rounded-[22px] border border-red-200 bg-red-50/80 px-4 py-4 text-[14px] leading-6 text-red-700">
+            {pageError}
+          </div>
+        ) : null}
 
-      {successMessage ? (
-        <div className="rounded-[22px] border border-primary/35 bg-primary-light/80 px-4 py-4 text-[14px] leading-6 text-text-primary">
-          {successMessage}
-        </div>
-      ) : null}
+        {successMessage ? (
+          <div className="rounded-[22px] border border-primary/35 bg-primary-light/80 px-4 py-4 text-[14px] leading-6 text-text-primary">
+            {successMessage}
+          </div>
+        ) : null}
 
-      {isLoading ? (
-        <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-          <div className="surface-card rounded-[28px] p-5 sm:p-6">
-            <SkeletonRow className="mb-4 h-4 w-32" />
-            <SkeletonRow className="mb-6 h-8 w-56" />
-            <div className="space-y-4">
-              <SkeletonRow className="h-[52px]" />
-              <SkeletonRow className="h-[52px]" />
-              <SkeletonRow className="h-[52px]" />
-              <SkeletonRow className="h-[120px]" />
-              <SkeletonRow className="h-[52px]" />
-              <SkeletonRow className="h-[52px]" />
+        {isLoading ? (
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_360px]">
+            <div className="surface-card rounded-[28px] p-5 sm:p-6">
+              <SkeletonRow className="mb-4 h-4 w-32" />
+              <SkeletonRow className="mb-6 h-8 w-56" />
+              <div className="space-y-4">
+                <SkeletonRow className="h-[52px]" />
+                <SkeletonRow className="h-[52px]" />
+                <SkeletonRow className="h-[52px]" />
+                <SkeletonRow className="h-[120px]" />
+                <SkeletonRow className="h-[52px]" />
+                <SkeletonRow className="h-[52px]" />
+              </div>
+            </div>
+            <div className="space-y-6">
+              <SkeletonRow className="h-[240px] rounded-[28px]" />
+              <SkeletonRow className="h-[180px] rounded-[28px]" />
             </div>
           </div>
-          <div className="space-y-4">
-            <SkeletonRow className="h-[240px] rounded-[28px]" />
-            <SkeletonRow className="h-[180px] rounded-[28px]" />
+        ) : !location ? (
+          <div className="surface-card rounded-[28px] p-8 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
+              Not Found
+            </p>
+            <h2 className="mt-4 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
+              Destination not found
+            </h2>
+            <p className="mt-3 text-[14px] leading-6 text-text-secondary">
+              The quick location you are looking for may have been removed or does not exist.
+            </p>
+            <div className="mt-6">
+              <Link
+                href="/admin/locations"
+                className="inline-flex items-center justify-center rounded-[14px] border border-border bg-white px-4 py-2 text-[13px] font-semibold text-text-primary shadow-soft"
+              >
+                Back
+              </Link>
+            </div>
           </div>
-        </div>
-      ) : !location ? (
-        <div className="surface-card rounded-[28px] p-8 text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
-            Not Found
-          </p>
-          <h2 className="mt-4 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-            Destination not found
-          </h2>
-          <p className="mt-3 text-[14px] leading-6 text-text-secondary">
-            The quick location you are looking for may have been removed or does not exist.
-          </p>
-          <div className="mt-6">
-            <Link
-              href="/admin/locations"
-              className="inline-flex items-center justify-center rounded-[14px] border border-border bg-white px-4 py-2 text-[13px] font-semibold text-text-primary shadow-soft"
-            >
-              Back
-            </Link>
-          </div>
-        </div>
-      ) : (
-        <>
-          {activeTab === "info" ? (
-            <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-              <section className="surface-card rounded-[28px] p-5 sm:p-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
-                  Quick location details
-                </p>
-                <h2 className="mt-4 font-sora text-[26px] font-bold tracking-[-0.04em] text-text-primary">
-                  Edit information
-                </h2>
+        ) : (
+          <>
+            {activeTab === "info" ? (
+              <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_360px]">
+                <section className="surface-card rounded-[28px] p-5 sm:p-6">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
+                    Quick location details
+                  </p>
+                  <h2 className="mt-4 font-sora text-[26px] font-bold tracking-[-0.04em] text-text-primary">
+                    Edit information
+                  </h2>
 
                 <form className="mt-6 space-y-4" onSubmit={handleSaveLocation}>
                   <label className="block">
@@ -707,7 +719,7 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
                 </form>
               </section>
 
-              <section className="space-y-4">
+              <section className="space-y-6">
                 <div className="surface-card rounded-[28px] p-5 sm:p-6">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
                     Public Link
@@ -788,7 +800,7 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
           ) : null}
 
           {activeTab === "transport" ? (
-            <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
               <section className="surface-card rounded-[28px] p-5 sm:p-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
                   {editingTransportId ? "Edit transport" : "Add transport"}
@@ -1008,7 +1020,7 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
           ) : null}
 
           {activeTab === "food" ? (
-            <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
               <section className="surface-card rounded-[28px] p-5 sm:p-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-text-secondary">
                   {editingFoodId ? "Edit food spot" : "Add food spot"}
@@ -1255,6 +1267,7 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
           ) : null}
         </>
       )}
-    </div>
+      </div>
+    </AdminShell>
   );
 };
