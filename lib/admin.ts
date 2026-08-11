@@ -1235,7 +1235,6 @@ export type AdminTransportItem = {
   companyName: string;
   contactNumber: string;
   description: string;
-  heroImage: string | null;
   sortOrder: number;
   isActive: boolean;
   createdAt?: string;
@@ -1248,7 +1247,6 @@ export type AdminFoodItem = {
   phoneNumber: string;
   location: string;
   description: string;
-  heroImage: string | null;
   sortOrder: number;
   isActive: boolean;
   createdAt?: string;
@@ -1281,7 +1279,6 @@ export type UpsertAdminTransportPayload = {
   companyName?: string;
   contactNumber?: string;
   description?: string;
-  heroImage?: string | null;
   sortOrder?: number;
   isActive?: boolean;
 };
@@ -1291,7 +1288,6 @@ export type UpsertAdminFoodPayload = {
   phoneNumber?: string;
   location?: string;
   description?: string;
-  heroImage?: string | null;
   sortOrder?: number;
   isActive?: boolean;
 };
@@ -1339,7 +1335,6 @@ const normalizeAdminTransportItem = (payload: unknown): AdminTransportItem => {
     companyName: asString(s.companyName ?? s.company_name),
     contactNumber: asString(s.contactNumber ?? s.contact_number),
     description: asString(s.description),
-    heroImage: asOptionalString(s.heroImage),
     sortOrder: asNumber(s.sortOrder) ?? 0,
     isActive: asBoolean(s.isActive ?? true),
     createdAt: asOptionalString(s.createdAt ?? s.created_at) ?? undefined,
@@ -1355,7 +1350,6 @@ const normalizeAdminFoodItem = (payload: unknown): AdminFoodItem => {
     phoneNumber: asString(s.phoneNumber ?? s.phone_number),
     location: asString(s.location),
     description: asString(s.description),
-    heroImage: asOptionalString(s.heroImage),
     sortOrder: asNumber(s.sortOrder) ?? 0,
     isActive: asBoolean(s.isActive ?? true),
     createdAt: asOptionalString(s.createdAt ?? s.created_at) ?? undefined,
@@ -1435,7 +1429,8 @@ export async function upsertTransport(
   id: string | null | undefined,
   payload: UpsertAdminTransportPayload,
 ): Promise<AdminTransportItem> {
-  const body: Record<string, unknown> = { ...payload };
+  const { heroImage, ...rest } = payload as unknown as Record<string, unknown>;
+  const body: Record<string, unknown> = { ...rest };
   const raw = id
     ? await apiRequest<unknown>(`/api/v1/admin/locations/${locationId}/transport/${id}`, {
         method: "PATCH",
@@ -1470,7 +1465,8 @@ export async function upsertFood(
   id: string | null | undefined,
   payload: UpsertAdminFoodPayload,
 ): Promise<AdminFoodItem> {
-  const body: Record<string, unknown> = { ...payload };
+  const { heroImage, ...rest } = payload as unknown as Record<string, unknown>;
+  const body: Record<string, unknown> = { ...rest };
   const raw = id
     ? await apiRequest<unknown>(`/api/v1/admin/locations/${locationId}/food/${id}`, {
         method: "PATCH",

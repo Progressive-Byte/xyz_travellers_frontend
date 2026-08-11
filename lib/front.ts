@@ -667,8 +667,6 @@ export type FrontTransportItem = {
   companyName: string;
   contactNumber: string;
   description: string;
-  heroImage: string | null;
-  heroImageUrl: string | null;
 };
 
 export type FrontFoodItem = {
@@ -677,8 +675,6 @@ export type FrontFoodItem = {
   phoneNumber: string;
   location: string;
   description: string;
-  heroImage: string | null;
-  heroImageUrl: string | null;
 };
 
 export type FrontDestinationStaticSection<TItem> = {
@@ -776,21 +772,17 @@ const normalizeFrontDestinationListingsSection = (
 
 const normalizeFrontTransportItem = (payload: unknown): FrontTransportItem => {
   const source = asRecord(payload);
-  const heroImage = asOptionalString(source.heroImage);
 
   return {
     id: asString(source.id),
     companyName: asString(source.companyName) || "Transport service",
     contactNumber: asString(source.contactNumber),
     description: asString(source.description),
-    heroImage,
-    heroImageUrl: heroImage ? resolveEmbeddableApiUrl(heroImage) : null,
   };
 };
 
 const normalizeFrontFoodItem = (payload: unknown): FrontFoodItem => {
   const source = asRecord(payload);
-  const heroImage = asOptionalString(source.heroImage);
 
   return {
     id: asString(source.id),
@@ -798,8 +790,6 @@ const normalizeFrontFoodItem = (payload: unknown): FrontFoodItem => {
     phoneNumber: asString(source.phoneNumber),
     location: asString(source.location),
     description: asString(source.description),
-    heroImage,
-    heroImageUrl: heroImage ? resolveEmbeddableApiUrl(heroImage) : null,
   };
 };
 

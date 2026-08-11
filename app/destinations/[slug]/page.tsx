@@ -286,39 +286,27 @@ export default async function DestinationPage({ params, searchParams }: Destinat
           <DestinationListingsSection
             section={page.listingsSection}
             location={page.location}
-            listingsHrefBuilder={(nextListingsPage) =>
-              buildFrontDestinationHref(page.location.slug || slug, {
-                listingsPage: nextListingsPage,
-                transportPage,
-                foodPage,
-              })
-            }
+            slug={page.location.slug || slug}
+            transportPage={transportPage}
+            foodPage={foodPage}
           />
         </div>
 
         <div id="transport">
           <DestinationTransportSection
             section={page.transportSection}
-            paginationHrefBuilder={(nextTransportPage) =>
-              buildFrontDestinationHref(page.location.slug || slug, {
-                listingsPage,
-                transportPage: nextTransportPage,
-                foodPage,
-              })
-            }
+            slug={page.location.slug || slug}
+            listingsPage={listingsPage}
+            foodPage={foodPage}
           />
         </div>
 
         <div id="food">
           <DestinationFoodSection
             section={page.foodSection}
-            paginationHrefBuilder={(nextFoodPage) =>
-              buildFrontDestinationHref(page.location.slug || slug, {
-                listingsPage,
-                transportPage,
-                foodPage: nextFoodPage,
-              })
-            }
+            slug={page.location.slug || slug}
+            listingsPage={listingsPage}
+            transportPage={transportPage}
           />
         </div>
       </main>
