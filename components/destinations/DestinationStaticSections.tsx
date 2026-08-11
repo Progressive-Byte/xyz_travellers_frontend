@@ -451,9 +451,11 @@ const DestinationStaticSectionInner = <TItem,>({
               {items.map((item: TItem, index: number) => (
                 <li
                   key={(item as { id?: string }).id || `${sectionLabel}-${index}`}
-                  className="flex"
+                  className="flex justify-center"
                 >
-                  {renderCard(item, index)}
+                  <div className="w-full max-w-[460px]">
+                    {renderCard(item, index)}
+                  </div>
                 </li>
               ))}
             </ul>

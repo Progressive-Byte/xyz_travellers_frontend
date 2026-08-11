@@ -10,14 +10,44 @@ import {
 } from "@/lib/front";
 import { subscribe as subscribeDestinations } from "@/lib/locations-store";
 
+const PILL_AUTO_PX_PER_SECOND = 30;
+
 export const LocationPillStrip: React.FC = () => {
-  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const progressRef = useRef(0);
+  const lastFrameRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const pathname = usePathname();
   const [pills, setPills] = useState<FrontLocationPill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const isHoveredRef = useRef(false);
+  const isFocusedRef = useRef(false);
+  const isTouchingRef = useRef(false);
+  const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const applyTransform = () => {
+    const track = trackRef.current;
+    if (!track) return;
+    const halfWidth = track.scrollWidth / 2;
+    if (!halfWidth) {
+      track.style.transform = "translateX(0)";
+      return;
+    }
+    let offset = progressRef.current % halfWidth;
+    if (offset > 0) offset -= halfWidth;
+    track.style.transform = `translateX(${offset}px)`;
+  };
+
+  const recomputePause = () => {
+    const shouldPause =
+      isHoveredRef.current || isFocusedRef.current || isTouchingRef.current;
+    setIsPaused(shouldPause);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -70,41 +100,37 @@ export const LocationPillStrip: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const element = scrollRef.current;
-    if (!element) {
-      return;
-    }
+    const tick = (now: number) => {
+      if (lastFrameRef.current == null) lastFrameRef.current = now;
+      const dtMs = now - lastFrameRef.current;
+      lastFrameRef.current = now;
 
-    const update = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = element;
-      setCanScrollLeft(scrollLeft > 4);
-      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 4);
+      if (!isPaused) {
+        const dtSec = dtMs / 1000;
+        progressRef.current = progressRef.current - PILL_AUTO_PX_PER_SECOND * dtSec;
+      }
+
+      applyTransform();
+      rafRef.current = requestAnimationFrame(tick);
     };
 
-    update();
-    element.addEventListener("scroll", update, { passive: true });
-    const ro = new ResizeObserver(update);
-    ro.observe(element);
-    window.addEventListener("resize", update);
+    rafRef.current = requestAnimationFrame(tick);
 
     return () => {
-      element.removeEventListener("scroll", update);
-      ro.disconnect();
-      window.removeEventListener("resize", update);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      lastFrameRef.current = null;
     };
-  }, [pills.length]);
+  }, [isPaused, pills.length]);
 
-  const scroll = (direction: "left" | "right") => {
-    const element = scrollRef.current;
-    if (!element) {
-      return;
-    }
-    const amount = Math.max(280, Math.round(element.clientWidth * 0.7));
-    element.scrollBy({
-      left: direction === "left" ? -amount : amount,
-      behavior: "smooth",
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const ro = new ResizeObserver(() => {
+      applyTransform();
     });
-  };
+    if (trackRef.current) ro.observe(trackRef.current);
+    return () => ro.disconnect();
+  }, [pills.length, isLoading]);
 
   const activeSlug = pathname?.startsWith("/destinations/")
     ? pathname.split("/destinations/")[1]?.split("?")[0] ?? ""
@@ -115,6 +141,27 @@ export const LocationPillStrip: React.FC = () => {
   }
 
   const pillCount = Math.max(6, pills.length);
+
+  const step = (direction: "left" | "right") => {
+    const wrap = wrapRef.current;
+    const amount = wrap ? Math.max(280, Math.round(wrap.clientWidth * 0.7)) : 320;
+    const track = trackRef.current;
+    if (track) {
+      track.style.transition =
+        "transform 420ms cubic-bezier(0.22, 1, 0.36, 1)";
+      if (transitionTimerRef.current) {
+        clearTimeout(transitionTimerRef.current);
+      }
+      transitionTimerRef.current = setTimeout(() => {
+        if (trackRef.current) {
+          trackRef.current.style.transition = "";
+        }
+        transitionTimerRef.current = null;
+      }, 520);
+    }
+    progressRef.current = progressRef.current + (direction === "left" ? amount : -amount);
+    applyTransform();
+  };
 
   return (
     <div className="mb-4 w-full md:mb-6">
@@ -136,10 +183,9 @@ export const LocationPillStrip: React.FC = () => {
         <div className="relative flex items-center gap-2">
           <button
             type="button"
-            onClick={() => scroll("left")}
-            disabled={!canScrollLeft}
-            className="relative z-30 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-soft"
-            aria-label="Scroll left"
+            onClick={() => step("left")}
+            className="relative z-30 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface hover:shadow-medium"
+            aria-label="Scroll quick locations left"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
               <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -147,30 +193,83 @@ export const LocationPillStrip: React.FC = () => {
           </button>
 
           <div
-            ref={scrollRef}
-            className="scrollbar-hide flex min-w-0 flex-1 items-center gap-3 overflow-x-auto scroll-smooth px-1 py-1"
-            role="list"
-            aria-label="Destination shortcuts"
+            ref={wrapRef}
+            className="relative min-w-0 flex-1 overflow-hidden"
+            onMouseEnter={() => {
+              isHoveredRef.current = true;
+              recomputePause();
+            }}
+            onMouseLeave={() => {
+              isHoveredRef.current = false;
+              recomputePause();
+            }}
+            onFocus={() => {
+              isFocusedRef.current = true;
+              recomputePause();
+            }}
+            onBlur={() => {
+              isFocusedRef.current = false;
+              recomputePause();
+            }}
+            onTouchStart={() => {
+              isTouchingRef.current = true;
+              recomputePause();
+            }}
+            onTouchEnd={() => {
+              isTouchingRef.current = false;
+              if (resumeTimerRef.current) {
+                clearTimeout(resumeTimerRef.current);
+              }
+              resumeTimerRef.current = setTimeout(() => {
+                resumeTimerRef.current = null;
+                recomputePause();
+              }, 2500);
+            }}
           >
-            {isLoading
-              ? Array.from({ length: pillCount }).map((_, index) => (
-                  <div
-                    key={`pill-skeleton-${index}`}
-                    role="listitem"
-                    className="h-11 w-28 shrink-0 animate-pulse rounded-full bg-surface-muted/90 md:h-12 md:w-32"
-                    aria-hidden
-                  />
-                ))
-              : pills.map((pill) => {
+            <div ref={trackRef} className="w-max flex items-center gap-3 py-1">
+              {isLoading
+                ? Array.from({ length: pillCount * 2 }).map((_, index) => (
+                    <div
+                      key={`pill-skeleton-${index}`}
+                      role="listitem"
+                      className="h-11 w-28 shrink-0 animate-pulse rounded-full bg-surface-muted/90 md:h-12 md:w-32"
+                      aria-hidden
+                    />
+                  ))
+                : pills.map((pill) => {
+                    const isActive = pill.slug && pill.slug === activeSlug;
+
+                    return (
+                      <Link
+                        key={`first-${pill.id || pill.slug}`}
+                        href={pill.href}
+                        role="listitem"
+                        aria-current={isActive ? "page" : undefined}
+                        aria-label={`Explore ${pill.name}`}
+                        className={`group inline-flex shrink-0 items-center rounded-full border px-5 py-2.5 text-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 ${
+                          isActive
+                            ? "border-primary bg-primary text-text-primary shadow-glow"
+                            : "border-border bg-card text-text-primary shadow-soft hover:border-primary/50 hover:shadow-medium"
+                        }`}
+                      >
+                        <span className="whitespace-nowrap max-w-[240px]">
+                          {pill.name}
+                        </span>
+                      </Link>
+                    );
+                  })}
+              {!isLoading &&
+                pills.map((pill) => {
                   const isActive = pill.slug && pill.slug === activeSlug;
 
                   return (
                     <Link
-                      key={pill.id || pill.slug}
+                      key={`dupe-${pill.id || pill.slug}`}
                       href={pill.href}
                       role="listitem"
+                      aria-hidden="true"
+                      tabIndex={-1}
                       aria-current={isActive ? "page" : undefined}
-                      aria-label={`Explore ${pill.name}`}
                       className={`group inline-flex shrink-0 items-center rounded-full border px-5 py-2.5 text-[13px] font-semibold transition-all duration-200 hover:-translate-y-0.5 ${
                         isActive
                           ? "border-primary bg-primary text-text-primary shadow-glow"
@@ -183,14 +282,14 @@ export const LocationPillStrip: React.FC = () => {
                     </Link>
                   );
                 })}
+            </div>
           </div>
 
           <button
             type="button"
-            onClick={() => scroll("right")}
-            disabled={!canScrollRight}
-            className="relative z-30 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-soft"
-            aria-label="Scroll right"
+            onClick={() => step("right")}
+            className="relative z-30 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface hover:shadow-medium"
+            aria-label="Scroll quick locations right"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
               <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

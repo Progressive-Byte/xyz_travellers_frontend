@@ -861,7 +861,9 @@ type FrontDestinationQuery = {
   listingsPage?: number;
   listingsLimit?: number;
   transportPage?: number;
+  transportLimit?: number;
   foodPage?: number;
+  foodLimit?: number;
 };
 
 export async function getFrontDestinationPage(
@@ -875,7 +877,9 @@ export async function getFrontDestinationPage(
       listingsPage: query.listingsPage ?? undefined,
       listingsLimit: query.listingsLimit ?? undefined,
       transportPage: query.transportPage ?? undefined,
+      transportLimit: query.transportLimit ?? undefined,
       foodPage: query.foodPage ?? undefined,
+      foodLimit: query.foodLimit ?? undefined,
     })}`,
     {
       method: "GET",
