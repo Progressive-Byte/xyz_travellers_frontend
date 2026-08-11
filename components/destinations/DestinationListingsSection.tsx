@@ -1,15 +1,20 @@
+"use client";
+
 import React from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ListingCard } from "@/components/ui/ListingCard";
-import type {
-  FrontDestinationListingsSection,
-  FrontDestinationLocation,
+import {
+  buildFrontDestinationHref,
+  type FrontDestinationListingsSection,
+  type FrontDestinationLocation,
 } from "@/lib/front";
 
 type DestinationListingsSectionProps = {
   section: FrontDestinationListingsSection;
   location: FrontDestinationLocation;
-  listingsHrefBuilder: (page: number) => string;
+  slug: string;
+  transportPage: number;
+  foodPage: number;
 };
 
 const PageButton: React.FC<{
@@ -20,7 +25,8 @@ const PageButton: React.FC<{
   isActive?: boolean;
   disabled?: boolean;
   direction?: "prev" | "next";
-}> = ({ page, label, ariaLabel, href, isActive = false, disabled = false, direction }) => {
+  onClick?: (e: React.MouseEvent) => void;
+}> = ({ page, label, ariaLabel, href, isActive = false, disabled = false, direction, onClick }) => {
   const content =
     direction === "prev" ? (
       "‹"
@@ -49,14 +55,15 @@ const PageButton: React.FC<{
 
   if (href) {
     return (
-      <Link
+      <a
         href={href}
+        onClick={onClick}
         aria-label={ariaLabel}
         aria-current={isActive ? "page" : undefined}
         className={`${baseClassName} ${variantClass}`}
       >
         {content}
-      </Link>
+      </a>
     );
   }
 
@@ -68,6 +75,7 @@ const Pagination: React.FC<{
   totalPages: number;
   hrefBuilder: (page: number) => string;
 }> = ({ currentPage, totalPages, hrefBuilder }) => {
+  const router = useRouter();
   if (totalPages <= 1) {
     return null;
   }
@@ -82,6 +90,13 @@ const Pagination: React.FC<{
     pageNumbers.push(p);
   }
 
+  const goToPage = (nextPage: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    const nextUrl = hrefBuilder(nextPage);
+    if (!nextUrl) return;
+    router.replace(nextUrl, { scroll: false });
+  };
+
   return (
     <nav aria-label="Listing pagination" className="mt-10 flex items-center justify-center gap-2">
       <PageButton
@@ -89,11 +104,17 @@ const Pagination: React.FC<{
         ariaLabel="Previous page of listings"
         href={currentPage > 1 ? hrefBuilder(currentPage - 1) : undefined}
         disabled={currentPage <= 1}
+        onClick={currentPage > 1 ? (e) => goToPage(currentPage - 1, e) : undefined}
       />
 
       {start > 1 ? (
         <>
-          <PageButton page={1} href={hrefBuilder(1)} ariaLabel="Go to page 1" />
+          <PageButton
+            page={1}
+            href={hrefBuilder(1)}
+            ariaLabel="Go to page 1"
+            onClick={(e) => goToPage(1, e)}
+          />
           {start > 2 ? (
             <span className="px-1 text-text-secondary" aria-hidden>…</span>
           ) : null}
@@ -107,6 +128,7 @@ const Pagination: React.FC<{
           href={hrefBuilder(page)}
           isActive={page === currentPage}
           ariaLabel={`Go to page ${page}`}
+          onClick={(e) => goToPage(page, e)}
         />
       ))}
 
@@ -115,7 +137,12 @@ const Pagination: React.FC<{
           {end < totalPages - 1 ? (
             <span className="px-1 text-text-secondary" aria-hidden>…</span>
           ) : null}
-          <PageButton page={totalPages} href={hrefBuilder(totalPages)} ariaLabel={`Go to page ${totalPages}`} />
+          <PageButton
+            page={totalPages}
+            href={hrefBuilder(totalPages)}
+            ariaLabel={`Go to page ${totalPages}`}
+            onClick={(e) => goToPage(totalPages, e)}
+          />
         </>
       ) : null}
 
@@ -124,6 +151,7 @@ const Pagination: React.FC<{
         ariaLabel="Next page of listings"
         href={currentPage < totalPages ? hrefBuilder(currentPage + 1) : undefined}
         disabled={currentPage >= totalPages}
+        onClick={currentPage < totalPages ? (e) => goToPage(currentPage + 1, e) : undefined}
       />
     </nav>
   );
@@ -132,7 +160,9 @@ const Pagination: React.FC<{
 export const DestinationListingsSection: React.FC<DestinationListingsSectionProps> = ({
   section,
   location,
-  listingsHrefBuilder,
+  slug,
+  transportPage,
+  foodPage,
 }) => {
   const { items, pagination } = section;
   const hasItems = items.length > 0;
@@ -141,6 +171,12 @@ export const DestinationListingsSection: React.FC<DestinationListingsSectionProp
     : "Stays in this destination";
   const title = section.title || fallbackTitle;
   const subtitle = section.subtitle || location.description || "";
+  const hrefBuilder = (nextListingsPage: number) =>
+    buildFrontDestinationHref(slug, {
+      listingsPage: nextListingsPage,
+      transportPage,
+      foodPage,
+    });
 
   return (
     <section className="section-shell bg-background py-10 md:py-14">
@@ -199,7 +235,7 @@ export const DestinationListingsSection: React.FC<DestinationListingsSectionProp
           <Pagination
             currentPage={pagination.page}
             totalPages={pagination.totalPages}
-            hrefBuilder={listingsHrefBuilder}
+            hrefBuilder={hrefBuilder}
           />
         </div>
       </div>

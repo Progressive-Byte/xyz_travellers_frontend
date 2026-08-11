@@ -64,7 +64,6 @@ function createEmptyTransportForm(): UpsertAdminTransportPayload {
     companyName: "",
     contactNumber: "",
     description: "",
-    heroImage: "",
     sortOrder: 0,
     isActive: true,
   };
@@ -76,7 +75,6 @@ function createEmptyFoodForm(): UpsertAdminFoodPayload {
     phoneNumber: "",
     location: "",
     description: "",
-    heroImage: "",
     sortOrder: 0,
     isActive: true,
   };
@@ -106,7 +104,6 @@ function mapTransportItemToForm(item: AdminTransportItem): UpsertAdminTransportP
     companyName: item.companyName,
     contactNumber: item.contactNumber,
     description: item.description,
-    heroImage: item.heroImage ?? "",
     sortOrder: item.sortOrder,
     isActive: item.isActive,
   };
@@ -118,7 +115,6 @@ function mapFoodItemToForm(item: AdminFoodItem): UpsertAdminFoodPayload {
     phoneNumber: item.phoneNumber,
     location: item.location,
     description: item.description,
-    heroImage: item.heroImage ?? "",
     sortOrder: item.sortOrder,
     isActive: item.isActive,
   };
@@ -852,17 +848,6 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[13px] font-semibold text-text-primary">Hero image URL</span>
-                    <input
-                      type="text"
-                      value={transportForm.heroImage ?? ""}
-                      onChange={(e) => setTransportForm((c) => ({ ...c, heroImage: e.target.value }))}
-                      className={inputClassName}
-                      placeholder="https://..."
-                    />
-                  </label>
-
-                  <label className="block">
                     <span className="mb-2 block text-[13px] font-semibold text-text-primary">Sort order</span>
                     <input
                       type="number"
@@ -1082,17 +1067,6 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
                       value={foodForm.description ?? ""}
                       onChange={(e) => setFoodForm((c) => ({ ...c, description: e.target.value }))}
                       className={`${inputClassName} min-h-[100px] resize-y`}
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-2 block text-[13px] font-semibold text-text-primary">Hero image URL</span>
-                    <input
-                      type="text"
-                      value={foodForm.heroImage ?? ""}
-                      onChange={(e) => setFoodForm((c) => ({ ...c, heroImage: e.target.value }))}
-                      className={inputClassName}
-                      placeholder="https://..."
                     />
                   </label>
 

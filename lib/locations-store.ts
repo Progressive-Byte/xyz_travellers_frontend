@@ -25,7 +25,6 @@ export type AdminTransportItem = {
   companyName: string;
   contactNumber: string;
   description: string;
-  heroImage: string | null;
   sortOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -38,7 +37,6 @@ export type AdminFoodItem = {
   phoneNumber: string;
   location: string;
   description: string;
-  heroImage: string | null;
   sortOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -71,7 +69,6 @@ export type UpsertAdminTransportPayload = {
   companyName?: string;
   contactNumber?: string;
   description?: string;
-  heroImage?: string | null;
   sortOrder?: number;
   isActive?: boolean;
 };
@@ -81,7 +78,6 @@ export type UpsertAdminFoodPayload = {
   phoneNumber?: string;
   location?: string;
   description?: string;
-  heroImage?: string | null;
   sortOrder?: number;
   isActive?: boolean;
 };
@@ -241,7 +237,6 @@ export function upsertTransport(
     companyName: payload.companyName || "",
     contactNumber: payload.contactNumber || "",
     description: payload.description || "",
-    heroImage: payload.heroImage ?? null,
     sortOrder: payload.sortOrder ?? 0,
     isActive: payload.isActive ?? true,
     createdAt: now,
@@ -274,7 +269,6 @@ export function upsertFood(
     phoneNumber: payload.phoneNumber || "",
     location: payload.location || "",
     description: payload.description || "",
-    heroImage: payload.heroImage ?? null,
     sortOrder: payload.sortOrder ?? 0,
     isActive: payload.isActive ?? true,
     createdAt: now,
