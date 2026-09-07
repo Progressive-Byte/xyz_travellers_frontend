@@ -118,6 +118,7 @@ export async function apiRequestOptional<T>(
     throw new ApiError(
       payload?.message || "Something went wrong. Please try again.",
       response.status,
+      payload?.code,
     );
   }
 
