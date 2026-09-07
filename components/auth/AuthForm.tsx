@@ -276,16 +276,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({ mode, intent, returnTo }) =>
       router.refresh();
     } catch (error) {
       if (error instanceof ApiError) {
-        const message =
-          error.status === 401
-            ? "We could not log you in with those credentials."
-            : error.status === 403
-              ? "Your account is currently inactive. Please contact support."
-              : error.message;
-
-        setErrors({ form: message || "Something went wrong. Please try again." });
+        setErrors({ form: getAuthErrorMessage(error, isRegisterMode) });
       } else {
-        setErrors({ form: "Something went wrong. Please try again." });
+        setErrors({
+          form: "We could not reach the server. Check your connection and try again.",
+        });
       }
     } finally {
       setIsSubmitting(false);
