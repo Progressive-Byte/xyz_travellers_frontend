@@ -41,16 +41,21 @@ type ApiRequestOptions = Omit<RequestInit, "body"> & {
 type ApiEnvelope<T> = {
   success?: boolean;
   message?: string;
+  code?: string;
   data?: T;
 };
 
 export class ApiError extends Error {
   status: number;
 
-  constructor(message: string, status: number) {
+  /** Machine-readable error code from the API envelope, e.g. "INVALID_CREDENTIALS". */
+  code: string;
+
+  constructor(message: string, status: number, code = "") {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.code = code;
   }
 }
 
