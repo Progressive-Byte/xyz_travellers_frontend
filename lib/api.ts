@@ -95,6 +95,7 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     throw new ApiError(
       payload?.message || "Something went wrong. Please try again.",
       response.status,
+      payload?.code,
     );
   }
 
