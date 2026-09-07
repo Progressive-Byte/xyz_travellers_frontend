@@ -111,6 +111,40 @@ const getDefaultPortalDestination = (
   return "/guest/dashboard";
 };
 
+/**
+ * Turns an API failure into copy that tells the user what actually went wrong and
+ * what to do next. Codes come from the API error envelope; the status checks are
+ * fallbacks for endpoints that have not been given a specific code yet.
+ */
+const getAuthErrorMessage = (error: ApiError, isRegisterMode: boolean) => {
+  if (error.code === "INVALID_CREDENTIALS" || error.status === 401) {
+    return "The email or password you entered is incorrect. Please double-check and try again.";
+  }
+
+  if (error.code === "ACCOUNT_INACTIVE") {
+    return "This account has been deactivated. Please contact support to restore access.";
+  }
+
+  if (error.code === "CONFLICT" && isRegisterMode) {
+    return "An account with that email already exists. Try logging in instead.";
+  }
+
+  if (error.code === "VALIDATION_ERROR") {
+    return error.message || "Please check the details you entered and try again.";
+  }
+
+  if (error.status === 429) {
+    return "Too many attempts. Please wait a few minutes before trying again.";
+  }
+
+  if (error.status >= 500) {
+    return "Something went wrong on our end. Please try again in a moment.";
+  }
+
+  // The API writes user-facing messages, so prefer its wording over a generic one.
+  return error.message || "Something went wrong. Please try again.";
+};
+
 const getSuccessMessage = ({
   intent,
   isRegisterMode,
