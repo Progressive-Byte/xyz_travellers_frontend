@@ -119,7 +119,7 @@ const StatusPanelCard: React.FC<{
 
 const PropertyStatusCard: React.FC<{ record: PropertyStatusRecord }> = ({ record }) => {
   const { property, submissionStatus } = record;
-  const canEdit = isHostPropertyEditable(property.status);
+  const isEarlyStage = property.status === "draft" || property.status === "rejected";
   const editHref = `/host/properties/${property.id}/edit`;
   const verificationHref = `/host/properties/${property.id}/verification`;
   const submittedAt =
