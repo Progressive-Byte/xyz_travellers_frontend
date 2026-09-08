@@ -53,6 +53,8 @@ export const HostPropertiesList: React.FC<HostPropertiesListProps> = ({
             const editHref = canEdit
               ? `/host/properties/${property.id}/continue`
               : `/host/properties/${property.id}/verification`;
+            const editLabel =
+              property.status === "rejected" ? "Fix" : property.status === "draft" ? "Edit" : "Edit";
 
             return (
               <tr
