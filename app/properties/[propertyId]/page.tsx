@@ -717,7 +717,10 @@ export default async function PropertyPage({
               </div>
             </div>
 
-            <div id="request-booking" className="self-start lg:sticky lg:top-28">
+            <div
+              id="request-booking"
+              className="self-start lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:overscroll-contain"
+            >
               <PropertyBookingCard
                 propertyId={propertyId}
                 priceLabel={detail.pricing.minNightlyLabel || "Rate unavailable"}
