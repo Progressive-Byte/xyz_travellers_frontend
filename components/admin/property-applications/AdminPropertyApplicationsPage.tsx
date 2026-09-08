@@ -760,59 +760,202 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
                 </div>
               ) : selectedDetail ? (
                 <>
-                  <h2 className="mt-4 font-sora text-[26px] font-bold tracking-[-0.04em] text-text-primary">
-                    {selectedDetail.property.propertyName || "Untitled property"}
-                  </h2>
-                  <div className="mt-5 space-y-3 text-[14px] leading-6 text-text-secondary">
-                    <p>
-                      <span className="font-semibold text-text-primary">Property ID:</span>{" "}
-                      {selectedDetail.property.id}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-text-primary">Host:</span>{" "}
-                      {getHostName(selectedDetail)} ({selectedDetail.host.email})
-                    </p>
-                    <p>
-                      <span className="font-semibold text-text-primary">Ownership:</span>{" "}
-                      {selectedDetail.property.ownershipType || "Not provided"}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-text-primary">Location:</span>{" "}
-                      {[selectedDetail.property.city, selectedDetail.property.country]
-                        .filter(Boolean)
-                        .join(", ") || "Not provided"}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-text-primary">Status:</span>{" "}
-                      {selectedDetail.property.status || "unknown"}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-text-primary">Submitted:</span>{" "}
-                      {formatDate(selectedDetail.property.submittedAt)}
-                    </p>
-                    <p>
-                      <span className="font-semibold text-text-primary">Reviewed:</span>{" "}
-                      {formatDate(selectedDetail.property.reviewedAt)}
-                    </p>
-                    {selectedDetail.property.rejectionReason ? (
-                      <p>
-                        <span className="font-semibold text-text-primary">Rejection reason:</span>{" "}
-                        {selectedDetail.property.rejectionReason}
-                      </p>
-                    ) : null}
-                    {selectedDetail.property.description ? (
-                      <p>
-                        <span className="font-semibold text-text-primary">Description:</span>{" "}
-                        {selectedDetail.property.description}
-                      </p>
-                    ) : null}
-                    {selectedDetail.property.houseRules ? (
-                      <p>
-                        <span className="font-semibold text-text-primary">House rules:</span>{" "}
-                        {selectedDetail.property.houseRules}
-                      </p>
+                  <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
+                    <h2 className="font-sora text-[26px] font-bold tracking-[-0.04em] text-text-primary">
+                      {selectedDetail.property.propertyName || "Untitled property"}
+                    </h2>
+                    {!isEditing ? (
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={handleStartEdit}
+                          className="inline-flex items-center justify-center rounded-[14px] border border-border bg-white px-3.5 py-2 text-[12px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void handleDeleteSelected()}
+                          disabled={isDeleting}
+                          className="inline-flex items-center justify-center rounded-[14px] border border-red-200 bg-red-50/80 px-3.5 py-2 text-[12px] font-semibold text-[rgb(140,50,50)] shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-red-300 hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {isDeleting ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
                     ) : null}
                   </div>
+
+                  {selectedDetail.property.status === "submitted" &&
+                  selectedDetail.property.hasBeenApproved ? (
+                    <div className="mt-4 rounded-[20px] border border-primary/30 bg-primary-light/80 px-4 py-3 text-[13px] leading-6 text-text-primary">
+                      This property was previously approved and has been resubmitted after the host
+                      edited it. It is hidden from public search until it is approved again.
+                    </div>
+                  ) : null}
+
+                  {isEditing ? (
+                    <form className="mt-5 space-y-4" onSubmit={handleSaveEdit}>
+                      {editError ? (
+                        <div className="rounded-[16px] border border-red-200 bg-red-50/80 px-4 py-3 text-[13px] leading-6 text-red-700">
+                          {editError}
+                        </div>
+                      ) : null}
+
+                      <label className="block">
+                        <span className="mb-2 block text-[13px] font-semibold text-text-primary">
+                          Property name
+                        </span>
+                        <input
+                          type="text"
+                          value={editForm.propertyName ?? ""}
+                          onChange={(event) =>
+                            setEditForm((current) => ({ ...current, propertyName: event.target.value }))
+                          }
+                          className={inputClassName}
+                        />
+                      </label>
+
+                      <label className="block">
+                        <span className="mb-2 block text-[13px] font-semibold text-text-primary">
+                          Description
+                        </span>
+                        <textarea
+                          rows={3}
+                          value={editForm.description ?? ""}
+                          onChange={(event) =>
+                            setEditForm((current) => ({ ...current, description: event.target.value }))
+                          }
+                          className={`${inputClassName} min-h-[90px] resize-y`}
+                        />
+                      </label>
+
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <label className="block">
+                          <span className="mb-2 block text-[13px] font-semibold text-text-primary">
+                            City
+                          </span>
+                          <input
+                            type="text"
+                            value={editForm.city ?? ""}
+                            onChange={(event) =>
+                              setEditForm((current) => ({ ...current, city: event.target.value }))
+                            }
+                            className={inputClassName}
+                          />
+                        </label>
+                        <label className="block">
+                          <span className="mb-2 block text-[13px] font-semibold text-text-primary">
+                            Country
+                          </span>
+                          <input
+                            type="text"
+                            value={editForm.country ?? ""}
+                            onChange={(event) =>
+                              setEditForm((current) => ({ ...current, country: event.target.value }))
+                            }
+                            className={inputClassName}
+                          />
+                        </label>
+                      </div>
+
+                      <label className="block">
+                        <span className="mb-2 block text-[13px] font-semibold text-text-primary">
+                          Address
+                        </span>
+                        <input
+                          type="text"
+                          value={editForm.address ?? ""}
+                          onChange={(event) =>
+                            setEditForm((current) => ({ ...current, address: event.target.value }))
+                          }
+                          className={inputClassName}
+                        />
+                      </label>
+
+                      <label className="block">
+                        <span className="mb-2 block text-[13px] font-semibold text-text-primary">
+                          House rules
+                        </span>
+                        <textarea
+                          rows={3}
+                          value={editForm.houseRules ?? ""}
+                          onChange={(event) =>
+                            setEditForm((current) => ({ ...current, houseRules: event.target.value }))
+                          }
+                          className={`${inputClassName} min-h-[90px] resize-y`}
+                        />
+                      </label>
+
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          type="submit"
+                          disabled={isSavingEdit}
+                          className="inline-flex items-center justify-center rounded-[16px] bg-primary px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                          {isSavingEdit ? "Saving..." : "Save changes"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleCancelEdit}
+                          disabled={isSavingEdit}
+                          className="inline-flex items-center justify-center rounded-[16px] border border-border bg-white px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="mt-5 space-y-3 text-[14px] leading-6 text-text-secondary">
+                      <p>
+                        <span className="font-semibold text-text-primary">Property ID:</span>{" "}
+                        {selectedDetail.property.id}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-text-primary">Host:</span>{" "}
+                        {getHostName(selectedDetail)} ({selectedDetail.host.email})
+                      </p>
+                      <p>
+                        <span className="font-semibold text-text-primary">Ownership:</span>{" "}
+                        {selectedDetail.property.ownershipType || "Not provided"}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-text-primary">Location:</span>{" "}
+                        {[selectedDetail.property.city, selectedDetail.property.country]
+                          .filter(Boolean)
+                          .join(", ") || "Not provided"}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-text-primary">Status:</span>{" "}
+                        {selectedDetail.property.status || "unknown"}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-text-primary">Submitted:</span>{" "}
+                        {formatDate(selectedDetail.property.submittedAt)}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-text-primary">Reviewed:</span>{" "}
+                        {formatDate(selectedDetail.property.reviewedAt)}
+                      </p>
+                      {selectedDetail.property.rejectionReason ? (
+                        <p>
+                          <span className="font-semibold text-text-primary">Rejection reason:</span>{" "}
+                          {selectedDetail.property.rejectionReason}
+                        </p>
+                      ) : null}
+                      {selectedDetail.property.description ? (
+                        <p>
+                          <span className="font-semibold text-text-primary">Description:</span>{" "}
+                          {selectedDetail.property.description}
+                        </p>
+                      ) : null}
+                      {selectedDetail.property.houseRules ? (
+                        <p>
+                          <span className="font-semibold text-text-primary">House rules:</span>{" "}
+                          {selectedDetail.property.houseRules}
+                        </p>
+                      ) : null}
+                    </div>
+                  )}
 
                   <div className="mt-5 rounded-[24px] border border-border-light bg-surface px-4 py-4">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary">
