@@ -1328,6 +1328,7 @@ const normalizeHostPropertySummary = (payload: unknown): HostPropertySummary => 
     ),
     updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
     createdAt: asOptionalString(source.createdAt ?? source.created_at),
+    hasBeenApproved: asBoolean(source.hasBeenApproved ?? source.has_been_approved),
   };
 };
 
