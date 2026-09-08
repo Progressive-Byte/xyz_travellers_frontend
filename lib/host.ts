@@ -424,6 +424,7 @@ export type HostPropertySummary = {
   selectedBusinessDocumentIds: string[];
   updatedAt: string | null;
   createdAt: string | null;
+  hasBeenApproved: boolean;
 };
 
 export type HostPropertyDetail = HostPropertySummary & {
