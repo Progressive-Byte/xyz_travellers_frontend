@@ -351,6 +351,110 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
     }
   };
 
+  const handleStartEdit = () => {
+    if (!selectedDetail) {
+      return;
+    }
+
+    setEditForm({
+      propertyName: selectedDetail.property.propertyName,
+      description: selectedDetail.property.description,
+      address: selectedDetail.property.address,
+      city: selectedDetail.property.city,
+      country: selectedDetail.property.country,
+      houseRules: selectedDetail.property.houseRules,
+    });
+    setEditError("");
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditError("");
+  };
+
+  const handleSaveEdit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!token || !selectedDetail) {
+      return;
+    }
+
+    if (!editForm.propertyName?.trim()) {
+      setEditError("Property name cannot be empty.");
+      return;
+    }
+
+    setIsSavingEdit(true);
+    setEditError("");
+
+    try {
+      const result = await updateAdminPropertyApplication(token, selectedDetail.property.id, editForm);
+
+      setApplications((current) =>
+        current.map((item) =>
+          item.id === result.id ? { ...item, propertyName: result.propertyName, city: result.city, country: result.country } : item,
+        ),
+      );
+      setSelectedDetail((current) =>
+        current
+          ? {
+              ...current,
+              property: {
+                ...current.property,
+                propertyName: result.propertyName,
+                description: result.description,
+                address: result.address,
+                city: result.city,
+                country: result.country,
+                houseRules: result.houseRules,
+              },
+            }
+          : current,
+      );
+      setIsEditing(false);
+      setSuccessMessage("Property updated successfully.");
+    } catch (error) {
+      setEditError(
+        error instanceof ApiError ? error.message : "Unable to update this property right now.",
+      );
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (!token || !selectedDetail) {
+      return;
+    }
+
+    if (
+      !window.confirm(
+        "Delete this property? This permanently removes its media, units, calendars, pricing, and verification files.",
+      )
+    ) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setPageError("");
+
+    try {
+      await deleteAdminPropertyApplication(token, selectedDetail.property.id);
+
+      setApplications((current) => current.filter((item) => item.id !== selectedDetail.property.id));
+      setSelectedDetail(null);
+      setSelectedPropertyId("");
+      setSuccessMessage("Property deleted successfully.");
+    } catch (error) {
+      setPageError(
+        error instanceof ApiError ? error.message : "Unable to delete this property right now.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <AdminShell
       badge="Admin Moderation"
