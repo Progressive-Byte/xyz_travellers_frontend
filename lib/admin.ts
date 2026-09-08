@@ -630,6 +630,26 @@ const normalizeAdminPropertyApplicationReviewResult = (
     reviewedAt: asOptionalString(source.reviewedAt ?? source.reviewed_at),
     reviewedBy: asOptionalString(source.reviewedBy ?? source.reviewed_by),
     rejectionReason: asString(source.rejectionReason ?? source.rejection_reason),
+    hasBeenApproved: asBoolean(source.hasBeenApproved ?? source.has_been_approved),
+  };
+};
+
+const normalizeAdminPropertyApplicationUpdateResult = (
+  payload: unknown,
+): AdminPropertyApplicationUpdateResult => {
+  const source = asRecord(payload);
+
+  return {
+    id: asString(source.id),
+    propertyName: asString(source.propertyName ?? source.name),
+    description: asString(source.description),
+    address: asString(source.address),
+    city: asString(source.city),
+    country: asString(source.country),
+    houseRules: asString(source.houseRules ?? source.house_rules),
+    status: asString(source.status),
+    rejectionReason: asString(source.rejectionReason ?? source.rejection_reason),
+    hasBeenApproved: asBoolean(source.hasBeenApproved ?? source.has_been_approved),
   };
 };
 
