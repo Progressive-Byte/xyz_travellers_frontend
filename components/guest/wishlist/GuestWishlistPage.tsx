@@ -3,14 +3,9 @@
 import Link from "next/link";
 import React, { useEffect, useMemo, useState } from "react";
 import { GuestShell } from "@/components/guest/GuestShell";
-import { useAuth } from "@/context/AuthContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { ApiError } from "@/lib/api";
-import {
-  getGuestPropertyLookups,
-  getGuestWishlist,
-  removeGuestWishlistProperty,
-  type GuestWishlistItem,
-} from "@/lib/guest";
+import { getGuestPropertyLookups } from "@/lib/guest";
 
 const formatDate = (value: string | null) => {
   if (!value) {
@@ -31,89 +26,80 @@ const formatDate = (value: string | null) => {
 };
 
 export const GuestWishlistPage: React.FC = () => {
-  const { token } = useAuth();
-  const [wishlist, setWishlist] = useState<GuestWishlistItem[]>([]);
+  const { items, isLoaded, pendingPropertyId, toggle } = useWishlist();
   const [propertyLookup, setPropertyLookup] = useState<
     Awaited<ReturnType<typeof getGuestPropertyLookups>>
   >({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [removingPropertyId, setRemovingPropertyId] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [retryKey, setRetryKey] = useState(0);
+
+  const propertyIdsKey = items.map((item) => item.propertyId).join(",");
 
   useEffect(() => {
-    if (!token) {
+    if (!propertyIdsKey) {
+      setPropertyLookup({});
       return;
     }
 
     let isActive = true;
 
-    const loadWishlist = async () => {
-      setIsLoading(true);
-      setError("");
-
-      try {
-        const result = await getGuestWishlist(token);
-        const propertyIds = result.map((item) => item.propertyId).filter(Boolean);
-        const lookups = await getGuestPropertyLookups(propertyIds);
-
-        if (!isActive) {
-          return;
-        }
-
-        setWishlist(result);
-        setPropertyLookup(lookups);
-      } catch (requestError) {
-        if (!isActive) {
-          return;
-        }
-
-        setError(
-          requestError instanceof ApiError
-            ? requestError.message || "We couldn't load your wishlist right now."
-            : "We couldn't load your wishlist right now.",
-        );
-      } finally {
+    getGuestPropertyLookups(propertyIdsKey.split(","))
+      .then((lookups) => {
         if (isActive) {
-          setIsLoading(false);
+          setPropertyLookup(lookups);
         }
-      }
-    };
-
-    void loadWishlist();
+      })
+      .catch(() => {
+        if (isActive) {
+          setPropertyLookup({});
+        }
+      });
 
     return () => {
       isActive = false;
     };
-  }, [retryKey, token]);
+  }, [propertyIdsKey]);
 
-  const sortedWishlist = useMemo(
+  const sortedItems = useMemo(
     () =>
-      [...wishlist].sort((left, right) => {
+      [...items].sort((left, right) => {
         const leftTime = left.savedAt ? new Date(left.savedAt).getTime() : 0;
         const rightTime = right.savedAt ? new Date(right.savedAt).getTime() : 0;
         return rightTime - leftTime;
       }),
-    [wishlist],
+    [items],
   );
+
+  const handleRemove = async (propertyId: string) => {
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      await toggle(propertyId);
+      setSuccessMessage("Property removed from wishlist successfully.");
+    } catch (requestError) {
+      setError(
+        requestError instanceof ApiError
+          ? requestError.message || "Unable to remove this property right now."
+          : "Unable to remove this property right now.",
+      );
+    }
+  };
 
   return (
     <GuestShell badge="Wishlist">
       <div className="surface-card overflow-hidden rounded-panel">
         <div className="p-5">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Wishlist workspace
-            </p>
-            <h1 className="mt-2 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-              Keep your saved properties in one place
-            </h1>
-            <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-              Review properties saved for later, open them again, or remove them when your shortlist changes.
-              Tap the heart icon on any property to add it here.
-            </p>
-          </div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+            Wishlist workspace
+          </p>
+          <h1 className="mt-2 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
+            Keep your saved properties in one place
+          </h1>
+          <p className="mt-2 text-[14px] leading-6 text-text-secondary">
+            Review properties saved for later, open them again, or remove them when your shortlist changes.
+            Tap the heart icon on any property to add it here.
+          </p>
         </div>
 
         {error ? (
@@ -127,13 +113,13 @@ export const GuestWishlistPage: React.FC = () => {
           </div>
         ) : null}
 
-        {isLoading ? (
+        {!isLoaded ? (
           <div className="space-y-3 border-t border-border-light px-5 py-5">
             {Array.from({ length: 3 }).map((_, index) => (
               <div key={index} className="h-20 animate-pulse rounded-[20px] bg-white/75" />
             ))}
           </div>
-        ) : sortedWishlist.length ? (
+        ) : sortedItems.length ? (
           <div className="overflow-x-auto border-t border-border-light">
             <table className="min-w-[920px] w-full border-collapse">
               <thead className="bg-[rgba(245,243,237,0.92)]">
@@ -150,7 +136,7 @@ export const GuestWishlistPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {sortedWishlist.map((item) => {
+                {sortedItems.map((item) => {
                   const property = propertyLookup[item.propertyId];
 
                   return (
@@ -184,35 +170,11 @@ export const GuestWishlistPage: React.FC = () => {
                           </Link>
                           <button
                             type="button"
-                            disabled={removingPropertyId === item.propertyId}
-                            onClick={async () => {
-                              if (!token) {
-                                return;
-                              }
-
-                              setRemovingPropertyId(item.propertyId);
-                              setError("");
-                              setSuccessMessage("");
-
-                              try {
-                                await removeGuestWishlistProperty(token, item.propertyId);
-                                setWishlist((current) =>
-                                  current.filter((entry) => entry.propertyId !== item.propertyId),
-                                );
-                                setSuccessMessage("Property removed from wishlist successfully.");
-                              } catch (requestError) {
-                                setError(
-                                  requestError instanceof ApiError
-                                    ? requestError.message || "Unable to remove this property right now."
-                                    : "Unable to remove this property right now.",
-                                );
-                              } finally {
-                                setRemovingPropertyId("");
-                              }
-                            }}
+                            disabled={pendingPropertyId === item.propertyId}
+                            onClick={() => void handleRemove(item.propertyId)}
                             className="inline-flex items-center justify-center rounded-[12px] border border-red-200 bg-red-50/80 px-3 py-1.5 text-[12px] font-semibold text-[rgb(140,50,50)] shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-red-300 hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-60"
                           >
-                            {removingPropertyId === item.propertyId ? "Removing..." : "Remove"}
+                            {pendingPropertyId === item.propertyId ? "Removing..." : "Remove"}
                           </button>
                         </div>
                       </td>
