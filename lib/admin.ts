@@ -452,6 +452,7 @@ const normalizeAdminPropertyApplicationRecord = (payload: unknown): AdminPropert
     reviewedAt: asOptionalString(source.reviewedAt ?? source.reviewed_at),
     reviewedBy: asOptionalString(source.reviewedBy ?? source.reviewed_by),
     rejectionReason: asString(source.rejectionReason ?? source.rejection_reason),
+    hasBeenApproved: asBoolean(source.hasBeenApproved ?? source.has_been_approved),
     createdAt: asOptionalString(source.createdAt ?? source.created_at),
     updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
   };
