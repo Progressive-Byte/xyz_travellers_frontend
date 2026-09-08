@@ -64,27 +64,29 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({ propertyId, clas
   };
 
   return (
-    <span className={`relative inline-flex ${className}`}>
-      <button
-        type="button"
-        onClick={handleClick}
-        disabled={isPending}
-        aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
-        aria-pressed={saved}
-        className={`flex h-9 w-9 items-center justify-center rounded-full border shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-70 ${
-          saved
-            ? "border-primary/40 bg-primary text-text-primary"
-            : "border-border bg-white/90 text-text-primary backdrop-blur"
-        }`}
-      >
-        <HeartIcon filled={saved} />
-      </button>
+    <span className={className}>
+      <span className="relative inline-flex">
+        <button
+          type="button"
+          onClick={handleClick}
+          disabled={isPending}
+          aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+          aria-pressed={saved}
+          className={`flex h-9 w-9 items-center justify-center rounded-full border shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-medium disabled:cursor-not-allowed disabled:opacity-70 ${
+            saved
+              ? "border-primary/40 bg-primary text-text-primary"
+              : "border-border bg-white/90 text-text-primary backdrop-blur"
+          }`}
+        >
+          <HeartIcon filled={saved} />
+        </button>
 
-      {notice ? (
-        <span className="absolute right-0 top-full z-30 mt-2 w-56 rounded-[14px] border border-border bg-card px-3 py-2 text-[12px] leading-5 text-text-primary shadow-strong">
-          {notice}
-        </span>
-      ) : null}
+        {notice ? (
+          <span className="absolute right-0 top-full z-30 mt-2 w-56 rounded-[14px] border border-border bg-card px-3 py-2 text-[12px] leading-5 text-text-primary shadow-strong">
+            {notice}
+          </span>
+        ) : null}
+      </span>
     </span>
   );
 };
