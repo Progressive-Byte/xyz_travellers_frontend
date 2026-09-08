@@ -133,6 +133,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 {searchResults.items.map((item) => (
                   <ListingCard
                     key={item.propertyId}
+                    propertyId={item.propertyId}
                     title={item.title}
                     location={item.locationLabel}
                     priceLabel={item.price.displayLabel}
