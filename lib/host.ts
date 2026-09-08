@@ -861,6 +861,7 @@ const emptyHostPropertySubmissionStatus = (): HostPropertySubmissionStatus => ({
   rejectionReason: "",
   submittedAt: null,
   updatedAt: null,
+  hasBeenApproved: false,
 });
 
 const normalizeHostProfile = (payload: unknown): HostProfile => {
