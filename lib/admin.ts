@@ -708,6 +708,43 @@ export async function reviewAdminPropertyApplication(
   return normalizeAdminPropertyApplicationReviewResult(data);
 }
 
+export async function updateAdminPropertyApplication(
+  token: string,
+  propertyId: string,
+  payload: UpdateAdminPropertyApplicationPayload,
+): Promise<AdminPropertyApplicationUpdateResult> {
+  const body: Record<string, unknown> = {};
+
+  if (payload.propertyName !== undefined) body.propertyName = payload.propertyName.trim();
+  if (payload.description !== undefined) body.description = payload.description;
+  if (payload.address !== undefined) body.address = payload.address;
+  if (payload.city !== undefined) body.city = payload.city;
+  if (payload.country !== undefined) body.country = payload.country;
+  if (payload.houseRules !== undefined) body.houseRules = payload.houseRules;
+
+  const data = await apiRequest<unknown>(`/api/v1/admin/properties/${propertyId}`, {
+    method: "PATCH",
+    headers: authHeaders(token),
+    body,
+  });
+
+  return normalizeAdminPropertyApplicationUpdateResult(data);
+}
+
+export async function deleteAdminPropertyApplication(
+  token: string,
+  propertyId: string,
+): Promise<DeleteAdminPropertyApplicationResult> {
+  const data = await apiRequest<unknown>(`/api/v1/admin/properties/${propertyId}`, {
+    method: "DELETE",
+    headers: authHeaders(token),
+  });
+
+  const source = asRecord(data);
+
+  return { id: asString(source.id ?? source.propertyId ?? source.property_id) };
+}
+
 export type AdminHomepageSectionSummary = {
   id: string;
   title: string;
