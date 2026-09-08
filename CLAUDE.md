@@ -15,7 +15,7 @@ npm run start    # run a production build
 npm run lint     # eslint (eslint-config-next core-web-vitals)
 ```
 
-There is no test framework in this repo. After any non-trivial change, run `npm run build` to verify the route tree compiles and typechecks (`strict` TypeScript, `noEmit`).
+There is no test framework in this repo. After any non-trivial change, run `npm run build` to verify the route tree compiles and typechecks (`strict` TypeScript, `noEmit`). Import repo files via the `@/*` path alias (`tsconfig.json`), not relative `../../..` chains.
 
 ## Architecture
 
