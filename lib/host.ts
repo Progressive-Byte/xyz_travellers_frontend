@@ -563,6 +563,7 @@ export type HostPropertySubmissionStatus = {
   rejectionReason: string;
   submittedAt: string | null;
   updatedAt: string | null;
+  hasBeenApproved: boolean;
 };
 
 export type HostPropertySubmissionChecklistKey =
