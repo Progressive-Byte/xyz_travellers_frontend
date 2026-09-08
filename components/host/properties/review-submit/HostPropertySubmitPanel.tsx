@@ -33,7 +33,7 @@ export const HostPropertySubmitPanel: React.FC<HostPropertySubmitPanelProps> = (
     status === "submitted"
       ? "The listing is with the admin team right now. You can keep watching the status card below for any review outcome."
       : status === "approved"
-        ? "The listing has already cleared review and is live. If you made changes, submit again so the admin team can review them — the listing will move back to Submitted until it's approved again."
+        ? "The listing has already cleared review and is live. If you made changes, submit again so the admin team can review them — doing so moves the listing back to Submitted and hides it from public search until it's approved again."
         : status === "rejected"
           ? "Once the missing items below are resolved, submit the property again so the admin team can review the updated proof and listing data."
           : "Submission sends the listing to the admin review queue. Make sure the checklist is complete before you continue.";
