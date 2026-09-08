@@ -6,7 +6,6 @@ import { GuestShell } from "@/components/guest/GuestShell";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
-  addGuestWishlistProperty,
   getGuestPropertyLookups,
   getGuestWishlist,
   removeGuestWishlistProperty,
