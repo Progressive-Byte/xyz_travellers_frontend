@@ -226,8 +226,14 @@ export const GuestWishlistPage: React.FC = () => {
           <div className="border-t border-border-light px-5 py-10 text-center">
             <p className="text-[15px] font-semibold text-text-primary">No saved properties yet</p>
             <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-              Save approved properties to build your shortlist for later decisions.
+              Tap the heart icon on any property to build your shortlist for later decisions.
             </p>
+            <Link
+              href="/search"
+              className="mt-5 inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+            >
+              Browse stays
+            </Link>
           </div>
         )}
       </div>
