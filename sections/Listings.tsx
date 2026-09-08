@@ -67,6 +67,7 @@ const ListingRail: React.FC<ListingRailProps> = ({
       {listings.map((listing) => (
         <ListingCard
           key={listing.propertyId}
+          propertyId={listing.propertyId}
           title={listing.title}
           location={listing.locationLabel}
           priceLabel={listing.price.displayLabel}
