@@ -5,12 +5,15 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
+  deleteAdminPropertyApplication,
   getAdminPropertyApplication,
   getAdminPropertyApplications,
   reviewAdminPropertyApplication,
+  updateAdminPropertyApplication,
   type AdminPropertyApplicationDetail,
   type AdminPropertyApplicationReviewAction,
   type AdminPropertyApplicationSummary,
+  type UpdateAdminPropertyApplicationPayload,
 } from "@/lib/admin";
 
 const inputClassName =
