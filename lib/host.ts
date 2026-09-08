@@ -3075,8 +3075,11 @@ export async function updateHostPayoutProfile(
   return normalizeHostPayoutProfile(response);
 }
 
+// Hosts can manage their own property (including its units/media/pricing/calendar) in any
+// review status. Editing an approved or submitted listing does not change its status by
+// itself — only explicitly submitting again sends it back to "submitted" for re-review.
 export const isHostPropertyEditable = (status: HostPropertyStatus) =>
-  status === "draft" || status === "rejected";
+  status === "draft" || status === "rejected" || status === "submitted" || status === "approved";
 
 export async function getHostProperties(token: string): Promise<HostPropertySummary[]> {
   if (!token) {
