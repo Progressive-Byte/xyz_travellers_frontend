@@ -786,6 +786,7 @@ const emptyHostPropertyDetail = (): HostPropertyDetail => ({
   selectedBusinessDocumentIds: [],
   updatedAt: null,
   createdAt: null,
+  hasBeenApproved: false,
   description: "",
   amenities: [],
   lat: "",
