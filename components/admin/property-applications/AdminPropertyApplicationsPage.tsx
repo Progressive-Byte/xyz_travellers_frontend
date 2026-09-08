@@ -680,13 +680,20 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
                         </td>
 
                         <td className="px-4 py-3.5 align-middle">
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-1 text-[12px] font-medium capitalize ${getStatusTone(
-                              item.status,
-                            )}`}
-                          >
-                            {item.status || "unknown"}
-                          </span>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span
+                              className={`inline-flex items-center rounded-full px-2.5 py-1 text-[12px] font-medium capitalize ${getStatusTone(
+                                item.status,
+                              )}`}
+                            >
+                              {item.status || "unknown"}
+                            </span>
+                            {item.status === "submitted" && item.hasBeenApproved ? (
+                              <span className="inline-flex items-center rounded-full bg-primary-light px-2 py-0.5 text-[11px] font-medium text-text-primary">
+                                Resubmitted
+                              </span>
+                            ) : null}
+                          </div>
                         </td>
 
                         <td className="px-4 py-3.5 align-middle text-[13px] text-text-primary">
