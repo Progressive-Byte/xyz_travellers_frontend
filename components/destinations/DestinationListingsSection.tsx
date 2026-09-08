@@ -207,6 +207,7 @@ export const DestinationListingsSection: React.FC<DestinationListingsSectionProp
               {items.map((listing) => (
                 <li key={listing.propertyId} className="flex">
                   <ListingCard
+                    propertyId={listing.propertyId}
                     title={listing.title}
                     location={listing.locationLabel}
                     priceLabel={listing.price.displayLabel}
