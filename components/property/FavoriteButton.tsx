@@ -13,7 +13,7 @@ type FavoriteButtonProps = {
 const HeartIcon: React.FC<{ filled: boolean }> = ({ filled }) => (
   <svg
     viewBox="0 0 24 24"
-    className="h-4.5 w-4.5"
+    className="h-[18px] w-[18px]"
     fill={filled ? "currentColor" : "none"}
     stroke="currentColor"
     strokeWidth="1.8"
