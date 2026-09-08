@@ -384,6 +384,19 @@ export type GetAdminPropertyApplicationsFilters = {
   hostId?: string;
 };
 
+export type UpdateAdminPropertyApplicationPayload = {
+  propertyName?: string;
+  description?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  houseRules?: string;
+};
+
+export type DeleteAdminPropertyApplicationResult = {
+  id: string;
+};
+
 
 const normalizeAdminPropertyApplicationHost = (payload: unknown): AdminPropertyApplicationHost => {
   const source = asRecord(payload);
