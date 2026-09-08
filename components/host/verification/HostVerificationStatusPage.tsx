@@ -195,7 +195,7 @@ const PropertyStatusCard: React.FC<{ record: PropertyStatusRecord }> = ({ record
 
       <div className="mt-5 flex flex-wrap gap-3">
         <Link
-          href={canEdit ? editHref : verificationHref}
+          href={isEarlyStage ? editHref : verificationHref}
           className="inline-flex items-center justify-center rounded-[18px] bg-primary px-4 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
         >
           {property.status === "rejected"
