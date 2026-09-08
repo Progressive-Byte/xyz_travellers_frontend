@@ -1,8 +1,10 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FavoriteButton } from "@/components/property/FavoriteButton";
 
 interface ListingCardProps {
+  propertyId?: string;
   title: string;
   location: string;
   price?: number;
