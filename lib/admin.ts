@@ -418,6 +418,7 @@ const normalizeAdminPropertyApplicationSummary = (payload: unknown): AdminProper
       source.hasVerificationDocuments ?? source.has_verification_documents,
     ),
     hasCoverMedia: asBoolean(source.hasCoverMedia ?? source.has_cover_media),
+    hasBeenApproved: asBoolean(source.hasBeenApproved ?? source.has_been_approved),
   };
 };
 
