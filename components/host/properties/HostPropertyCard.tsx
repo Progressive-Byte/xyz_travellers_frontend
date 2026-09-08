@@ -32,6 +32,12 @@ export const HostPropertyCard: React.FC<HostPropertyCardProps> = ({
   const editHref = canEdit
     ? `/host/properties/${property.id}/continue`
     : `/host/properties/${property.id}/verification`;
+  const editLabel =
+    property.status === "rejected"
+      ? "Fix listing"
+      : property.status === "draft"
+        ? "Continue draft"
+        : "Edit property";
 
   return (
     <div className="surface-card rounded-[24px] p-4">
