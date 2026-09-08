@@ -55,7 +55,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${sora.variable} ${instrumentSans.variable}`}>
       <body className="font-instrument-sans bg-background text-text-primary">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <WishlistProvider>{children}</WishlistProvider>
+        </AuthProvider>
       </body>
     </html>
   );
