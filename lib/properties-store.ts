@@ -98,6 +98,7 @@ export const toAdminPropertyApplicationSummary = (
   unitsCount: p.unitsCount,
   hasVerificationDocuments: p.hasVerificationDocuments,
   hasCoverMedia: p.hasCoverMedia,
+  hasBeenApproved: false,
 });
 
 export const getAdminPropertyApplications = (filters?: {
