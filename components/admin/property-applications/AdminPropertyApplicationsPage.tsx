@@ -308,6 +308,7 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
                 status: reviewResult.status,
                 reviewedAt: reviewResult.reviewedAt,
                 rejectionReason: reviewResult.rejectionReason,
+                hasBeenApproved: reviewResult.hasBeenApproved,
               }
             : item,
         ),
@@ -322,6 +323,7 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
                 reviewedAt: reviewResult.reviewedAt,
                 reviewedBy: reviewResult.reviewedBy,
                 rejectionReason: reviewResult.rejectionReason,
+                hasBeenApproved: reviewResult.hasBeenApproved,
               },
             }
           : current,
