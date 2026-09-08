@@ -36,9 +36,7 @@ export const GuestWishlistPage: React.FC = () => {
   const [propertyLookup, setPropertyLookup] = useState<
     Awaited<ReturnType<typeof getGuestPropertyLookups>>
   >({});
-  const [propertyIdInput, setPropertyIdInput] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [removingPropertyId, setRemovingPropertyId] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
