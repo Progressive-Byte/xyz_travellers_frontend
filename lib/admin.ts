@@ -377,6 +377,20 @@ export type AdminPropertyApplicationReviewResult = {
   reviewedAt: string | null;
   reviewedBy: string | null;
   rejectionReason: string;
+  hasBeenApproved: boolean;
+};
+
+export type AdminPropertyApplicationUpdateResult = {
+  id: string;
+  propertyName: string;
+  description: string;
+  address: string;
+  city: string;
+  country: string;
+  houseRules: string;
+  status: string;
+  rejectionReason: string;
+  hasBeenApproved: boolean;
 };
 
 export type GetAdminPropertyApplicationsFilters = {
