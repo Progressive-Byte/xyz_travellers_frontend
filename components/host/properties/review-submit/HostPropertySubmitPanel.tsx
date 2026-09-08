@@ -24,7 +24,7 @@ export const HostPropertySubmitPanel: React.FC<HostPropertySubmitPanelProps> = (
     status === "submitted"
       ? "This property is already in review"
       : status === "approved"
-        ? "This property is already approved"
+        ? "This property is approved and live"
         : status === "rejected"
           ? "Prepare the listing for resubmission"
           : "Submit this property for review";
@@ -33,15 +33,15 @@ export const HostPropertySubmitPanel: React.FC<HostPropertySubmitPanelProps> = (
     status === "submitted"
       ? "The listing is with the admin team right now. You can keep watching the status card below for any review outcome."
       : status === "approved"
-        ? "The listing has already cleared review. No further submission action is needed here."
+        ? "The listing has already cleared review and is live. If you made changes, submit again so the admin team can review them — the listing will move back to Submitted until it's approved again."
         : status === "rejected"
           ? "Once the missing items below are resolved, submit the property again so the admin team can review the updated proof and listing data."
           : "Submission sends the listing to the admin review queue. Make sure the checklist is complete before you continue.";
 
   const buttonLabel =
-    status === "rejected" ? "Resubmit for review" : "Submit for review";
+    status === "rejected" || status === "approved" ? "Resubmit for review" : "Submit for review";
 
-  const showButton = status === "draft" || status === "rejected";
+  const showButton = status === "draft" || status === "rejected" || status === "approved";
 
   return (
     <div className="surface-card rounded-panel p-6">
