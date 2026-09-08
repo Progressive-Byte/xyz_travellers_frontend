@@ -12,7 +12,6 @@ import {
   getHostIdentityVerificationStatus,
   getHostProperties,
   getHostPropertySubmissionStatus,
-  isHostPropertyEditable,
   type HostIdentityVerificationStatus,
   type HostPropertySubmissionStatus,
   type HostPropertySummary,
