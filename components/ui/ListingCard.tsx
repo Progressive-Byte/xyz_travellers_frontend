@@ -20,6 +20,7 @@ interface ListingCardProps {
 }
 
 export const ListingCard: React.FC<ListingCardProps> = ({
+  propertyId,
   title,
   location,
   price,
