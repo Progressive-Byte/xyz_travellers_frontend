@@ -67,6 +67,13 @@ export const HostPropertySubmissionStatusCard: React.FC<HostPropertySubmissionSt
         {statusCopy[status.status].body}
       </p>
 
+      {status.status === "submitted" && status.hasBeenApproved ? (
+        <div className="mt-5 rounded-[20px] border border-primary/30 bg-primary-light/80 px-4 py-4 text-[14px] leading-6 text-text-primary">
+          This listing was previously approved. Your edits have been resubmitted and the property
+          is pending admin re-review — it stays live under its last approved details until then.
+        </div>
+      ) : null}
+
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <div className="rounded-[20px] border border-border-light bg-white/85 px-4 py-4">
           <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">Submitted at</p>
