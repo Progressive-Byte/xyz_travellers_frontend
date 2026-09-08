@@ -62,6 +62,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             </span>
           ) : null}
         </div>
+
+        {propertyId ? (
+          <FavoriteButton propertyId={propertyId} className="absolute right-3 top-3 z-10" />
+        ) : null}
       </div>
 
       <div className="px-1 pb-1 pt-4">
