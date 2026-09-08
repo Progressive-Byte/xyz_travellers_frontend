@@ -111,66 +111,8 @@ export const GuestWishlistPage: React.FC = () => {
             </h1>
             <p className="mt-2 text-[14px] leading-6 text-text-secondary">
               Review properties saved for later, open them again, or remove them when your shortlist changes.
+              Tap the heart icon on any property to add it here.
             </p>
-          </div>
-
-          <div className="mt-5 border-t border-border-light pt-5">
-            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
-              <input
-                type="text"
-                value={propertyIdInput}
-                onChange={(event) => setPropertyIdInput(event.target.value)}
-                placeholder="Save a property by property id"
-                className="w-full rounded-[18px] border border-border bg-card px-4 py-3 text-[14px] text-text-primary shadow-soft outline-none transition-all duration-200 placeholder:text-text-secondary/70 focus:-translate-y-0.5 focus:border-text-primary/15 focus:shadow-medium"
-              />
-              <button
-                type="button"
-                disabled={isSaving}
-                onClick={async () => {
-                  if (!token) {
-                    return;
-                  }
-
-                  if (!propertyIdInput.trim()) {
-                    setError("Property id is required.");
-                    return;
-                  }
-
-                  setIsSaving(true);
-                  setError("");
-                  setSuccessMessage("");
-
-                  try {
-                    const saved = await addGuestWishlistProperty(token, propertyIdInput);
-                    const propertyIds = Array.from(
-                      new Set([saved.propertyId, ...wishlist.map((item) => item.propertyId)]),
-                    );
-                    const lookups = await getGuestPropertyLookups(propertyIds);
-
-                    setWishlist((current) => {
-                      const withoutDuplicate = current.filter(
-                        (item) => item.propertyId !== saved.propertyId,
-                      );
-                      return [{ propertyId: saved.propertyId, savedAt: new Date().toISOString() }, ...withoutDuplicate];
-                    });
-                    setPropertyLookup((current) => ({ ...current, ...lookups }));
-                    setPropertyIdInput("");
-                    setSuccessMessage("Property saved to wishlist successfully.");
-                  } catch (requestError) {
-                    setError(
-                      requestError instanceof ApiError
-                        ? requestError.message || "Unable to save this property right now."
-                        : "Unable to save this property right now.",
-                    );
-                  } finally {
-                    setIsSaving(false);
-                  }
-                }}
-                className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSaving ? "Saving..." : "Save property"}
-              </button>
-            </div>
           </div>
         </div>
 
