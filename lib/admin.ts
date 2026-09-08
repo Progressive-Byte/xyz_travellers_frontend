@@ -260,6 +260,7 @@ export type AdminPropertyApplicationSummary = {
   unitsCount: number | null;
   hasVerificationDocuments: boolean;
   hasCoverMedia: boolean;
+  hasBeenApproved: boolean;
 };
 
 export type AdminPropertyApplicationRecord = {
