@@ -277,8 +277,6 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
     setEditError("");
   }, [selectedPropertyId]);
 
-  const canReviewSelectedProperty = Boolean(selectedDetail);
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
