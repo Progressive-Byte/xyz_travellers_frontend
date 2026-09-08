@@ -284,6 +284,7 @@ export type AdminPropertyApplicationRecord = {
   reviewedAt: string | null;
   reviewedBy: string | null;
   rejectionReason: string;
+  hasBeenApproved: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 };
