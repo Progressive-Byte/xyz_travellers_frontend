@@ -69,8 +69,9 @@ export const HostPropertySubmissionStatusCard: React.FC<HostPropertySubmissionSt
 
       {status.status === "submitted" && status.hasBeenApproved ? (
         <div className="mt-5 rounded-[20px] border border-primary/30 bg-primary-light/80 px-4 py-4 text-[14px] leading-6 text-text-primary">
-          This listing was previously approved. Your edits have been resubmitted and the property
-          is pending admin re-review — it stays live under its last approved details until then.
+          This listing was previously approved. Your edits have been resubmitted for admin
+          re-review, and the property is temporarily hidden from public search and booking until
+          it's approved again.
         </div>
       ) : null}
 
