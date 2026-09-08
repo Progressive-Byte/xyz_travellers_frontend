@@ -1182,16 +1182,16 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
                       </label>
                     ) : null}
 
-                    {!canReviewSelectedProperty ? (
-                      <div className="rounded-[18px] border border-border-light bg-surface px-4 py-3 text-[13px] leading-6 text-text-secondary">
-                        This property is currently <span className="font-semibold text-text-primary">{selectedDetail.property.status}</span>.
-                        Only submitted properties can be approved or rejected.
+                    {selectedDetail.property.status === "approved" && action === "reject" ? (
+                      <div className="rounded-[18px] border border-red-200 bg-red-50/80 px-4 py-3 text-[13px] leading-6 text-red-700">
+                        This property is currently <span className="font-semibold">approved</span> and
+                        live. Rejecting it takes it offline immediately.
                       </div>
                     ) : null}
 
                     <button
                       type="submit"
-                      disabled={isSubmitting || !canReviewSelectedProperty}
+                      disabled={isSubmitting}
                       className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       {isSubmitting
