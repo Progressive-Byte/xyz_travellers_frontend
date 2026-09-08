@@ -277,7 +277,7 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
     setEditError("");
   }, [selectedPropertyId]);
 
-  const canReviewSelectedProperty = selectedDetail?.property.status === "submitted";
+  const canReviewSelectedProperty = Boolean(selectedDetail);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -288,11 +288,6 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
 
     setPageError("");
     setSuccessMessage("");
-
-    if (!canReviewSelectedProperty) {
-      setPageError("Only submitted properties can be approved or rejected.");
-      return;
-    }
 
     if (action === "reject" && !rejectionReason.trim()) {
       setPageError("Rejection reason is required when rejecting a property application.");
