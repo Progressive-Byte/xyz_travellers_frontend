@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import { FavoriteButton } from "@/components/property/FavoriteButton";
 import { PropertyBookingCard } from "@/components/property/PropertyBookingCard";
 import { PropertyGallery } from "@/components/property/PropertyGallery";
 import { ListingCard } from "@/components/ui/ListingCard";
