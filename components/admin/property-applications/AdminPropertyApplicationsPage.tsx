@@ -272,6 +272,11 @@ export const AdminPropertyApplicationsPage: React.FC = () => {
     [applications, selectedPropertyId],
   );
 
+  useEffect(() => {
+    setIsEditing(false);
+    setEditError("");
+  }, [selectedPropertyId]);
+
   const canReviewSelectedProperty = selectedDetail?.property.status === "submitted";
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
