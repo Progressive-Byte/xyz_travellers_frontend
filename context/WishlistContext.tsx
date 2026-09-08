@@ -2,11 +2,17 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { addGuestWishlistProperty, getGuestWishlist, removeGuestWishlistProperty } from "@/lib/guest";
+import {
+  addGuestWishlistProperty,
+  getGuestWishlist,
+  removeGuestWishlistProperty,
+  type GuestWishlistItem,
+} from "@/lib/guest";
 
 type WishlistContextValue = {
   canUseWishlist: boolean;
   isLoaded: boolean;
+  items: GuestWishlistItem[];
   pendingPropertyId: string;
   isSaved: (propertyId: string) => boolean;
   toggle: (propertyId: string) => Promise<void>;
@@ -24,7 +30,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       !user.roles.includes("admin"),
   );
 
-  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [items, setItems] = useState<GuestWishlistItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [pendingPropertyId, setPendingPropertyId] = useState("");
 
@@ -34,7 +40,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
 
     if (!canUseWishlist || !token) {
-      setSavedIds(new Set());
+      setItems([]);
       setIsLoaded(true);
       return;
     }
@@ -43,14 +49,14 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setIsLoaded(false);
 
     getGuestWishlist(token)
-      .then((items) => {
+      .then((result) => {
         if (isActive) {
-          setSavedIds(new Set(items.map((item) => item.propertyId)));
+          setItems(result);
         }
       })
       .catch(() => {
         if (isActive) {
-          setSavedIds(new Set());
+          setItems([]);
         }
       })
       .finally(() => {
@@ -64,7 +70,10 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
   }, [canUseWishlist, isHydrated, token]);
 
-  const isSaved = useCallback((propertyId: string) => savedIds.has(propertyId), [savedIds]);
+  const isSaved = useCallback(
+    (propertyId: string) => items.some((item) => item.propertyId === propertyId),
+    [items],
+  );
 
   const toggle = useCallback(
     async (propertyId: string) => {
@@ -72,46 +81,41 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return;
       }
 
-      const wasSaved = savedIds.has(propertyId);
+      const wasSaved = items.some((item) => item.propertyId === propertyId);
 
       setPendingPropertyId(propertyId);
-      setSavedIds((current) => {
-        const next = new Set(current);
-        if (wasSaved) {
-          next.delete(propertyId);
-        } else {
-          next.add(propertyId);
-        }
-        return next;
-      });
+      setItems((current) =>
+        wasSaved
+          ? current.filter((item) => item.propertyId !== propertyId)
+          : [{ propertyId, savedAt: new Date().toISOString() }, ...current],
+      );
 
       try {
         if (wasSaved) {
           await removeGuestWishlistProperty(token, propertyId);
         } else {
-          await addGuestWishlistProperty(token, propertyId);
+          const saved = await addGuestWishlistProperty(token, propertyId);
+          setItems((current) =>
+            current.map((item) => (item.propertyId === propertyId ? saved : item)),
+          );
         }
       } catch (error) {
-        setSavedIds((current) => {
-          const next = new Set(current);
-          if (wasSaved) {
-            next.add(propertyId);
-          } else {
-            next.delete(propertyId);
-          }
-          return next;
-        });
+        setItems((current) =>
+          wasSaved
+            ? [{ propertyId, savedAt: new Date().toISOString() }, ...current]
+            : current.filter((item) => item.propertyId !== propertyId),
+        );
         throw error;
       } finally {
         setPendingPropertyId("");
       }
     },
-    [canUseWishlist, pendingPropertyId, savedIds, token],
+    [canUseWishlist, items, pendingPropertyId, token],
   );
 
   const value = useMemo(
-    () => ({ canUseWishlist, isLoaded, pendingPropertyId, isSaved, toggle }),
-    [canUseWishlist, isLoaded, isSaved, pendingPropertyId, toggle],
+    () => ({ canUseWishlist, isLoaded, items, pendingPropertyId, isSaved, toggle }),
+    [canUseWishlist, isLoaded, items, isSaved, pendingPropertyId, toggle],
   );
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;
