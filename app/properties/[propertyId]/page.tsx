@@ -763,6 +763,7 @@ export default async function PropertyPage({
                 {detail.similar.map((relatedProperty) => (
                   <ListingCard
                     key={relatedProperty.propertyId}
+                    propertyId={relatedProperty.propertyId}
                     title={relatedProperty.title}
                     location={relatedProperty.locationLabel}
                     priceLabel={relatedProperty.price.displayLabel}
