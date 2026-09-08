@@ -1633,6 +1633,7 @@ const normalizeHostPropertySubmissionStatus = (
       asString(source.note),
     submittedAt: asOptionalString(source.submittedAt ?? source.submitted_at),
     updatedAt: asOptionalString(source.updatedAt ?? source.updated_at),
+    hasBeenApproved: asBoolean(source.hasBeenApproved ?? source.has_been_approved),
   };
 };
 
