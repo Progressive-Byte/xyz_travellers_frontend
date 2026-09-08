@@ -85,15 +85,17 @@ export const HostPropertyCard: React.FC<HostPropertyCardProps> = ({
           href={editHref}
           className="inline-flex items-center justify-center rounded-[16px] bg-primary px-4 py-2.5 text-[13px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
         >
-          {canEdit ? (property.status === "rejected" ? "Fix listing" : "Continue draft") : "View details"}
+          {editLabel}
         </Link>
-        {canEdit && onDelete ? (
+        {onDelete ? (
           <button
             type="button"
             onClick={() => {
               if (
                 window.confirm(
-                  "Delete this property draft? This also removes its media, units, calendars, pricing, and verification files.",
+                  property.status === "approved"
+                    ? "Delete this approved property? It will be removed from live listings along with its media, units, calendars, pricing, and verification files."
+                    : "Delete this property? This also removes its media, units, calendars, pricing, and verification files.",
                 )
               ) {
                 void onDelete(property);
