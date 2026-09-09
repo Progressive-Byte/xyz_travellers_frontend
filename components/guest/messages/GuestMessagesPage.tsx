@@ -245,7 +245,7 @@ export const GuestMessagesPage: React.FC = () => {
           <div className="border-t border-border-light px-5 py-10 text-center">
             <p className="text-[15px] font-semibold text-text-primary">No conversations yet</p>
             <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-              Reservation-linked host messages will show up here once a conversation starts.
+              Host conversations, including pre-booking questions, will show up here once a conversation starts.
             </p>
           </div>
         )}
