@@ -306,7 +306,7 @@ export const GuestSafetyPage: React.FC<{
                     <option value="">Select message thread</option>
                     {threads.map((thread) => (
                       <option key={thread.id} value={thread.id}>
-                        {thread.reservationId.slice(-6).toUpperCase() + " - " + (propertyLookup[thread.propertyId]?.propertyTitle || thread.propertyId)}
+                        {(thread.reservationId ? thread.reservationId.slice(-6).toUpperCase() : thread.id.slice(-6).toUpperCase()) + " - " + (propertyLookup[thread.propertyId]?.propertyTitle || thread.propertyId)}
                       </option>
                     ))}
                   </select>
