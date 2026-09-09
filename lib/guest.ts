@@ -751,6 +751,21 @@ export async function getGuestMessageThreads(
   return asArray(response).map(normalizeGuestMessageThreadSummary);
 }
 
+export async function startGuestPropertyInquiry(
+  token: string,
+  propertyId: string,
+): Promise<GuestMessageThreadDetail> {
+  const response = await apiRequest<unknown>("/api/v1/messages/threads", {
+    method: "POST",
+    headers: createAuthHeaders(token),
+    body: {
+      propertyId,
+    },
+  });
+
+  return normalizeGuestMessageThreadDetail(response);
+}
+
 export async function getGuestMessageThread(
   token: string,
   threadId: string,
