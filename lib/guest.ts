@@ -388,7 +388,7 @@ const normalizeGuestMessage = (payload: unknown): GuestMessage => {
   return {
     id: asString(source.id),
     threadId: asString(source.threadId ?? source.thread_id),
-    reservationId: asString(source.reservationId ?? source.reservation_id),
+    reservationId: asOptionalString(source.reservationId ?? source.reservation_id),
     senderId: asString(source.senderId ?? source.sender_id),
     senderRole: asString(source.senderRole ?? source.sender_role),
     body: asString(source.body),
@@ -403,10 +403,13 @@ const normalizeGuestMessageThreadSummary = (payload: unknown): GuestMessageThrea
 
   return {
     id: asString(source.id),
-    reservationId: asString(source.reservationId ?? source.reservation_id),
+    reservationId: asOptionalString(source.reservationId ?? source.reservation_id),
     propertyId: asString(source.propertyId ?? source.property_id),
-    unitId: asString(source.unitId ?? source.unit_id),
+    propertyName: asString(source.propertyName ?? source.property_name),
+    unitId: asOptionalString(source.unitId ?? source.unit_id),
+    unitName: asOptionalString(source.unitName ?? source.unit_name),
     guestId: asString(source.guestId ?? source.guest_id),
+    hostName: asString(source.hostName ?? source.host_name),
     lastMessagePreview: asString(source.lastMessagePreview ?? source.last_message_preview),
     lastMessageAt: asOptionalString(source.lastMessageAt ?? source.last_message_at),
     guestUnreadCount: asNumber(source.guestUnreadCount ?? source.guest_unread_count) ?? 0,
