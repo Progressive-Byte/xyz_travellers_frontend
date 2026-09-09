@@ -169,22 +169,37 @@ export const GuestMessageThreadPage: React.FC<{ threadId: string }> = ({ threadI
                     Conversation detail
                   </p>
                   <h1 className="mt-2 font-sora text-[28px] font-bold tracking-[-0.05em] text-text-primary">
-                    {property?.propertyTitle || `Reservation ${thread.reservationId.slice(-6).toUpperCase()}`}
+                    {thread.propertyName ||
+                      property?.propertyTitle ||
+                      (thread.reservationId
+                        ? `Reservation ${thread.reservationId.slice(-6).toUpperCase()}`
+                        : "New conversation")}
                   </h1>
                   <p className="mt-2 text-[14px] leading-6 text-text-secondary">
-                    {property?.unitNamesById[thread.unitId] || "Selected unit"} ·{" "}
-                    {property?.locationLabel || thread.propertyId}
+                    {thread.unitName ||
+                      (thread.unitId ? property?.unitNamesById[thread.unitId] : null) ||
+                      (thread.reservationId ? "Selected unit" : "Pre-booking inquiry")}{" "}
+                    · {property?.locationLabel || thread.propertyId}
                   </p>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <Link
-                    href={`/guest/bookings/${thread.reservationId}`}
-                    className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
-                  >
-                    Open booking
-                  </Link>
-                  {hostUserIds[0] ? (
+                  {thread.reservationId ? (
+                    <Link
+                      href={`/guest/bookings/${thread.reservationId}`}
+                      className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+                    >
+                      Open booking
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/properties/${thread.propertyId}`}
+                      className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-[13px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
+                    >
+                      Book this stay
+                    </Link>
+                  )}
+                  {hostUserIds[0] && thread.reservationId ? (
                     <Link
                       href={`/guest/safety?threadId=${thread.id}&userId=${hostUserIds[0]}&reservationId=${thread.reservationId}`}
                       className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-2 text-[13px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
