@@ -992,7 +992,7 @@ const normalizeHostMessage = (payload: unknown): HostMessage => {
   return {
     id: asString(source.id) || asString(source.messageId ?? source.message_id),
     threadId: asString(source.threadId ?? source.thread_id),
-    reservationId: asString(source.reservationId ?? source.reservation_id),
+    reservationId: asOptionalString(source.reservationId ?? source.reservation_id),
     senderId: asString(source.senderId ?? source.sender_id),
     senderRole: asString(source.senderRole ?? source.sender_role),
     body: asString(source.body ?? source.message ?? source.text),
