@@ -623,6 +623,8 @@ export default async function PropertyPage({
                         <p className="mt-2 text-[14px] leading-7 text-text-secondary">
                           Published property information, gallery, and pricing are shown exactly from the live API.
                         </p>
+
+                        <MessageHostButton propertyId={propertyId} className="mt-4 inline-block" />
                       </div>
                     </div>
                   </div>
