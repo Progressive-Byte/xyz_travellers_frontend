@@ -48,18 +48,32 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({ propertyId, clas
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const [entered, setEntered] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const hideTimeoutRef = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const instanceId = useId();
 
   const saved = isSaved(propertyId);
   const isPending = pendingPropertyId === propertyId;
 
   useEffect(() => {
-    return () => {
-      if (hideTimeoutRef.current) {
-        window.clearTimeout(hideTimeoutRef.current);
+    const closeIfOtherInstance = (event: Event) => {
+      const openedId = (event as CustomEvent<string>).detail;
+      if (openedId !== instanceId) {
+        if (hideTimeoutRef.current) {
+          clearTimeout(hideTimeoutRef.current);
+          hideTimeoutRef.current = null;
+        }
+        setTooltip(null);
       }
     };
-  }, []);
+
+    window.addEventListener(TOOLTIP_OPEN_EVENT, closeIfOtherInstance);
+    return () => {
+      window.removeEventListener(TOOLTIP_OPEN_EVENT, closeIfOtherInstance);
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, [instanceId]);
 
   useEffect(() => {
     if (!tooltip) {
