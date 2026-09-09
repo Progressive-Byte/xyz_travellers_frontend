@@ -126,7 +126,7 @@ export type HostMessageThreadSummary = {
   propertyId: string;
   propertyName: string;
   unitId: string | null;
-  unitName: string | null;
+  unitName: string;
   guestId: string;
   guestName: string;
   lastMessagePreview: string;
