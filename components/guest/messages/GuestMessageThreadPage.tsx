@@ -344,10 +344,10 @@ export const GuestMessageThreadPage: React.FC<{ threadId: string }> = ({ threadI
                   </div>
                   <div className="rounded-[18px] border border-border bg-card px-4 py-3">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                      Host user refs
+                      Host
                     </p>
-                    <p className="mt-2 break-all text-[14px] text-text-primary">
-                      {hostUserIds.join(", ") || "Host sender id will appear after host messages exist."}
+                    <p className="mt-2 text-[14px] font-semibold text-text-primary">
+                      {thread.hostName || "Host will appear after they reply."}
                     </p>
                   </div>
                 </div>
