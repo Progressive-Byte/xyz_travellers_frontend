@@ -135,7 +135,7 @@ export const HostMessagesPage: React.FC = () => {
         <MetricCard
           label="Active threads"
           value={metrics.total}
-          helper="Reservation conversations currently available to your host inbox."
+          helper="Reservation and pre-booking conversations currently available to your host inbox."
         />
         <MetricCard
           label="Unread threads"
