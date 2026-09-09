@@ -104,13 +104,15 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({ propertyId, clas
     const buttonCenter = rect.left + rect.width / 2;
     const arrowLeft = Math.max(18, Math.min(buttonCenter - left, width - 18));
 
+    window.dispatchEvent(new CustomEvent(TOOLTIP_OPEN_EVENT, { detail: instanceId }));
+
     setEntered(false);
     setTooltip({ message, top, left, width, arrowLeft, placement });
 
     if (hideTimeoutRef.current) {
-      window.clearTimeout(hideTimeoutRef.current);
+      clearTimeout(hideTimeoutRef.current);
     }
-    hideTimeoutRef.current = window.setTimeout(() => setTooltip(null), 3200);
+    hideTimeoutRef.current = setTimeout(() => setTooltip(null), 3200);
   };
 
   const handleClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
