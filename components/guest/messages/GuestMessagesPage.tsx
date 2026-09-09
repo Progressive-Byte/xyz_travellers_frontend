@@ -208,7 +208,11 @@ export const GuestMessagesPage: React.FC = () => {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate text-[15px] font-semibold text-text-primary">
-                          {property?.propertyTitle || `Reservation ${thread.reservationId.slice(-6).toUpperCase()}`}
+                          {thread.propertyName ||
+                            property?.propertyTitle ||
+                            (thread.reservationId
+                              ? `Reservation ${thread.reservationId.slice(-6).toUpperCase()}`
+                              : "New conversation")}
                         </p>
                         {thread.guestUnreadCount > 0 ? (
                           <span className="rounded-full border border-primary/25 bg-primary-light px-2.5 py-1 text-[11px] font-semibold text-text-primary">
