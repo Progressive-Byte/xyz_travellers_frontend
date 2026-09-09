@@ -221,8 +221,10 @@ export const GuestMessagesPage: React.FC = () => {
                         ) : null}
                       </div>
                       <p className="mt-1 truncate text-[13px] text-text-secondary">
-                        {property?.unitNamesById[thread.unitId] || "Selected unit"} ·{" "}
-                        {property?.locationLabel || thread.propertyId}
+                        {thread.unitName ||
+                          (thread.unitId ? property?.unitNamesById[thread.unitId] : null) ||
+                          (thread.reservationId ? "Selected unit" : "Pre-booking inquiry")}{" "}
+                        · {property?.locationLabel || thread.propertyId}
                       </p>
                     </div>
                     <span className="text-[12px] text-text-secondary">
