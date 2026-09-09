@@ -1010,12 +1010,12 @@ const normalizeHostMessageThreadSummary = (payload: unknown): HostMessageThreadS
 
   return {
     id: asString(source.id) || asString(source.threadId ?? source.thread_id),
-    reservationId: asString(source.reservationId ?? source.reservation_id),
+    reservationId: asOptionalString(source.reservationId ?? source.reservation_id),
     propertyId: asString(source.propertyId ?? source.property_id),
     propertyName:
       asString(source.propertyName ?? source.property_name) ||
       asString(propertySource.name ?? propertySource.propertyName ?? propertySource.property_name),
-    unitId: asString(source.unitId ?? source.unit_id),
+    unitId: asOptionalString(source.unitId ?? source.unit_id),
     unitName:
       asString(source.unitName ?? source.unit_name) ||
       asString(unitSource.name ?? unitSource.unitName ?? unitSource.unit_name),
