@@ -319,11 +319,20 @@ export const GuestMessageThreadPage: React.FC<{ threadId: string }> = ({ threadI
                 <div className="mt-4 space-y-3">
                   <div className="rounded-[18px] border border-border bg-card px-4 py-3">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                      Reservation
+                      {thread.reservationId ? "Reservation" : "Property"}
                     </p>
-                    <p className="mt-2 text-[14px] font-semibold text-text-primary">
-                      {thread.reservationId}
-                    </p>
+                    {thread.reservationId ? (
+                      <p className="mt-2 text-[14px] font-semibold text-text-primary">
+                        {thread.reservationId}
+                      </p>
+                    ) : (
+                      <Link
+                        href={`/properties/${thread.propertyId}`}
+                        className="mt-2 block text-[14px] font-semibold text-text-primary underline-offset-2 hover:underline"
+                      >
+                        {thread.propertyName || "View property"}
+                      </Link>
+                    )}
                   </div>
                   <div className="rounded-[18px] border border-border bg-card px-4 py-3">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
