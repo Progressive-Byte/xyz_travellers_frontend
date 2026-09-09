@@ -190,12 +190,21 @@ export const HostMessageThreadPage: React.FC<HostMessageThreadPageProps> = ({ th
         >
           Back to messages
         </Link>
-        <Link
-          href={`/host/reservations/${thread.reservationId}`}
-          className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
-        >
-          Open reservation
-        </Link>
+        {thread.reservationId ? (
+          <Link
+            href={`/host/reservations/${thread.reservationId}`}
+            className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+          >
+            Open reservation
+          </Link>
+        ) : (
+          <Link
+            href={`/host/properties/${thread.propertyId}/edit`}
+            className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
+          >
+            View property
+          </Link>
+        )}
       </div>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
