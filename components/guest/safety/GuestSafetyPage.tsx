@@ -83,7 +83,7 @@ export const GuestSafetyPage: React.FC<{
         }
 
         setBookings(bookingResults);
-        setThreads(threadResults);
+        setThreads(threadResults.filter((thread) => thread.reservationId));
         setPropertyLookup(lookups);
       } catch (requestError) {
         if (!isActive) {
