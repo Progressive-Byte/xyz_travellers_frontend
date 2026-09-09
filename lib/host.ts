@@ -111,7 +111,7 @@ export type UpdateHostReservationStatusPayload = {
 export type HostMessage = {
   id: string;
   threadId: string;
-  reservationId: string;
+  reservationId: string | null;
   senderId: string;
   senderRole: string;
   body: string;
@@ -122,11 +122,11 @@ export type HostMessage = {
 
 export type HostMessageThreadSummary = {
   id: string;
-  reservationId: string;
+  reservationId: string | null;
   propertyId: string;
   propertyName: string;
-  unitId: string;
-  unitName: string;
+  unitId: string | null;
+  unitName: string | null;
   guestId: string;
   guestName: string;
   lastMessagePreview: string;
