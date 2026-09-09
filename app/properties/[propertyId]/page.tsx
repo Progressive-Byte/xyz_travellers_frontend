@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { FavoriteButton } from "@/components/property/FavoriteButton";
+import { MessageHostButton } from "@/components/property/MessageHostButton";
 import { PropertyBookingCard } from "@/components/property/PropertyBookingCard";
 import { PropertyGallery } from "@/components/property/PropertyGallery";
 import { ListingCard } from "@/components/ui/ListingCard";
