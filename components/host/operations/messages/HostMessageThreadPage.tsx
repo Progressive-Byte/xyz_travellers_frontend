@@ -169,7 +169,7 @@ export const HostMessageThreadPage: React.FC<HostMessageThreadPageProps> = ({ th
               Reservation
             </p>
             <p className="mt-3 text-[17px] font-semibold text-text-primary">
-              #{thread.reservationId.slice(-6).toUpperCase()}
+              {thread.reservationId ? `#${thread.reservationId.slice(-6).toUpperCase()}` : "Pre-booking inquiry"}
             </p>
           </div>
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
