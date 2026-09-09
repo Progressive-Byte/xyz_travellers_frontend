@@ -248,7 +248,7 @@ export const HostMessagesPage: React.FC = () => {
           <div className="mt-6 rounded-[24px] border border-dashed border-border-light bg-white/80 px-5 py-6">
             <p className="text-[15px] font-semibold text-text-primary">No guest conversations yet</p>
             <p className="mt-2 max-w-2xl text-[14px] leading-7 text-text-secondary">
-              Message threads will appear here once guests start reaching out around their reservations.
+              Message threads will appear here once guests start reaching out about your properties or reservations.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
