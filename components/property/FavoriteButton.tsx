@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { ApiError } from "@/lib/api";
+
+const TOOLTIP_OPEN_EVENT = "xyz-favorite-tooltip-open";
 
 type FavoriteButtonProps = {
   propertyId: string;
