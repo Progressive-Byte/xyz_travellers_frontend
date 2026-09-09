@@ -55,7 +55,13 @@ export const HostMessagesList: React.FC<HostMessagesListProps> = ({ threads, res
                 {formatHostDateTime(thread.lastMessageAt)}
               </span>
               <span className="text-[13px] text-text-secondary">
-                Reservation #{thread.reservationId.slice(-6).toUpperCase()}
+                {thread.reservationId ? (
+                  `Reservation #${thread.reservationId.slice(-6).toUpperCase()}`
+                ) : (
+                  <span className="rounded-full border border-primary/25 bg-primary-light px-2.5 py-1 text-[12px] font-semibold text-text-primary">
+                    Pre-booking inquiry
+                  </span>
+                )}
               </span>
             </div>
           </div>
