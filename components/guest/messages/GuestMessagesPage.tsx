@@ -101,11 +101,13 @@ export const GuestMessagesPage: React.FC = () => {
 
       const property = propertyLookup[thread.propertyId];
       return [
+        thread.propertyName,
         property?.propertyTitle ?? "",
         property?.locationLabel ?? "",
-        property?.unitNamesById[thread.unitId] ?? "",
+        thread.unitName ?? "",
+        thread.unitId ? (property?.unitNamesById[thread.unitId] ?? "") : "",
         thread.lastMessagePreview,
-        thread.reservationId,
+        thread.reservationId ?? "",
       ]
         .join(" ")
         .toLowerCase()
