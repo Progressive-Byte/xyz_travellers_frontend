@@ -183,7 +183,7 @@ export type GuestBookingRouteParams = {
 export type GuestMessage = {
   id: string;
   threadId: string;
-  reservationId: string;
+  reservationId: string | null;
   senderId: string;
   senderRole: string;
   body: string;
@@ -194,10 +194,13 @@ export type GuestMessage = {
 
 export type GuestMessageThreadSummary = {
   id: string;
-  reservationId: string;
+  reservationId: string | null;
   propertyId: string;
-  unitId: string;
+  propertyName: string;
+  unitId: string | null;
+  unitName: string | null;
   guestId: string;
+  hostName: string;
   lastMessagePreview: string;
   lastMessageAt: string | null;
   guestUnreadCount: number;
