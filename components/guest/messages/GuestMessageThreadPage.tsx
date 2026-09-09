@@ -248,7 +248,7 @@ export const GuestMessageThreadPage: React.FC<{ threadId: string }> = ({ threadI
                     })
                   ) : (
                     <div className="rounded-[18px] border border-dashed border-border bg-card px-4 py-5 text-[14px] text-text-secondary">
-                      No messages yet for this reservation thread.
+                      No messages yet in this conversation.
                     </div>
                   )}
                 </div>
