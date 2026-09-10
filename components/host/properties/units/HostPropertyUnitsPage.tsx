@@ -240,6 +240,8 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
           );
         }
       } finally {
+        isProvisioningRoomUnitRef.current = false;
+
         if (isActive) {
           setIsProvisioningRoomUnit(false);
         }
