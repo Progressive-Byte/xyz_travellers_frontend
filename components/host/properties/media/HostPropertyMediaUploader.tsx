@@ -6,12 +6,22 @@ type HostPropertyMediaUploaderProps = {
   disabled: boolean;
   isUploading: boolean;
   onUpload: (files: File[]) => Promise<void>;
+  eyebrow?: string;
+  heading?: string;
+  description?: string;
+  chooseLabel?: string;
+  chooseHint?: string;
 };
 
 export const HostPropertyMediaUploader: React.FC<HostPropertyMediaUploaderProps> = ({
   disabled,
   isUploading,
   onUpload,
+  eyebrow = "Image upload",
+  heading = "Add the images guests should see first",
+  description = "Upload the main gallery images for this listing, then choose one as the cover photo once the uploads finish.",
+  chooseLabel = "Choose property images",
+  chooseHint = "Select one or more image files for this property's media gallery.",
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
