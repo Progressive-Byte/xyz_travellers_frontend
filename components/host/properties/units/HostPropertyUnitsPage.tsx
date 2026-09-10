@@ -511,35 +511,44 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
           </div>
 
           <div className="space-y-6">
-            <div className="surface-card rounded-panel p-6">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-                Units summary
-              </p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                <div className="rounded-[20px] border border-border-light bg-white/80 px-4 py-4">
-                  <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">Total units</p>
-                  <p className="mt-2 text-[20px] font-semibold text-text-primary">{units.length}</p>
-                </div>
-                <div className="rounded-[20px] border border-border-light bg-white/80 px-4 py-4">
-                  <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">Active units</p>
-                  <p className="mt-2 text-[20px] font-semibold text-text-primary">{activeUnitsCount}</p>
+            {isRoomType ? null : (
+              <div className="surface-card rounded-panel p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
+                  Units summary
+                </p>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                  <div className="rounded-[20px] border border-border-light bg-white/80 px-4 py-4">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">Total units</p>
+                    <p className="mt-2 text-[20px] font-semibold text-text-primary">{units.length}</p>
+                  </div>
+                  <div className="rounded-[20px] border border-border-light bg-white/80 px-4 py-4">
+                    <p className="text-[11px] uppercase tracking-[0.16em] text-text-secondary">Active units</p>
+                    <p className="mt-2 text-[20px] font-semibold text-text-primary">{activeUnitsCount}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="surface-card rounded-panel p-6">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
                 Workflow guidance
               </p>
               <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-                Keep inventory practical
+                {isRoomType ? "Keep the room details accurate" : "Keep inventory practical"}
               </h2>
               <div className="mt-5 space-y-3">
-                {[
-                  "Use unit names that will still make sense once pricing and blocked dates are configured.",
-                  "Set realistic guest capacity now so later booking controls do not drift from the real stay.",
-                  "Leave a unit inactive when it should not move forward into pricing yet.",
-                ].map((item) => (
+                {(isRoomType
+                  ? [
+                      "Set the real guest capacity, beds, and bathrooms for this room.",
+                      "Use the description to call out anything guests should know before booking.",
+                      "Add gallery photos so guests can see exactly what this room looks like.",
+                    ]
+                  : [
+                      "Use unit names that will still make sense once pricing and blocked dates are configured.",
+                      "Set realistic guest capacity now so later booking controls do not drift from the real stay.",
+                      "Leave a unit inactive when it should not move forward into pricing yet.",
+                    ]
+                ).map((item) => (
                   <div
                     key={item}
                     className="rounded-[20px] border border-border-light bg-white/80 px-4 py-3 text-[14px] leading-6 text-text-primary"
@@ -558,8 +567,9 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
                 Keep moving through setup
               </h2>
               <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                Media remains available in the previous step. Create or update units here, then continue
-                into pricing for the inventory you want to publish first.
+                {isRoomType
+                  ? "Media remains available in the previous step. Once the room details look right, continue into pricing."
+                  : "Media remains available in the previous step. Create or update units here, then continue into pricing for the inventory you want to publish first."}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
