@@ -3660,6 +3660,141 @@ export async function deleteHostPropertyMedia(
   });
 }
 
+export async function getHostUnitMedia(
+  token: string,
+  propertyId: string,
+  unitId: string,
+): Promise<HostPropertyMediaItem[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>(
+    `/api/v1/host/properties/${propertyId}/units/${unitId}/media`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    },
+  );
+
+  return extractHostPropertyMediaArray(response)
+    .map((item) => normalizeHostPropertyMediaItem(item))
+    .filter((item) => item.id && item.url)
+    .sort((left, right) => {
+      const leftOrder = left.sortOrder ?? Number.MAX_SAFE_INTEGER;
+      const rightOrder = right.sortOrder ?? Number.MAX_SAFE_INTEGER;
+
+      if (leftOrder !== rightOrder) {
+        return leftOrder - rightOrder;
+      }
+
+      return (left.createdAt ?? "").localeCompare(right.createdAt ?? "");
+    });
+}
+
+export async function uploadHostUnitImage(
+  token: string,
+  propertyId: string,
+  unitId: string,
+  file: File,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("mediaType", "image");
+
+  await apiRequestOptional<unknown>(
+    `/api/v1/host/properties/${propertyId}/units/${unitId}/media`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+      cache: "no-store",
+    },
+  );
+}
+
+export async function updateHostUnitMedia(
+  token: string,
+  propertyId: string,
+  unitId: string,
+  mediaId: string,
+  payload: UpdateHostPropertyMediaPayload,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const normalizedSortOrder = payload.sortOrder.trim();
+  const formData = new FormData();
+
+  if (payload.file) {
+    formData.append("file", payload.file);
+  }
+
+  if (payload.mediaType?.trim()) {
+    formData.append("mediaType", payload.mediaType.trim());
+  }
+
+  if (payload.mediaUrl?.trim()) {
+    formData.append("mediaUrl", payload.mediaUrl.trim());
+  }
+
+  if (payload.caption.trim()) {
+    formData.append("caption", payload.caption.trim());
+  }
+
+  if (normalizedSortOrder) {
+    formData.append("sortOrder", normalizedSortOrder);
+  }
+
+  if (typeof payload.isCover === "boolean") {
+    formData.append("isCover", String(payload.isCover));
+  }
+
+  await apiRequestOptional<unknown>(
+    `/api/v1/host/properties/${propertyId}/units/${unitId}/media/${mediaId}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+      cache: "no-store",
+    },
+  );
+}
+
+export async function deleteHostUnitMedia(
+  token: string,
+  propertyId: string,
+  unitId: string,
+  mediaId: string,
+): Promise<void> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  await apiRequestOptional<unknown>(
+    `/api/v1/host/properties/${propertyId}/units/${unitId}/media/${mediaId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    },
+  );
+}
+
 const toOptionalNumber = (value: string) => {
   const normalized = value.trim();
 
