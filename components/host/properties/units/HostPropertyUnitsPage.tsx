@@ -477,7 +477,12 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
             {isRoomType ? (
               roomUnit ? (
                 <div className="surface-card rounded-panel p-6 md:p-7">
-                  <HostPropertyUnitGallery propertyId={propertyId} unitId={roomUnit.id} disabled={!canEdit} />
+                  <HostPropertyUnitGallery
+                    propertyId={propertyId}
+                    unitId={roomUnit.id}
+                    disabled={!canEdit}
+                    bordered={false}
+                  />
                 </div>
               ) : null
             ) : units.length === 0 ? (
