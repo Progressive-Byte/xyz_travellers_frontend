@@ -368,25 +368,34 @@ const normalizeFrontPropertyGalleryImage = (
   };
 };
 
-const normalizeFrontPropertyUnit = (payload: unknown): FrontPropertyUnit => {
+const normalizeFrontPropertyUnit = (payload: unknown, propertyTitle: string): FrontPropertyUnit => {
   const source = asRecord(payload);
   const pricingSource = asRecord(source.pricing);
   const stayRulesSource = asRecord(source.stayRules);
+  const gallerySource = asRecord(source.gallery);
   const nightlyAmount = asNumber(pricingSource.nightlyAmount);
   const currency = asString(pricingSource.currency) || "BDT";
   const nights = asNumber(pricingSource.nights);
   const stayTotal = asNumber(pricingSource.stayTotal);
+  const unitName = asString(source.unitName) || "Unit";
 
   return {
     id: asString(source.id),
-    unitName: asString(source.unitName) || "Unit",
+    unitName,
     unitNumber: asString(source.unitNumber),
     unitType: asString(source.unitType),
+    description: asString(source.description),
     capacity: asNumber(source.capacity),
     bedrooms: asNumber(source.bedrooms),
     bathrooms: asNumber(source.bathrooms),
     beds: asNumber(source.beds),
     amenityIds: asArray(source.amenityIds).map((item) => asString(item)).filter(Boolean),
+    gallery: {
+      coverImageUrl: resolveEmbeddableApiUrl(asString(gallerySource.coverImageUrl)),
+      items: asArray(gallerySource.items).map((item) =>
+        normalizeFrontPropertyGalleryImage(item, `${propertyTitle} — ${unitName}`),
+      ),
+    },
     stayRules: {
       minimumStay: asNumber(stayRulesSource.minimumStay),
       maximumStay: asNumber(stayRulesSource.maximumStay),
