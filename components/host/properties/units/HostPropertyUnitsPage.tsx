@@ -92,6 +92,7 @@ const toUnitFormValues = (
     name: unit?.name ?? emptyUnit.name,
     unitNumber: unit?.unitNumber ?? emptyUnit.unitNumber,
     unitType: unit?.unitType ?? emptyUnit.unitType,
+    description: unit?.description ?? emptyUnit.description,
     capacity: unit?.capacity ?? emptyUnit.capacity,
     bedrooms: unit?.bedrooms ?? emptyUnit.bedrooms,
     bathrooms: unit?.bathrooms ?? emptyUnit.bathrooms,
