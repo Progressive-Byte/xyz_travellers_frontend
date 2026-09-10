@@ -803,6 +803,7 @@ const emptyHostPropertyUnit = (): HostPropertyUnit => ({
   name: "",
   unitNumber: "",
   unitType: "",
+  description: "",
   capacity: "",
   bedrooms: "",
   bathrooms: "",
