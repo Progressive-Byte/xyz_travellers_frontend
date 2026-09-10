@@ -67,19 +67,19 @@ export const HostPropertyUnitForm: React.FC<HostPropertyUnitFormProps> = ({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-            Step 4
+            {eyebrow}
           </p>
           <h2 className="mt-3 font-sora text-[28px] font-bold tracking-[-0.04em] text-text-primary">
-            {mode === "edit" ? "Edit unit" : "Create a unit"}
+            {heading ?? (mode === "edit" ? "Edit unit" : "Create a unit")}
           </h2>
         </div>
         <span className="rounded-full bg-primary-light px-3 py-2 text-[12px] font-semibold text-text-primary">
-          Inventory setup
+          {badgeLabel}
         </span>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <label>
+        <label className={hideIdentityFields ? "sm:col-span-2" : undefined}>
           <span className="mb-2 block text-[13px] font-semibold text-text-primary">Unit name</span>
           <input
             type="text"
@@ -92,31 +92,35 @@ export const HostPropertyUnitForm: React.FC<HostPropertyUnitFormProps> = ({
           {errors.name ? <p className="mt-2 text-[13px] text-red-600">{errors.name}</p> : null}
         </label>
 
-        <label>
-          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Unit number</span>
-          <input
-            type="text"
-            value={values.unitNumber}
-            onChange={(event) => onChange("unitNumber", event.target.value)}
-            placeholder="201"
-            disabled={disabled}
-            className={`${inputClassName} ${errors.unitNumber ? "border-red-300 focus:border-red-400" : ""}`}
-          />
-          {errors.unitNumber ? <p className="mt-2 text-[13px] text-red-600">{errors.unitNumber}</p> : null}
-        </label>
+        {hideIdentityFields ? null : (
+          <>
+            <label>
+              <span className="mb-2 block text-[13px] font-semibold text-text-primary">Unit number</span>
+              <input
+                type="text"
+                value={values.unitNumber}
+                onChange={(event) => onChange("unitNumber", event.target.value)}
+                placeholder="201"
+                disabled={disabled}
+                className={`${inputClassName} ${errors.unitNumber ? "border-red-300 focus:border-red-400" : ""}`}
+              />
+              {errors.unitNumber ? <p className="mt-2 text-[13px] text-red-600">{errors.unitNumber}</p> : null}
+            </label>
 
-        <label>
-          <span className="mb-2 block text-[13px] font-semibold text-text-primary">Unit type</span>
-          <input
-            type="text"
-            value={values.unitType}
-            onChange={(event) => onChange("unitType", event.target.value)}
-            placeholder="deluxe_room"
-            disabled={disabled}
-            className={`${inputClassName} ${errors.unitType ? "border-red-300 focus:border-red-400" : ""}`}
-          />
-          {errors.unitType ? <p className="mt-2 text-[13px] text-red-600">{errors.unitType}</p> : null}
-        </label>
+            <label>
+              <span className="mb-2 block text-[13px] font-semibold text-text-primary">Unit type</span>
+              <input
+                type="text"
+                value={values.unitType}
+                onChange={(event) => onChange("unitType", event.target.value)}
+                placeholder="deluxe_room"
+                disabled={disabled}
+                className={`${inputClassName} ${errors.unitType ? "border-red-300 focus:border-red-400" : ""}`}
+              />
+              {errors.unitType ? <p className="mt-2 text-[13px] text-red-600">{errors.unitType}</p> : null}
+            </label>
+          </>
+        )}
 
         <label>
           <span className="mb-2 block text-[13px] font-semibold text-text-primary">Guest capacity</span>
