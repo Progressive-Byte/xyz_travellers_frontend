@@ -180,6 +180,11 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
     [property],
   );
   const activeUnitsCount = useMemo(() => units.filter((unit) => unit.isActive).length, [units]);
+  const isRoomType = useMemo(
+    () => (property ? isHostPropertyRoomType(property.propertyType, propertyTypes) : false),
+    [property, propertyTypes],
+  );
+  const roomUnit = isRoomType ? units[0] ?? null : null;
 
   const refreshUnits = async () => {
     if (!token) {
@@ -188,7 +193,67 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
 
     const nextUnits = await getHostPropertyUnits(token, propertyId);
     setUnits(nextUnits);
+    return nextUnits;
   };
+
+  // A "Room" type property is itself the bookable unit: there's no multi-unit inventory to
+  // manage, so silently keep exactly one unit behind the scenes instead of showing the
+  // generic multi-unit "create a unit" workflow.
+  useEffect(() => {
+    if (!token || isLoading || !isRoomType || !canEdit || units.length > 0 || isProvisioningRoomUnit) {
+      return;
+    }
+
+    let isActive = true;
+    setIsProvisioningRoomUnit(true);
+
+    const provisionRoomUnit = async () => {
+      try {
+        await createHostPropertyUnit(token, propertyId, {
+          ...createEmptyHostPropertyUnit(),
+          name: property?.name || "Room",
+          unitType: "room",
+          capacity: "1",
+          bedrooms: "1",
+          bathrooms: "1",
+          beds: "1",
+        });
+
+        if (isActive) {
+          await refreshUnits();
+        }
+      } catch (requestError) {
+        if (isActive) {
+          setError(
+            requestError instanceof ApiError
+              ? requestError.message || "We couldn't set up this room right now."
+              : "We couldn't set up this room right now.",
+          );
+        }
+      } finally {
+        if (isActive) {
+          setIsProvisioningRoomUnit(false);
+        }
+      }
+    };
+
+    void provisionRoomUnit();
+
+    return () => {
+      isActive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, isLoading, isRoomType, canEdit, units.length, propertyId]);
+
+  useEffect(() => {
+    if (!roomUnit) {
+      return;
+    }
+
+    setEditingUnitId(roomUnit.id);
+    setValues(toUnitFormValues(roomUnit, amenities));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomUnit?.id, amenities]);
 
   const validateForm = () => {
     const nextErrors: UnitFormErrors = {};
