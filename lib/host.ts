@@ -3088,6 +3088,24 @@ export async function updateHostPayoutProfile(
 export const isHostPropertyEditable = (status: HostPropertyStatus) =>
   status === "draft" || status === "rejected" || status === "submitted" || status === "approved";
 
+// A "Room" type property is itself the bookable unit — there is no separate multi-unit
+// inventory to manage, so host UI collapses unit management down to a single implicit unit.
+export const isHostPropertyRoomType = (
+  propertyTypeId: string,
+  propertyTypes: HostPropertyReferenceOption[],
+): boolean => {
+  const normalizedId = propertyTypeId.trim().toLowerCase();
+
+  if (!normalizedId) {
+    return false;
+  }
+
+  const match = propertyTypes.find((option) => option.id.trim().toLowerCase() === normalizedId);
+  const candidates = match ? [match.value, match.label] : [propertyTypeId];
+
+  return candidates.some((candidate) => candidate.trim().toLowerCase().includes("room"));
+};
+
 export async function getHostProperties(token: string): Promise<HostPropertySummary[]> {
   if (!token) {
     throw new ApiError("Missing access token.", 401);
