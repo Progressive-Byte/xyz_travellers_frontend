@@ -1396,6 +1396,7 @@ const normalizeHostPropertyMediaItem = (payload: unknown): HostPropertyMediaItem
   return {
     id: asString(source.id) || asString(source.mediaId ?? source.media_id),
     propertyId: asString(source.propertyId ?? source.property_id),
+    unitId: asOptionalString(source.unitId ?? source.unit_id) ?? null,
     type: normalizeHostPropertyMediaType(rawType),
     url,
     thumbnailUrl: resolveApiUrl(
