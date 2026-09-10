@@ -164,11 +164,16 @@ export type FrontPropertyUnit = {
   unitName: string;
   unitNumber: string;
   unitType: string;
+  description: string;
   capacity: number | null;
   bedrooms: number | null;
   bathrooms: number | null;
   beds: number | null;
   amenityIds: string[];
+  gallery: {
+    coverImageUrl: string;
+    items: FrontPropertyGalleryImage[];
+  };
   stayRules: {
     minimumStay: number | null;
     maximumStay: number | null;
