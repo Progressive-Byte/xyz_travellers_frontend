@@ -5,6 +5,7 @@ import { HostPropertyUnitCard } from "@/components/host/properties/units/HostPro
 import { type HostPropertyUnit } from "@/lib/host";
 
 type HostPropertyUnitsListProps = {
+  propertyId: string;
   units: HostPropertyUnit[];
   disabled?: boolean;
   deletingUnitId?: string | null;
@@ -13,6 +14,7 @@ type HostPropertyUnitsListProps = {
 };
 
 export const HostPropertyUnitsList: React.FC<HostPropertyUnitsListProps> = ({
+  propertyId,
   units,
   disabled = false,
   deletingUnitId = null,
@@ -24,6 +26,7 @@ export const HostPropertyUnitsList: React.FC<HostPropertyUnitsListProps> = ({
       {units.map((unit) => (
         <HostPropertyUnitCard
           key={unit.id}
+          propertyId={propertyId}
           unit={unit}
           disabled={disabled}
           isDeleting={deletingUnitId === unit.id}
