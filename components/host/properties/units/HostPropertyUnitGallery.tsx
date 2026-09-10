@@ -131,7 +131,7 @@ export const HostPropertyUnitGallery: React.FC<HostPropertyUnitGalleryProps> = (
   };
 
   return (
-    <div className="mt-5 space-y-5 border-t border-border-light pt-5">
+    <div className={bordered ? "mt-5 space-y-5 border-t border-border-light pt-5" : "space-y-5"}>
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
           Unit gallery
