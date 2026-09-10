@@ -210,7 +210,7 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
     const provisionRoomUnit = async () => {
       try {
         await createHostPropertyUnit(token, propertyId, {
-          ...createEmptyHostPropertyUnit(),
+          ...toUnitFormValues(),
           name: property?.name || "Room",
           unitType: "room",
           capacity: "1",
