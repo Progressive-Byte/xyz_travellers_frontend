@@ -110,6 +110,7 @@ const isNumericFieldValid = (value: string) => !value.trim() || !Number.isNaN(Nu
 export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ propertyId }) => {
   const { token } = useAuth();
   const [property, setProperty] = useState<HostPropertyDetail | null>(null);
+  const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
   const [units, setUnits] = useState<HostPropertyUnit[]>([]);
   const [amenities, setAmenities] = useState<HostPropertyReferenceOption[]>([]);
   const [values, setValues] = useState<UpsertHostPropertyUnitPayload>(toUnitFormValues());
@@ -119,6 +120,7 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isProvisioningRoomUnit, setIsProvisioningRoomUnit] = useState(false);
   const [deletingUnitId, setDeletingUnitId] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
 
@@ -134,10 +136,11 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
       setError("");
 
       try {
-        const [propertyResult, unitsResult, amenitiesResult] = await Promise.all([
+        const [propertyResult, unitsResult, amenitiesResult, propertyTypesResult] = await Promise.all([
           getHostProperty(token, propertyId),
           getHostPropertyUnits(token, propertyId),
           getHostAmenities(token),
+          getHostPropertyTypes(token),
         ]);
 
         if (!isActive) {
@@ -147,6 +150,7 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
         setProperty(propertyResult);
         setUnits(unitsResult);
         setAmenities(amenitiesResult);
+        setPropertyTypes(propertyTypesResult);
       } catch (requestError) {
         if (!isActive) {
           return;
