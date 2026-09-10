@@ -18,12 +18,15 @@ type HostPropertyUnitGalleryProps = {
   propertyId: string;
   unitId: string;
   disabled: boolean;
+  /** Set false when this panel is the only content in its own card (no divider needed above it). */
+  bordered?: boolean;
 };
 
 export const HostPropertyUnitGallery: React.FC<HostPropertyUnitGalleryProps> = ({
   propertyId,
   unitId,
   disabled,
+  bordered = true,
 }) => {
   const { token } = useAuth();
   const [items, setItems] = useState<HostPropertyMediaItem[]>([]);
