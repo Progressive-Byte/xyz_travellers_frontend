@@ -440,6 +440,7 @@ export type HostPropertyMediaType = "image" | "video";
 export type HostPropertyMediaItem = {
   id: string;
   propertyId: string;
+  unitId: string | null;
   type: HostPropertyMediaType;
   url: string;
   thumbnailUrl: string;
@@ -456,6 +457,7 @@ export type HostPropertyUnit = {
   name: string;
   unitNumber: string;
   unitType: string;
+  description: string;
   capacity: string;
   bedrooms: string;
   bathrooms: string;
@@ -470,6 +472,7 @@ export type UpsertHostPropertyUnitPayload = {
   name: string;
   unitNumber: string;
   unitType: string;
+  description: string;
   capacity: string;
   bedrooms: string;
   bathrooms: string;
