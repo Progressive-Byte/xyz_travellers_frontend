@@ -62,20 +62,19 @@ export const HostPropertyMediaUploader: React.FC<HostPropertyMediaUploaderProps>
   return (
     <div className="surface-card rounded-panel p-6">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-        Image upload
+        {eyebrow}
       </p>
       <h2 className="mt-3 font-sora text-[24px] font-bold tracking-[-0.04em] text-text-primary">
-        Add the images guests should see first
+        {heading}
       </h2>
       <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-        Upload the main gallery images for this listing, then choose one as the cover photo once the
-        uploads finish.
+        {description}
       </p>
 
       <label className="mt-6 block rounded-[22px] border border-dashed border-border bg-white/80 p-5">
-        <span className="block text-[13px] font-semibold text-text-primary">Choose property images</span>
+        <span className="block text-[13px] font-semibold text-text-primary">{chooseLabel}</span>
         <span className="mt-2 block text-[13px] leading-6 text-text-secondary">
-          Select one or more image files for this property's media gallery.
+          {chooseHint}
         </span>
         <input
           ref={inputRef}
