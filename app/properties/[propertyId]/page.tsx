@@ -534,6 +534,11 @@ export default async function PropertyPage({
                                   .filter(Boolean)
                                   .join(" • ")}
                               </p>
+                              {unit.description ? (
+                                <p className="mt-3 max-w-2xl text-[14px] leading-6 text-text-secondary">
+                                  {unit.description}
+                                </p>
+                              ) : null}
                               {(unit.stayRules.minimumStay || unit.stayRules.maximumStay) ? (
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   {unit.stayRules.minimumStay ? (
@@ -545,6 +550,29 @@ export default async function PropertyPage({
                                     <span className="rounded-full border border-border bg-surface px-3 py-1.5 text-[12px] font-medium text-text-secondary">
                                       {formatStayRuleLabel(unit.stayRules.maximumStay, "max")}
                                     </span>
+                                  ) : null}
+                                </div>
+                              ) : null}
+                              {unit.gallery.items.length ? (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {unit.gallery.items.slice(0, 5).map((image) => (
+                                    <div
+                                      key={image.id || image.src}
+                                      className="relative h-14 w-14 overflow-hidden rounded-[14px] border border-border bg-surface-muted"
+                                    >
+                                      <Image
+                                        src={image.src}
+                                        alt={image.alt || `${unit.unitName} gallery image`}
+                                        fill
+                                        sizes="56px"
+                                        className="object-cover"
+                                      />
+                                    </div>
+                                  ))}
+                                  {unit.gallery.items.length > 5 ? (
+                                    <div className="flex h-14 w-14 items-center justify-center rounded-[14px] border border-border bg-surface text-[12px] font-semibold text-text-secondary">
+                                      +{unit.gallery.items.length - 5}
+                                    </div>
                                   ) : null}
                                 </div>
                               ) : null}
