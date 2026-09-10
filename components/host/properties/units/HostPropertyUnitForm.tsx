@@ -180,6 +180,18 @@ export const HostPropertyUnitForm: React.FC<HostPropertyUnitFormProps> = ({
         </label>
       </div>
 
+      <label className="mt-4 block">
+        <span className="mb-2 block text-[13px] font-semibold text-text-primary">Description</span>
+        <textarea
+          value={values.description}
+          onChange={(event) => onChange("description", event.target.value)}
+          placeholder="Share a short detail guests should know about this unit — a view, a layout quirk, what makes it special."
+          disabled={disabled}
+          rows={3}
+          className={`${inputClassName} resize-y`}
+        />
+      </label>
+
       <div className="mt-5 rounded-[22px] border border-border-light bg-white/80 px-4 py-4">
         <label className={`flex items-center gap-3 text-[14px] font-semibold text-text-primary ${disabled ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}>
           <input
