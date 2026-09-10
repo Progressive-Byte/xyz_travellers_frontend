@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { HostPropertyUnitGallery } from "@/components/host/properties/units/HostPropertyUnitGallery";
 import { type HostPropertyUnit } from "@/lib/host";
 
 type HostPropertyUnitCardProps = {
+  propertyId: string;
   unit: HostPropertyUnit;
   disabled?: boolean;
   isDeleting?: boolean;
@@ -12,12 +14,15 @@ type HostPropertyUnitCardProps = {
 };
 
 export const HostPropertyUnitCard: React.FC<HostPropertyUnitCardProps> = ({
+  propertyId,
   unit,
   disabled = false,
   isDeleting = false,
   onEdit,
   onDelete,
 }) => {
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+
   return (
     <div className="surface-card rounded-panel p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
