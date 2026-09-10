@@ -1443,6 +1443,7 @@ const normalizeHostPropertyUnit = (payload: unknown): HostPropertyUnit => {
       asString(source.label),
     unitNumber: asString(source.unitNumber ?? source.unit_number),
     unitType: asString(source.unitType ?? source.unit_type),
+    description: asString(source.description),
     capacity: asTextValue(source.capacity ?? source.maxGuests ?? source.max_guests ?? source.guests),
     bedrooms: asTextValue(source.bedrooms ?? source.bedroomCount ?? source.bedroom_count),
     bathrooms: asTextValue(source.bathrooms ?? source.bathroomCount ?? source.bathroom_count),
