@@ -421,34 +421,66 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
         currentStep="units"
         title={property.name || "Untitled property"}
         status={property.status}
-        description="Units turn the listing from a presentation draft into real inventory. Define what guests can actually book before you move into pricing and calendar controls."
+        description={
+          isRoomType
+            ? "A room listing is itself the bookable unit. Fill in its details and gallery here, then move into pricing and calendar controls."
+            : "Units turn the listing from a presentation draft into real inventory. Define what guests can actually book before you move into pricing and calendar controls."
+        }
         headerAside={
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
-              Inventory count
+              {isRoomType ? "Room status" : "Inventory count"}
             </p>
             <p className="mt-3 text-[16px] font-semibold text-text-primary">
-              {units.length} unit{units.length === 1 ? "" : "s"} total
+              {isRoomType
+                ? roomUnit
+                  ? "Room ready"
+                  : "Setting up room..."
+                : `${units.length} unit${units.length === 1 ? "" : "s"} total`}
             </p>
           </div>
         }
       >
         <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
           <div className="space-y-6">
-            <HostPropertyUnitForm
-              values={values}
-              amenities={amenities}
-              errors={errors}
-              successMessage={successMessage}
-              isSubmitting={isSaving}
-              disabled={!canEdit}
-              mode={editingUnitId ? "edit" : "create"}
-              onChange={handleChange}
-              onCancel={editingUnitId ? resetForm : undefined}
-              onSubmit={handleSubmit}
-            />
+            {isRoomType ? (
+              <HostPropertyUnitForm
+                values={values}
+                amenities={amenities}
+                errors={errors}
+                successMessage={successMessage}
+                isSubmitting={isSaving}
+                disabled={!canEdit || !roomUnit}
+                mode="edit"
+                hideIdentityFields
+                eyebrow="Step 4"
+                heading="Room details"
+                badgeLabel="Room setup"
+                onChange={handleChange}
+                onSubmit={handleSubmit}
+              />
+            ) : (
+              <HostPropertyUnitForm
+                values={values}
+                amenities={amenities}
+                errors={errors}
+                successMessage={successMessage}
+                isSubmitting={isSaving}
+                disabled={!canEdit}
+                mode={editingUnitId ? "edit" : "create"}
+                onChange={handleChange}
+                onCancel={editingUnitId ? resetForm : undefined}
+                onSubmit={handleSubmit}
+              />
+            )}
 
-            {units.length === 0 ? (
+            {isRoomType ? (
+              roomUnit ? (
+                <div className="surface-card rounded-panel p-6 md:p-7">
+                  <HostPropertyUnitGallery propertyId={propertyId} unitId={roomUnit.id} disabled={!canEdit} />
+                </div>
+              ) : null
+            ) : units.length === 0 ? (
               <div className="surface-card rounded-panel p-8">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
                   No units yet
@@ -463,6 +495,7 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
               </div>
             ) : (
               <HostPropertyUnitsList
+                propertyId={propertyId}
                 units={units}
                 disabled={!canEdit}
                 deletingUnitId={deletingUnitId}
