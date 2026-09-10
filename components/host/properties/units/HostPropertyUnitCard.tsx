@@ -42,8 +42,7 @@ export const HostPropertyUnitCard: React.FC<HostPropertyUnitCardProps> = ({
             </span>
           </div>
           <p className="mt-3 text-[14px] leading-7 text-text-secondary">
-            Keep the unit details accurate now so later pricing and calendar controls stay aligned to
-            real inventory.
+            {unit.description || "Keep the unit details accurate now so later pricing and calendar controls stay aligned to real inventory."}
           </p>
         </div>
 
@@ -55,6 +54,14 @@ export const HostPropertyUnitCard: React.FC<HostPropertyUnitCardProps> = ({
             className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium disabled:opacity-70"
           >
             Edit unit
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsGalleryOpen((current) => !current)}
+            disabled={isDeleting}
+            className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium disabled:opacity-70"
+          >
+            {isGalleryOpen ? "Hide gallery" : "Manage gallery"}
           </button>
           <button
             type="button"
