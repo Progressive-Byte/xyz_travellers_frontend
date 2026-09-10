@@ -364,7 +364,7 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
         const updatedUnit = await updateHostPropertyUnit(token, propertyId, editingUnitId, values);
         await refreshUnits();
         setValues(toUnitFormValues(updatedUnit, amenities));
-        setSuccessMessage("Unit updated successfully.");
+        setSuccessMessage(isRoomType ? "Room details updated successfully." : "Unit updated successfully.");
       } else {
         await createHostPropertyUnit(token, propertyId, values);
         await refreshUnits();
