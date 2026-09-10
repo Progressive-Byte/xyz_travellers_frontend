@@ -123,6 +123,7 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
   const [isProvisioningRoomUnit, setIsProvisioningRoomUnit] = useState(false);
   const [deletingUnitId, setDeletingUnitId] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
+  const isProvisioningRoomUnitRef = useRef(false);
 
   useEffect(() => {
     if (!token) {
