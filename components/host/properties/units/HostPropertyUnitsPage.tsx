@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { HostShell } from "@/components/host/HostShell";
 import { HostPropertyEditorShell } from "@/components/host/properties/HostPropertyEditorShell";
 import { HostPropertyUnitForm } from "@/components/host/properties/units/HostPropertyUnitForm";
+import { HostPropertyUnitGallery } from "@/components/host/properties/units/HostPropertyUnitGallery";
 import { HostPropertyUnitsList } from "@/components/host/properties/units/HostPropertyUnitsList";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
@@ -14,8 +15,10 @@ import {
   deleteHostPropertyUnit,
   getHostAmenities,
   getHostProperty,
+  getHostPropertyTypes,
   getHostPropertyUnits,
   isHostPropertyEditable,
+  isHostPropertyRoomType,
   updateHostPropertyUnit,
   type HostPropertyDetail,
   type HostPropertyReferenceOption,
