@@ -110,6 +110,10 @@ export const HostPropertyUnitCard: React.FC<HostPropertyUnitCardProps> = ({
           )}
         </div>
       </div>
+
+      {isGalleryOpen ? (
+        <HostPropertyUnitGallery propertyId={propertyId} unitId={unit.id} disabled={disabled} />
+      ) : null}
     </div>
   );
 };
