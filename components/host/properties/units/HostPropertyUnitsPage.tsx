@@ -201,11 +201,19 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
   // manage, so silently keep exactly one unit behind the scenes instead of showing the
   // generic multi-unit "create a unit" workflow.
   useEffect(() => {
-    if (!token || isLoading || !isRoomType || !canEdit || units.length > 0 || isProvisioningRoomUnit) {
+    if (
+      !token ||
+      isLoading ||
+      !isRoomType ||
+      !canEdit ||
+      units.length > 0 ||
+      isProvisioningRoomUnitRef.current
+    ) {
       return;
     }
 
     let isActive = true;
+    isProvisioningRoomUnitRef.current = true;
     setIsProvisioningRoomUnit(true);
 
     const provisionRoomUnit = async () => {
