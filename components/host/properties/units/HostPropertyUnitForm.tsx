@@ -24,6 +24,12 @@ type HostPropertyUnitFormProps = {
   isSubmitting: boolean;
   disabled?: boolean;
   mode: "create" | "edit";
+  /** Hides unit number/type inputs — used for a "Room" type property, where the property
+   * itself is the single bookable unit and those identity fields don't apply. */
+  hideIdentityFields?: boolean;
+  eyebrow?: string;
+  heading?: string;
+  badgeLabel?: string;
   onChange: (field: keyof UpsertHostPropertyUnitPayload, value: string | string[] | boolean) => void;
   onCancel?: () => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
