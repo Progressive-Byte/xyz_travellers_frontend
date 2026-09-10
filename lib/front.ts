@@ -494,7 +494,7 @@ const normalizeFrontPropertyDetail = (payload: unknown): FrontPropertyDetail => 
       guests: asNumber(asRecord(source.availability).guests),
       availableUnitsCount: asNumber(asRecord(source.availability).availableUnitsCount),
     },
-    units: asArray(source.units).map(normalizeFrontPropertyUnit),
+    units: asArray(source.units).map((item) => normalizeFrontPropertyUnit(item, propertyTitle)),
     amenities: asArray(source.amenities).map(normalizeFrontPropertyAmenity),
     host: {
       id: asString(asRecord(source.host).id),
