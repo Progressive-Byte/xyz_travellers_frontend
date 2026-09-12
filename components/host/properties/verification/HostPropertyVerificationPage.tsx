@@ -164,6 +164,7 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
         }
 
         setProperty(propertyResult);
+        setPropertyTypes(propertyTypesResult);
         setMediaItems(mediaResult);
         setUnits(unitsResult);
         setPricings(unitDetails.map((item) => item.pricing));
