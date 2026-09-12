@@ -115,19 +115,21 @@ export const HostPropertyLocationForm: React.FC<HostPropertyLocationFormProps> =
           />
         </div>
 
-        <Field
+        <SelectField
           label="City"
           value={values.city}
+          options={cityOptions}
           onChange={(value) => onChange("city", value)}
-          placeholder="Dhaka"
+          placeholder="Select a city"
           error={errors.city}
           disabled={disabled}
         />
-        <Field
+        <SelectField
           label="Country"
           value={values.country}
+          options={countryOptions}
           onChange={(value) => onChange("country", value)}
-          placeholder="Bangladesh"
+          placeholder="Select a country"
           error={errors.country}
           disabled={disabled}
         />
