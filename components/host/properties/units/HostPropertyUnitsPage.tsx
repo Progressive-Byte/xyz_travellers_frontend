@@ -333,7 +333,7 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isRoomType) {
     return <UnitsPageSkeleton />;
   }
 
