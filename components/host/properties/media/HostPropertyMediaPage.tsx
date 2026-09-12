@@ -494,6 +494,35 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
                 onDelete={handleDelete}
               />
             )}
+
+            {isRoomType ? (
+              <HostPropertyUnitForm
+                values={roomValues}
+                amenities={amenities}
+                errors={roomErrors}
+                successMessage={roomSuccessMessage}
+                isSubmitting={isSavingRoom}
+                disabled={!canEdit || !roomUnit || isProvisioningRoomUnit}
+                mode="edit"
+                hideIdentityFields
+                eyebrow="Room details"
+                heading="Room details"
+                badgeLabel="Room setup"
+                onChange={handleRoomChange}
+                onSubmit={handleRoomSubmit}
+              />
+            ) : null}
+
+            {isRoomType && roomUnit ? (
+              <div className="surface-card rounded-panel p-6 md:p-7">
+                <HostPropertyUnitGallery
+                  propertyId={propertyId}
+                  unitId={roomUnit.id}
+                  disabled={!canEdit}
+                  bordered={false}
+                />
+              </div>
+            ) : null}
           </div>
 
           <div className="space-y-6">
