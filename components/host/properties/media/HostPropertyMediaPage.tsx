@@ -191,6 +191,11 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
     () => mediaItems.filter((item) => item.type === "video").length,
     [mediaItems],
   );
+  const isRoomType = useMemo(
+    () => (property ? isHostPropertyRoomType(property.propertyType, propertyTypes) : false),
+    [property, propertyTypes],
+  );
+  const roomUnit = isRoomType ? units[0] ?? null : null;
 
   const refreshMediaItems = async () => {
     if (!token) {
@@ -199,6 +204,157 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
 
     const nextItems = await getHostPropertyMedia(token, propertyId);
     setMediaItems(nextItems);
+  };
+
+  const refreshUnits = async () => {
+    if (!token) {
+      return;
+    }
+
+    const nextUnits = await getHostPropertyUnits(token, propertyId);
+    setUnits(nextUnits);
+    return nextUnits;
+  };
+
+  // A "Room" type property is itself the bookable unit: there's no multi-unit inventory to
+  // manage, so silently keep exactly one unit behind the scenes instead of showing the
+  // generic multi-unit "create a unit" workflow.
+  useEffect(() => {
+    if (
+      !token ||
+      isLoading ||
+      !isRoomType ||
+      !canEdit ||
+      units.length > 0 ||
+      isProvisioningRoomUnitRef.current
+    ) {
+      return;
+    }
+
+    let isActive = true;
+    isProvisioningRoomUnitRef.current = true;
+    setIsProvisioningRoomUnit(true);
+
+    const provisionRoomUnit = async () => {
+      try {
+        await createHostPropertyUnit(token, propertyId, {
+          ...toRoomFormValues(),
+          name: property?.name || "Room",
+          unitType: "room",
+          capacity: "1",
+          bedrooms: "1",
+          bathrooms: "1",
+          beds: "1",
+        });
+
+        if (isActive) {
+          await refreshUnits();
+        }
+      } catch (requestError) {
+        if (isActive) {
+          setError(
+            requestError instanceof ApiError
+              ? requestError.message || "We couldn't set up this room right now."
+              : "We couldn't set up this room right now.",
+          );
+        }
+      } finally {
+        isProvisioningRoomUnitRef.current = false;
+
+        if (isActive) {
+          setIsProvisioningRoomUnit(false);
+        }
+      }
+    };
+
+    void provisionRoomUnit();
+
+    return () => {
+      isActive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, isLoading, isRoomType, canEdit, units.length, propertyId]);
+
+  useEffect(() => {
+    if (!roomUnit) {
+      return;
+    }
+
+    setRoomValues(toRoomFormValues(roomUnit, amenities));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomUnit?.id, amenities]);
+
+  const validateRoomForm = () => {
+    const nextErrors: RoomFormErrors = {};
+
+    if (!roomValues.name.trim()) {
+      nextErrors.name = "Please enter a unit name.";
+    }
+
+    if (!roomValues.capacity.trim()) {
+      nextErrors.capacity = "Please enter the guest capacity.";
+    } else if (!isNumericFieldValid(roomValues.capacity)) {
+      nextErrors.capacity = "Capacity should be a valid number.";
+    }
+
+    if (!isNumericFieldValid(roomValues.bedrooms)) {
+      nextErrors.bedrooms = "Bedrooms should be a valid number.";
+    }
+
+    if (!isNumericFieldValid(roomValues.bathrooms)) {
+      nextErrors.bathrooms = "Bathrooms should be a valid number.";
+    }
+
+    if (!isNumericFieldValid(roomValues.beds)) {
+      nextErrors.beds = "Beds should be a valid number.";
+    }
+
+    return nextErrors;
+  };
+
+  const handleRoomChange = (
+    field: keyof UpsertHostPropertyUnitPayload,
+    value: string | string[] | boolean,
+  ) => {
+    setRoomValues((current) => ({ ...current, [field]: value } as UpsertHostPropertyUnitPayload));
+    setRoomErrors((current) => ({ ...current, [field]: undefined, form: undefined }));
+    setRoomSuccessMessage("");
+  };
+
+  const handleRoomSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!token || !canEdit || !roomUnit) {
+      return;
+    }
+
+    const nextErrors = validateRoomForm();
+
+    if (Object.keys(nextErrors).length > 0) {
+      setRoomErrors(nextErrors);
+      setRoomSuccessMessage("");
+      return;
+    }
+
+    setIsSavingRoom(true);
+    setRoomErrors({});
+    setRoomSuccessMessage("");
+
+    try {
+      const updatedUnit = await updateHostPropertyUnit(token, propertyId, roomUnit.id, roomValues);
+      await refreshUnits();
+      setRoomValues(toRoomFormValues(updatedUnit, amenities));
+      setRoomSuccessMessage("Room details updated successfully.");
+    } catch (requestError) {
+      setRoomErrors({
+        form:
+          requestError instanceof ApiError
+            ? requestError.message || "We couldn't save the room details right now."
+            : "We couldn't save the room details right now.",
+      });
+    } finally {
+      setIsSavingRoom(false);
+    }
   };
 
   const handleUpload = async (files: File[]) => {
