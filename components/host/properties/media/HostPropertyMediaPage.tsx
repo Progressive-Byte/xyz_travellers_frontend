@@ -1,26 +1,85 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { HostShell } from "@/components/host/HostShell";
 import { HostPropertyEditorShell } from "@/components/host/properties/HostPropertyEditorShell";
 import { HostPropertyMediaEmptyState } from "@/components/host/properties/media/HostPropertyMediaEmptyState";
 import { HostPropertyMediaGallery } from "@/components/host/properties/media/HostPropertyMediaGallery";
 import { HostPropertyMediaUploader } from "@/components/host/properties/media/HostPropertyMediaUploader";
 import { HostPropertyVideoUrlForm } from "@/components/host/properties/media/HostPropertyVideoUrlForm";
+import { HostPropertyUnitForm } from "@/components/host/properties/units/HostPropertyUnitForm";
+import { HostPropertyUnitGallery } from "@/components/host/properties/units/HostPropertyUnitGallery";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
+  createEmptyHostPropertyUnit,
+  createHostPropertyUnit,
   createHostPropertyVideoUrl,
   deleteHostPropertyMedia,
+  getHostAmenities,
   getHostProperty,
   getHostPropertyMedia,
+  getHostPropertyTypes,
+  getHostPropertyUnits,
   isHostPropertyEditable,
+  isHostPropertyRoomType,
   updateHostPropertyMedia,
+  updateHostPropertyUnit,
   uploadHostPropertyImage,
   type HostPropertyDetail,
   type HostPropertyMediaItem,
+  type HostPropertyReferenceOption,
+  type HostPropertyUnit,
+  type UpsertHostPropertyUnitPayload,
 } from "@/lib/host";
+
+type RoomFormErrors = Partial<
+  Record<
+    keyof Pick<
+      UpsertHostPropertyUnitPayload,
+      "name" | "unitNumber" | "unitType" | "capacity" | "bedrooms" | "bathrooms" | "beds"
+    > | "form",
+    string
+  >
+>;
+
+const toRoomFormValues = (
+  unit?: HostPropertyUnit,
+  amenityOptions: HostPropertyReferenceOption[] = [],
+): UpsertHostPropertyUnitPayload => {
+  const emptyUnit = createEmptyHostPropertyUnit();
+  const resolveAmenityIds = (values: string[]) =>
+    Array.from(
+      new Set(
+        values
+          .map(
+            (value) =>
+              amenityOptions.find((option) =>
+                [option.id, option.value, option.label].some(
+                  (candidate) => candidate.trim().toLowerCase() === value.trim().toLowerCase(),
+                ),
+              )?.id || value,
+          )
+          .filter(Boolean),
+      ),
+    );
+
+  return {
+    name: unit?.name ?? emptyUnit.name,
+    unitNumber: unit?.unitNumber ?? emptyUnit.unitNumber,
+    unitType: unit?.unitType ?? emptyUnit.unitType,
+    description: unit?.description ?? emptyUnit.description,
+    capacity: unit?.capacity ?? emptyUnit.capacity,
+    bedrooms: unit?.bedrooms ?? emptyUnit.bedrooms,
+    bathrooms: unit?.bathrooms ?? emptyUnit.bathrooms,
+    beds: unit?.beds ?? emptyUnit.beds,
+    amenities: resolveAmenityIds(unit?.amenities ?? emptyUnit.amenities),
+    isActive: unit?.isActive ?? emptyUnit.isActive,
+  };
+};
+
+const isNumericFieldValid = (value: string) => !value.trim() || !Number.isNaN(Number(value));
 
 type HostPropertyMediaPageProps = {
   propertyId: string;
