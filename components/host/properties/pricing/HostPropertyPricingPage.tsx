@@ -78,9 +78,10 @@ export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = (
       setPageError("");
 
       try {
-        const [propertyResult, unitsResult] = await Promise.all([
+        const [propertyResult, unitsResult, propertyTypesResult] = await Promise.all([
           getHostProperty(token, propertyId),
           getHostPropertyUnits(token, propertyId),
+          getHostPropertyTypes(token),
         ]);
 
         if (!isActive) {
@@ -89,6 +90,7 @@ export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = (
 
         setProperty(propertyResult);
         setUnits(unitsResult);
+        setPropertyTypes(propertyTypesResult);
         setSelectedUnitId((current) =>
           current && unitsResult.some((unit) => unit.id === current)
             ? current
