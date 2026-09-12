@@ -204,6 +204,10 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
 
   const pageStatus = submissionStatus.status || property?.status || "draft";
   const canEdit = isHostPropertyEditable(pageStatus);
+  const isRoomType = useMemo(
+    () => (property ? isHostPropertyRoomType(property.propertyType, propertyTypes) : false),
+    [property, propertyTypes],
+  );
   const checklist = useMemo(() => {
     if (!property) {
       return null;
