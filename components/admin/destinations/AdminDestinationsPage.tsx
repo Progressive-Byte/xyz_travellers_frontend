@@ -6,9 +6,12 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { useAuth } from "@/context/AuthContext";
 import {
   deleteAdminLocation,
+  getAdminCities,
+  getAdminCountries,
   getAdminLocations,
   subscribeLocations,
   upsertAdminLocation,
+  type AdminGeoOption,
   type AdminLocationSummary,
   type UpsertAdminLocationPayload,
 } from "@/lib/admin";
