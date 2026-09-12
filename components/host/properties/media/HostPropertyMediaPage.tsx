@@ -9,7 +9,6 @@ import { HostPropertyMediaGallery } from "@/components/host/properties/media/Hos
 import { HostPropertyMediaUploader } from "@/components/host/properties/media/HostPropertyMediaUploader";
 import { HostPropertyVideoUrlForm } from "@/components/host/properties/media/HostPropertyVideoUrlForm";
 import { HostPropertyUnitForm } from "@/components/host/properties/units/HostPropertyUnitForm";
-import { HostPropertyUnitGallery } from "@/components/host/properties/units/HostPropertyUnitGallery";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api";
 import {
