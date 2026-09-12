@@ -355,6 +355,7 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
         currentStep="verification"
         title={property.name || "Untitled property"}
         status={pageStatus}
+        hideUnitsStep={isRoomType}
         description="Verification is the final host-facing step before admin review. Attach proof, review the submission checklist, and send the property into moderation with confidence."
         headerAside={
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
