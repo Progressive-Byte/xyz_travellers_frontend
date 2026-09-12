@@ -196,6 +196,25 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
     void loadLocation();
   }, [locationId, token]);
 
+  const loadGeoOptions = async () => {
+    if (!token) return;
+
+    try {
+      const [cityOptions, countryOptions] = await Promise.all([
+        getAdminCities(token),
+        getAdminCountries(token),
+      ]);
+      setCities(cityOptions);
+      setCountries(countryOptions);
+    } catch (error) {
+      // Non-fatal: the city/country fields still accept free text via the datalist fallback.
+    }
+  };
+
+  useEffect(() => {
+    void loadGeoOptions();
+  }, [token]);
+
   useEffect(() => {
     return subscribeLocations(() => {
       void loadLocation();
