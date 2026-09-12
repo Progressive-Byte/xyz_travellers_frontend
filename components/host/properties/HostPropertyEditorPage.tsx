@@ -132,11 +132,14 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
       setCommercialNotice("");
 
       try {
-        const [property, propertyTypesResult, commissionResult] = await Promise.all([
-          getHostProperty(token, propertyId),
-          getHostPropertyTypes(token),
-          getHostCommissionInfo(token),
-        ]);
+        const [property, propertyTypesResult, commissionResult, cityOptionsResult, countryOptionsResult] =
+          await Promise.all([
+            getHostProperty(token, propertyId),
+            getHostPropertyTypes(token),
+            getHostCommissionInfo(token),
+            getHostCities(token),
+            getHostCountries(token),
+          ]);
 
         if (!isActive) {
           return;
@@ -147,6 +150,8 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
           propertyType: resolveReferenceId(property.propertyType, propertyTypesResult),
         });
         setPropertyTypes(propertyTypesResult);
+        setCityOptions(cityOptionsResult);
+        setCountryOptions(countryOptionsResult);
         setCommissionInfo(commissionResult);
 
         try {
