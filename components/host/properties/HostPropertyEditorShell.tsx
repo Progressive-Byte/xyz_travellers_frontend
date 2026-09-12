@@ -18,6 +18,8 @@ type HostPropertyEditorShellProps = {
   children: React.ReactNode;
   headerAside?: React.ReactNode;
   description?: string;
+  /** Room-type properties fold unit details into the Media step, so the wizard has no separate "Units" step. */
+  hideUnitsStep?: boolean;
 };
 
 const stepStateClasses = {
