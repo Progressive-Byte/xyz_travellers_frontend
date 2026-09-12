@@ -338,15 +338,16 @@ export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = (
                   Keep setup moving
                 </h2>
                 <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                  Units remain editable in the previous step. Once pricing looks right, move into
-                  calendar rules and blocked dates.
+                  {isRoomType
+                    ? "Room details remain editable in the previous step. Once pricing looks right, move into calendar rules and blocked dates."
+                    : "Units remain editable in the previous step. Once pricing looks right, move into calendar rules and blocked dates."}
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link
-                    href={`/host/properties/${propertyId}/units`}
+                    href={previousStepHref}
                     className="inline-flex items-center justify-center rounded-[18px] border border-border bg-white px-5 py-3 text-[14px] font-semibold text-text-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-text-primary/20 hover:shadow-medium"
                   >
-                    Back to units
+                    {previousStepLabel}
                   </Link>
                   <Link
                     href={`/host/properties/${propertyId}/calendar`}
