@@ -1451,6 +1451,55 @@ const unwrap = (payload: unknown): unknown => {
   return payload;
 };
 
+export type AdminGeoOption = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+const normalizeAdminGeoOption = (raw: unknown): AdminGeoOption => {
+  const source = asRecord(raw);
+  return {
+    id: asString(source.id),
+    name: asString(source.name),
+    slug: asString(source.slug),
+  };
+};
+
+export async function getAdminCities(token: string): Promise<AdminGeoOption[]> {
+  const raw = await apiRequest<unknown>(`/api/v1/admin/cities`, {
+    method: "GET",
+    headers: authHeaders(token),
+  });
+  return asArray(unwrap(raw)).map(normalizeAdminGeoOption);
+}
+
+export async function createAdminCity(token: string, name: string): Promise<AdminGeoOption> {
+  const raw = await apiRequest<unknown>(`/api/v1/admin/cities`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: { name },
+  });
+  return normalizeAdminGeoOption(unwrap(raw));
+}
+
+export async function getAdminCountries(token: string): Promise<AdminGeoOption[]> {
+  const raw = await apiRequest<unknown>(`/api/v1/admin/countries`, {
+    method: "GET",
+    headers: authHeaders(token),
+  });
+  return asArray(unwrap(raw)).map(normalizeAdminGeoOption);
+}
+
+export async function createAdminCountry(token: string, name: string): Promise<AdminGeoOption> {
+  const raw = await apiRequest<unknown>(`/api/v1/admin/countries`, {
+    method: "POST",
+    headers: authHeaders(token),
+    body: { name },
+  });
+  return normalizeAdminGeoOption(unwrap(raw));
+}
+
 export async function getAdminLocations(
   token: string,
   params: { isActive?: boolean } = {},
