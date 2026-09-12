@@ -18,6 +18,8 @@ import {
   getHostBusinessDocuments,
   getHostCommissionInfo,
   getHostProperty,
+  getHostCities,
+  getHostCountries,
   getHostPropertyTypes,
   isHostPropertyEditable,
   isHostPropertyRoomType,
