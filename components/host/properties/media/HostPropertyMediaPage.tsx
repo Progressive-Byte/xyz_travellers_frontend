@@ -106,11 +106,20 @@ const MediaPageSkeleton = () => (
 export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ propertyId }) => {
   const { token } = useAuth();
   const [property, setProperty] = useState<HostPropertyDetail | null>(null);
+  const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
   const [mediaItems, setMediaItems] = useState<HostPropertyMediaItem[]>([]);
+  const [units, setUnits] = useState<HostPropertyUnit[]>([]);
+  const [amenities, setAmenities] = useState<HostPropertyReferenceOption[]>([]);
+  const [roomValues, setRoomValues] = useState<UpsertHostPropertyUnitPayload>(toRoomFormValues());
+  const [roomErrors, setRoomErrors] = useState<RoomFormErrors>({});
+  const [roomSuccessMessage, setRoomSuccessMessage] = useState("");
+  const [isSavingRoom, setIsSavingRoom] = useState(false);
+  const [isProvisioningRoomUnit, setIsProvisioningRoomUnit] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
+  const isProvisioningRoomUnitRef = useRef(false);
 
   useEffect(() => {
     if (!token) {
@@ -124,10 +133,14 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
       setError("");
 
       try {
-        const [propertyResult, mediaResult] = await Promise.all([
-          getHostProperty(token, propertyId),
-          getHostPropertyMedia(token, propertyId),
-        ]);
+        const [propertyResult, mediaResult, unitsResult, amenitiesResult, propertyTypesResult] =
+          await Promise.all([
+            getHostProperty(token, propertyId),
+            getHostPropertyMedia(token, propertyId),
+            getHostPropertyUnits(token, propertyId),
+            getHostAmenities(token),
+            getHostPropertyTypes(token),
+          ]);
 
         if (!isActive) {
           return;
@@ -135,6 +148,9 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
 
         setProperty(propertyResult);
         setMediaItems(mediaResult);
+        setUnits(unitsResult);
+        setAmenities(amenitiesResult);
+        setPropertyTypes(propertyTypesResult);
       } catch (requestError) {
         if (!isActive) {
           return;
