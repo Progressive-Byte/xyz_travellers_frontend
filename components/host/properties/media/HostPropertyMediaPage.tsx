@@ -458,7 +458,7 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
         hideUnitsStep={isRoomType}
         description={
           isRoomType
-            ? "This stage turns the draft into a real guest-facing listing by adding gallery images, choosing a cover photo, and setting the room's own details and gallery — a room is itself the bookable unit, so there is no separate units step."
+            ? "This stage turns the draft into a real guest-facing listing by adding gallery images, choosing a cover photo, and setting the room's own details — a room is itself the bookable unit, so this same gallery covers the room too and there is no separate units step."
             : "This stage turns the draft into a real guest-facing listing by adding gallery images, choosing a cover photo, and optionally attaching a supporting video link."
         }
         headerAside={
