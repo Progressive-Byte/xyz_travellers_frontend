@@ -108,6 +108,7 @@ const toUnitFormValues = (
 const isNumericFieldValid = (value: string) => !value.trim() || !Number.isNaN(Number(value));
 
 export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ propertyId }) => {
+  const router = useRouter();
   const { token } = useAuth();
   const [property, setProperty] = useState<HostPropertyDetail | null>(null);
   const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
@@ -120,10 +121,8 @@ export const HostPropertyUnitsPage: React.FC<HostPropertyUnitsPageProps> = ({ pr
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isProvisioningRoomUnit, setIsProvisioningRoomUnit] = useState(false);
   const [deletingUnitId, setDeletingUnitId] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
-  const isProvisioningRoomUnitRef = useRef(false);
 
   useEffect(() => {
     if (!token) {
