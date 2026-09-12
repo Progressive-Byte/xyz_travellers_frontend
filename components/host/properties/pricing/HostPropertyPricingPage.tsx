@@ -53,6 +53,7 @@ export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = (
   const router = useRouter();
   const { token } = useAuth();
   const [property, setProperty] = useState<HostPropertyDetail | null>(null);
+  const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
   const [units, setUnits] = useState<HostPropertyUnit[]>([]);
   const [selectedUnitId, setSelectedUnitId] = useState("");
   const [values, setValues] = useState<HostUnitPricing>(createEmptyHostUnitPricing());
