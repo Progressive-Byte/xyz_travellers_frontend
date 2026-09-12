@@ -287,6 +287,7 @@ export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = (
         currentStep="pricing"
         title={property.name || "Untitled property"}
         status={property.status}
+        hideUnitsStep={isRoomType}
         description="Pricing is configured per unit. Set clear base rates and currency now so calendar rules and submission checks rest on real listing data."
         headerAside={
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
