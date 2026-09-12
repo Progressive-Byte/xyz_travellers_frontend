@@ -3511,6 +3511,42 @@ export async function getHostAmenities(token: string): Promise<HostPropertyRefer
     .filter((item) => item.value);
 }
 
+export async function getHostCities(token: string): Promise<HostPropertyReferenceOption[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>("/api/v1/host/reference/cities", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return extractReferenceArray(response)
+    .map((item) => normalizeReferenceOption(item))
+    .filter((item) => item.value);
+}
+
+export async function getHostCountries(token: string): Promise<HostPropertyReferenceOption[]> {
+  if (!token) {
+    throw new ApiError("Missing access token.", 401);
+  }
+
+  const response = await apiRequest<unknown>("/api/v1/host/reference/countries", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return extractReferenceArray(response)
+    .map((item) => normalizeReferenceOption(item))
+    .filter((item) => item.value);
+}
+
 export async function getHostCommissionInfo(token: string): Promise<HostPropertyCommissionInfo | null> {
   if (!token) {
     throw new ApiError("Missing access token.", 401);
