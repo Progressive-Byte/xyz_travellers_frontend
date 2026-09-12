@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { type HostPropertyDetail } from "@/lib/host";
+import { type HostPropertyDetail, type HostPropertyReferenceOption } from "@/lib/host";
 
 type HostPropertyLocationFormErrors = Partial<
   Record<keyof Pick<HostPropertyDetail, "address" | "city" | "country" | "lat" | "lng" | "houseRules"> | "form", string>
@@ -10,6 +10,8 @@ type HostPropertyLocationFormErrors = Partial<
 type HostPropertyLocationFormProps = {
   values: HostPropertyDetail;
   errors: HostPropertyLocationFormErrors;
+  cityOptions: HostPropertyReferenceOption[];
+  countryOptions: HostPropertyReferenceOption[];
   isSubmitting: boolean;
   successMessage: string;
   disabled?: boolean;
