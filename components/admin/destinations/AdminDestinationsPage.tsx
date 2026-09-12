@@ -170,6 +170,7 @@ export const AdminDestinationsPage: React.FC = () => {
       setLocations(updated);
       setFormValues(createEmptyForm(updated.length + 1));
       setSuccessMessage("Quick location created successfully.");
+      void loadGeoOptions();
     } catch (error) {
       if (error instanceof Error) {
         setErrors({ form: error.message });
