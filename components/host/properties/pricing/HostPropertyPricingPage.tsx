@@ -314,10 +314,10 @@ export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = (
             </p>
             <div className="mt-6">
               <Link
-                href={`/host/properties/${propertyId}/units`}
+                href={previousStepHref}
                 className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
               >
-                Open units
+                {isRoomType ? "Open media" : "Open units"}
               </Link>
             </div>
           </div>
