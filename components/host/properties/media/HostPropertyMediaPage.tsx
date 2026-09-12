@@ -456,7 +456,12 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
         currentStep="media"
         title={property.name || "Untitled property"}
         status={property.status}
-        description="This stage turns the draft into a real guest-facing listing by adding gallery images, choosing a cover photo, and optionally attaching a supporting video link."
+        hideUnitsStep={isRoomType}
+        description={
+          isRoomType
+            ? "This stage turns the draft into a real guest-facing listing by adding gallery images, choosing a cover photo, and setting the room's own details and gallery — a room is itself the bookable unit, so there is no separate units step."
+            : "This stage turns the draft into a real guest-facing listing by adding gallery images, choosing a cover photo, and optionally attaching a supporting video link."
+        }
         headerAside={
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary">
