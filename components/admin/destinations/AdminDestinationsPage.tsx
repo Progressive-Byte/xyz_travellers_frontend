@@ -52,6 +52,8 @@ function createEmptyForm(sortOrder: number): UpsertAdminLocationPayload {
 export const AdminDestinationsPage: React.FC = () => {
   const { token } = useAuth();
   const [locations, setLocations] = useState<AdminLocationSummary[]>([]);
+  const [cities, setCities] = useState<AdminGeoOption[]>([]);
+  const [countries, setCountries] = useState<AdminGeoOption[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [formValues, setFormValues] = useState<UpsertAdminLocationPayload>(createEmptyForm(1));
   const [errors, setErrors] = useState<FormErrors>({});
