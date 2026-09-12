@@ -72,6 +72,7 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
 }) => {
   const { token } = useAuth();
   const [property, setProperty] = useState<HostPropertyDetail | null>(null);
+  const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
   const [mediaItems, setMediaItems] = useState<HostPropertyMediaItem[]>([]);
   const [units, setUnits] = useState<HostPropertyUnit[]>([]);
   const [pricings, setPricings] = useState<HostUnitPricing[]>([]);
