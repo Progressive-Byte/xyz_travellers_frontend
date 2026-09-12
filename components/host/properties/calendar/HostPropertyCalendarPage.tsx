@@ -203,6 +203,11 @@ export const HostPropertyCalendarPage: React.FC<HostPropertyCalendarPageProps> =
     () => units.find((unit) => unit.id === selectedUnitId) ?? null,
     [selectedUnitId, units],
   );
+  const isRoomType = useMemo(
+    () => (property ? isHostPropertyRoomType(property.propertyType, propertyTypes) : false),
+    [property, propertyTypes],
+  );
+  const previousStepHref = `/host/properties/${propertyId}/${isRoomType ? "media" : "units"}`;
 
   const refreshSelectedUnitCalendar = async () => {
     if (!token || !selectedUnitId) {
