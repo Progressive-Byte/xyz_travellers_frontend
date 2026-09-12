@@ -579,8 +579,9 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
                 Move through the listing workflow
               </h2>
               <p className="mt-4 text-[14px] leading-7 text-text-secondary">
-                Basics and location stay editable in the previous step. Units now open next, followed by
-                pricing and calendar controls before the final verification stage.
+                {isRoomType
+                  ? "Basics and location stay editable in the previous step. Once the room details and gallery look right, continue into pricing and calendar controls before the final verification stage."
+                  : "Basics and location stay editable in the previous step. Units now open next, followed by pricing and calendar controls before the final verification stage."}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
@@ -590,10 +591,10 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
                   Back to location
                 </Link>
                 <Link
-                  href={`/host/properties/${propertyId}/units`}
+                  href={`/host/properties/${propertyId}/${isRoomType ? "pricing" : "units"}`}
                   className="inline-flex items-center justify-center rounded-[18px] bg-primary px-5 py-3 text-[14px] font-semibold text-text-primary shadow-glow transition-all duration-200 hover:bg-primary-hover"
                 >
-                  Next: Units
+                  {isRoomType ? "Next: Pricing" : "Next: Units"}
                 </Link>
                 <Link
                   href="/host/properties"
