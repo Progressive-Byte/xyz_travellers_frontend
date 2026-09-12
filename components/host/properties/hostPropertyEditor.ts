@@ -182,10 +182,16 @@ export const getNextIncompleteHostPropertyStep = (
 export const getHostPropertyEditorSteps = (
   propertyId: string,
   currentStep: HostPropertyEditorStepKey,
+  // A "Room" type property is itself the bookable unit, so its setup wizard has no
+  // separate "Units" step — room details are captured as part of the Media step instead.
+  hideUnitsStep = false,
 ): HostPropertyEditorStep[] => {
-  const currentIndex = hostPropertyEditorStepDefinitions.findIndex((step) => step.key === currentStep);
+  const stepDefinitions = hideUnitsStep
+    ? hostPropertyEditorStepDefinitions.filter((step) => step.key !== "units")
+    : hostPropertyEditorStepDefinitions;
+  const currentIndex = stepDefinitions.findIndex((step) => step.key === currentStep);
 
-  return hostPropertyEditorStepDefinitions.map((step, index) => {
+  return stepDefinitions.map((step, index) => {
     let state: HostPropertyEditorStepState = "upcoming";
 
     if (index === currentIndex) {
