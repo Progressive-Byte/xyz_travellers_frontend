@@ -602,10 +602,16 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
                       <span className="mb-2 block text-[13px] font-semibold text-text-primary">City *</span>
                       <input
                         type="text"
+                        list="admin-city-options"
                         value={locationForm.city ?? ""}
                         onChange={(e) => setLocationForm((c) => ({ ...c, city: e.target.value }))}
                         className={inputClassName}
                       />
+                      <datalist id="admin-city-options">
+                        {cities.map((city) => (
+                          <option key={city.id} value={city.name} />
+                        ))}
+                      </datalist>
                       {locationErrors.city ? (
                         <p className="mt-2 text-[13px] text-red-600">{locationErrors.city}</p>
                       ) : null}
@@ -615,10 +621,16 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
                       <span className="mb-2 block text-[13px] font-semibold text-text-primary">Country *</span>
                       <input
                         type="text"
+                        list="admin-country-options"
                         value={locationForm.country ?? ""}
                         onChange={(e) => setLocationForm((c) => ({ ...c, country: e.target.value }))}
                         className={inputClassName}
                       />
+                      <datalist id="admin-country-options">
+                        {countries.map((country) => (
+                          <option key={country.id} value={country.name} />
+                        ))}
+                      </datalist>
                       {locationErrors.country ? (
                         <p className="mt-2 text-[13px] text-red-600">{locationErrors.country}</p>
                       ) : null}
