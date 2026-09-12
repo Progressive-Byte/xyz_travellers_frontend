@@ -48,8 +48,9 @@ export const HostPropertyEditorShell: React.FC<HostPropertyEditorShellProps> = (
   children,
   headerAside,
   description,
+  hideUnitsStep = false,
 }) => {
-  const steps = getHostPropertyEditorSteps(propertyId, currentStep);
+  const steps = getHostPropertyEditorSteps(propertyId, currentStep, hideUnitsStep);
   const currentStepNumber = steps.findIndex((step) => step.key === currentStep) + 1;
 
   return (
