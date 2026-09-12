@@ -484,6 +484,7 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
         currentStep={currentStep}
         title={values.name || "Untitled property"}
         status={values.status}
+        hideUnitsStep={isRoomType}
         description={
           currentStep === "basics"
             ? "This step saves the property foundations first, including ownership and any required business linkage for commercial listings."
