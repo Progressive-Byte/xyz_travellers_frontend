@@ -511,17 +511,6 @@ export const HostPropertyMediaPage: React.FC<HostPropertyMediaPageProps> = ({ pr
                 onSubmit={handleRoomSubmit}
               />
             ) : null}
-
-            {isRoomType && roomUnit ? (
-              <div className="surface-card rounded-panel p-6 md:p-7">
-                <HostPropertyUnitGallery
-                  propertyId={propertyId}
-                  unitId={roomUnit.id}
-                  disabled={!canEdit}
-                  bordered={false}
-                />
-              </div>
-            ) : null}
           </div>
 
           <div className="space-y-6">
