@@ -69,6 +69,7 @@ const isNumericFieldValid = (value: string) => !value.trim() || !Number.isNaN(Nu
 export const HostPropertyCalendarPage: React.FC<HostPropertyCalendarPageProps> = ({ propertyId }) => {
   const { token } = useAuth();
   const [property, setProperty] = useState<HostPropertyDetail | null>(null);
+  const [propertyTypes, setPropertyTypes] = useState<HostPropertyReferenceOption[]>([]);
   const [units, setUnits] = useState<HostPropertyUnit[]>([]);
   const [selectedUnitId, setSelectedUnitId] = useState("");
   const [rules, setRules] = useState<HostUnitCalendarRules>(createEmptyHostUnitCalendarRules());
