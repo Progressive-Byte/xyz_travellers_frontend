@@ -110,15 +110,23 @@ export const HostPropertyVerificationPage: React.FC<HostPropertyVerificationPage
       setSubmitError("");
 
       try {
-        const [propertyResult, mediaResult, unitsResult, verificationResult, statusResult, businessesResult] =
-          await Promise.all([
-            getHostProperty(token, propertyId),
-            getHostPropertyMedia(token, propertyId),
-            getHostPropertyUnits(token, propertyId),
-            getHostPropertyVerification(token, propertyId),
-            getHostPropertySubmissionStatus(token, propertyId),
-            getHostBusinesses(token).catch(() => []),
-          ]);
+        const [
+          propertyResult,
+          mediaResult,
+          unitsResult,
+          verificationResult,
+          statusResult,
+          businessesResult,
+          propertyTypesResult,
+        ] = await Promise.all([
+          getHostProperty(token, propertyId),
+          getHostPropertyMedia(token, propertyId),
+          getHostPropertyUnits(token, propertyId),
+          getHostPropertyVerification(token, propertyId),
+          getHostPropertySubmissionStatus(token, propertyId),
+          getHostBusinesses(token).catch(() => []),
+          getHostPropertyTypes(token),
+        ]);
 
         const unitDetails = await Promise.all(
           unitsResult.map(async (unit) => {
