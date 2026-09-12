@@ -402,11 +402,20 @@ export const AdminDestinationsPage: React.FC = () => {
                 <span className="mb-2 block text-[13px] font-semibold text-text-primary">City *</span>
                 <input
                   type="text"
+                  list="admin-city-options"
                   value={formValues.city || ""}
                   onChange={(event) => handleFormChange("city", event.target.value)}
                   placeholder="Cox's Bazar"
                   className={inputClassName}
                 />
+                <datalist id="admin-city-options">
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.name} />
+                  ))}
+                </datalist>
+                <p className="mt-2 text-[12px] text-text-secondary">
+                  Pick an existing city or type a new one to add it.
+                </p>
                 {errors.city ? <p className="mt-2 text-[13px] text-red-600">{errors.city}</p> : null}
               </label>
 
@@ -414,11 +423,20 @@ export const AdminDestinationsPage: React.FC = () => {
                 <span className="mb-2 block text-[13px] font-semibold text-text-primary">Country *</span>
                 <input
                   type="text"
+                  list="admin-country-options"
                   value={formValues.country || ""}
                   onChange={(event) => handleFormChange("country", event.target.value)}
                   placeholder="Bangladesh"
                   className={inputClassName}
                 />
+                <datalist id="admin-country-options">
+                  {countries.map((country) => (
+                    <option key={country.id} value={country.name} />
+                  ))}
+                </datalist>
+                <p className="mt-2 text-[12px] text-text-secondary">
+                  Pick an existing country or type a new one to add it.
+                </p>
                 {errors.country ? <p className="mt-2 text-[13px] text-red-600">{errors.country}</p> : null}
               </label>
             </div>
