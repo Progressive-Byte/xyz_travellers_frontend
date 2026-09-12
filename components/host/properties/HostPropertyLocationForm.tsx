@@ -45,9 +45,41 @@ const Field: React.FC<{
   </label>
 );
 
+const SelectField: React.FC<{
+  label: string;
+  value: string;
+  options: HostPropertyReferenceOption[];
+  onChange: (value: string) => void;
+  placeholder?: string;
+  error?: string;
+  disabled?: boolean;
+}> = ({ label, value, options, onChange, placeholder = "Select...", error, disabled = false }) => (
+  <label className="block">
+    <span className="mb-2 block text-[13px] font-semibold text-text-primary">{label}</span>
+    <select
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      disabled={disabled || options.length === 0}
+      className={`${inputClassName} ${error ? "border-red-300 focus:border-red-400" : ""}`}
+    >
+      <option value="" disabled>
+        {options.length === 0 ? "No options available yet" : placeholder}
+      </option>
+      {options.map((option) => (
+        <option key={option.id} value={option.label}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+    {error ? <p className="mt-2 text-[13px] text-red-600">{error}</p> : null}
+  </label>
+);
+
 export const HostPropertyLocationForm: React.FC<HostPropertyLocationFormProps> = ({
   values,
   errors,
+  cityOptions,
+  countryOptions,
   isSubmitting,
   successMessage,
   disabled = false,
