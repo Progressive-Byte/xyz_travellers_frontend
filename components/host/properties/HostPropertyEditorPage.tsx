@@ -528,6 +528,8 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
               <HostPropertyLocationForm
                 values={values}
                 errors={locationErrors}
+                cityOptions={cityOptions}
+                countryOptions={countryOptions}
                 isSubmitting={isSavingLocation}
                 successMessage={locationSuccessMessage}
                 disabled={!canEdit}
