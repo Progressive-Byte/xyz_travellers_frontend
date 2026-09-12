@@ -410,6 +410,7 @@ export const HostPropertyCalendarPage: React.FC<HostPropertyCalendarPageProps> =
         currentStep="calendar"
         title={property.name || "Untitled property"}
         status={property.status}
+        hideUnitsStep={isRoomType}
         description="Calendar controls keep unit availability honest. Set minimum and maximum stay rules, then block dates intentionally before verification and submission arrive."
         headerAside={
           <div className="rounded-[24px] border border-border-light bg-card px-5 py-4 shadow-soft">
