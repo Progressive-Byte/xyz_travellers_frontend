@@ -274,6 +274,7 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
       const refreshed = await getAdminLocation(token, locationId);
       if (refreshed) syncLocationState(refreshed);
       setSuccessMessage("Quick location information updated successfully.");
+      void loadGeoOptions();
     } catch (error) {
       setLocationErrors({ form: error instanceof Error ? error.message : "Unable to save quick location." });
     } finally {
