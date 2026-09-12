@@ -12,11 +12,14 @@ import { ApiError } from "@/lib/api";
 import {
   createEmptyHostUnitPricing,
   getHostProperty,
+  getHostPropertyTypes,
   getHostPropertyUnits,
   getHostUnitPricing,
   isHostPropertyEditable,
+  isHostPropertyRoomType,
   updateHostUnitPricing,
   type HostPropertyDetail,
+  type HostPropertyReferenceOption,
   type HostPropertyUnit,
   type HostUnitPricing,
 } from "@/lib/host";
