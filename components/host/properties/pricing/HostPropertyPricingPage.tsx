@@ -174,6 +174,12 @@ export const HostPropertyPricingPage: React.FC<HostPropertyPricingPageProps> = (
     () => units.find((unit) => unit.id === selectedUnitId) ?? null,
     [selectedUnitId, units],
   );
+  const isRoomType = useMemo(
+    () => (property ? isHostPropertyRoomType(property.propertyType, propertyTypes) : false),
+    [property, propertyTypes],
+  );
+  const previousStepHref = `/host/properties/${propertyId}/${isRoomType ? "media" : "units"}`;
+  const previousStepLabel = isRoomType ? "Back to media" : "Back to units";
 
   const validateForm = () => {
     const nextErrors: PricingErrors = {};
