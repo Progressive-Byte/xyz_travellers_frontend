@@ -20,6 +20,7 @@ import {
   getHostProperty,
   getHostPropertyTypes,
   isHostPropertyEditable,
+  isHostPropertyRoomType,
   updateHostProperty,
   type HostBusiness,
   type HostBusinessDocument,
@@ -245,6 +246,10 @@ export const HostPropertyEditorPage: React.FC<HostPropertyEditorPageProps> = ({ 
   }, [token, values.businessId, values.ownershipType]);
 
   const canEdit = useMemo(() => isHostPropertyEditable(values.status), [values.status]);
+  const isRoomType = useMemo(
+    () => isHostPropertyRoomType(values.propertyType, propertyTypes),
+    [values.propertyType, propertyTypes],
+  );
 
   const handleChange = (field: keyof HostPropertyDetail, value: string | string[]) => {
     setValues((current) => {
