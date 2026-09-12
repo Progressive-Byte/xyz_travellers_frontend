@@ -133,6 +133,8 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
   const { token } = useAuth();
 
   const [location, setLocation] = useState<AdminLocationDetail | null>(null);
+  const [cities, setCities] = useState<AdminGeoOption[]>([]);
+  const [countries, setCountries] = useState<AdminGeoOption[]>([]);
   const [locationForm, setLocationForm] = useState<UpsertAdminLocationPayload>(createEmptyLocationForm());
   const [transportForm, setTransportForm] = useState<UpsertAdminTransportPayload>(createEmptyTransportForm());
   const [foodForm, setFoodForm] = useState<UpsertAdminFoodPayload>(createEmptyFoodForm());
