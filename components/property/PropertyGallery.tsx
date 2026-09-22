@@ -58,7 +58,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
           <button
             type="button"
             onClick={() => openGallery(0)}
-            className="group relative min-h-[380px] overflow-hidden rounded-[24px] bg-surface-muted text-left transition-transform duration-300 sm:min-h-[460px] lg:min-h-[560px]"
+            className="relative min-h-[320px] overflow-hidden rounded-[24px] bg-surface-muted text-left sm:min-h-[420px]"
             aria-label={`Open full gallery for ${title}`}
           >
             <Image
@@ -67,7 +67,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 66vw"
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+              className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/16 via-transparent to-transparent" />
           </button>
@@ -78,7 +78,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
                 key={image.src}
                 type="button"
                 onClick={() => openGallery(index + 1)}
-                className="group relative min-h-[180px] overflow-hidden rounded-[20px] bg-surface-muted text-left transition-transform duration-300 sm:min-h-[220px] lg:min-h-[270px]"
+                className="relative min-h-[150px] overflow-hidden rounded-[20px] bg-surface-muted text-left sm:min-h-[200px]"
                 aria-label={`Open gallery image ${index + 2} for ${title}`}
               >
                 <Image
@@ -86,7 +86,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
                   alt={image.alt || `${title} gallery image ${index + 2}`}
                   fill
                   sizes="(max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  className="object-cover"
                 />
                 {index === 3 ? (
                   <div className="absolute inset-x-3 bottom-3 rounded-full bg-[rgba(255,255,255,0.92)] px-3 py-2 text-center text-[12px] font-semibold text-text-primary shadow-soft">
@@ -102,14 +102,14 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
 
       {isModalOpen && activeImage ? (
         <div
-          className="fixed inset-0 z-[80] overflow-y-auto bg-[rgba(26,27,18,0.82)] px-3 py-3 backdrop-blur-md sm:px-4 sm:py-6 [animation:gallery-backdrop-in_0.22s_ease-out]"
+          className="fixed inset-0 z-[80] overflow-y-auto bg-[rgba(26,27,18,0.82)] px-3 py-3 backdrop-blur-md sm:px-4 sm:py-6"
           role="dialog"
           aria-modal="true"
           aria-label={`${title} full gallery`}
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="surface-card-strong relative mx-auto flex max-h-[calc(100vh-24px)] w-full max-w-6xl flex-col overflow-hidden rounded-[30px] p-3 [animation:gallery-panel-in_0.32s_cubic-bezier(0.16,1,0.3,1)] sm:max-h-[calc(100vh-48px)] sm:p-4 md:p-5"
+            className="surface-card-strong relative mx-auto flex max-h-[calc(100vh-24px)] w-full max-w-6xl flex-col overflow-hidden rounded-[30px] p-3 sm:max-h-[calc(100vh-48px)] sm:p-4 md:p-5"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mb-4 flex items-start justify-between gap-4">
@@ -141,10 +141,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
 
             <div className="min-h-0 flex-1 overflow-y-auto">
               <div className="relative overflow-hidden rounded-[24px] bg-surface-muted">
-                <div
-                  key={activeIndex}
-                  className="relative h-[clamp(320px,62vh,760px)] w-full [animation:gallery-slide-fade_0.35s_ease-out]"
-                >
+                <div className="relative h-[clamp(260px,52vh,680px)] w-full">
                 <Image
                   src={activeImage.src}
                   alt={activeImage.alt || `${title} full gallery image`}
