@@ -8,6 +8,7 @@ import { FavoriteButton } from "@/components/property/FavoriteButton";
 import { MessageHostButton } from "@/components/property/MessageHostButton";
 import { PropertyBookingCard } from "@/components/property/PropertyBookingCard";
 import { PropertyGallery } from "@/components/property/PropertyGallery";
+import { UnitGallery } from "@/components/property/UnitGallery";
 import { ListingCard } from "@/components/ui/ListingCard";
 import { ApiError } from "@/lib/api";
 import {
