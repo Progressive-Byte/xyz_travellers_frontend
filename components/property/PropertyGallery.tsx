@@ -102,14 +102,14 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
 
       {isModalOpen && activeImage ? (
         <div
-          className="fixed inset-0 z-[80] overflow-y-auto bg-[rgba(26,27,18,0.82)] px-3 py-3 backdrop-blur-md sm:px-4 sm:py-6"
+          className="fixed inset-0 z-[80] overflow-y-auto bg-[rgba(26,27,18,0.82)] px-3 py-3 backdrop-blur-md sm:px-4 sm:py-6 [animation:gallery-backdrop-in_0.22s_ease-out]"
           role="dialog"
           aria-modal="true"
           aria-label={`${title} full gallery`}
           onClick={() => setIsModalOpen(false)}
         >
           <div
-            className="surface-card-strong relative mx-auto flex max-h-[calc(100vh-24px)] w-full max-w-6xl flex-col overflow-hidden rounded-[30px] p-3 sm:max-h-[calc(100vh-48px)] sm:p-4 md:p-5"
+            className="surface-card-strong relative mx-auto flex max-h-[calc(100vh-24px)] w-full max-w-6xl flex-col overflow-hidden rounded-[30px] p-3 [animation:gallery-panel-in_0.32s_cubic-bezier(0.16,1,0.3,1)] sm:max-h-[calc(100vh-48px)] sm:p-4 md:p-5"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mb-4 flex items-start justify-between gap-4">
