@@ -141,7 +141,10 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
 
             <div className="min-h-0 flex-1 overflow-y-auto">
               <div className="relative overflow-hidden rounded-[24px] bg-surface-muted">
-                <div className="relative h-[clamp(260px,52vh,680px)] w-full">
+                <div
+                  key={activeIndex}
+                  className="relative h-[clamp(320px,62vh,760px)] w-full [animation:gallery-slide-fade_0.35s_ease-out]"
+                >
                 <Image
                   src={activeImage.src}
                   alt={activeImage.alt || `${title} full gallery image`}
