@@ -554,29 +554,7 @@ export default async function PropertyPage({
                                   ) : null}
                                 </div>
                               ) : null}
-                              {unit.gallery.items.length ? (
-                                <div className="mt-3 flex flex-wrap gap-2">
-                                  {unit.gallery.items.slice(0, 5).map((image) => (
-                                    <div
-                                      key={image.id || image.src}
-                                      className="relative h-14 w-14 overflow-hidden rounded-[14px] border border-border bg-surface-muted"
-                                    >
-                                      <Image
-                                        src={image.src}
-                                        alt={image.alt || `${unit.unitName} gallery image`}
-                                        fill
-                                        sizes="56px"
-                                        className="object-cover"
-                                      />
-                                    </div>
-                                  ))}
-                                  {unit.gallery.items.length > 5 ? (
-                                    <div className="flex h-14 w-14 items-center justify-center rounded-[14px] border border-border bg-surface text-[12px] font-semibold text-text-secondary">
-                                      +{unit.gallery.items.length - 5}
-                                    </div>
-                                  ) : null}
-                                </div>
-                              ) : null}
+                              <UnitGallery unitLabel={unit.unitName} images={unit.gallery.items} />
                             </div>
 
                             <div className="rounded-[20px] border border-border bg-surface px-4 py-4 text-right">
