@@ -58,7 +58,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
           <button
             type="button"
             onClick={() => openGallery(0)}
-            className="relative min-h-[320px] overflow-hidden rounded-[24px] bg-surface-muted text-left sm:min-h-[420px]"
+            className="group relative min-h-[380px] overflow-hidden rounded-[24px] bg-surface-muted text-left transition-transform duration-300 sm:min-h-[460px] lg:min-h-[560px]"
             aria-label={`Open full gallery for ${title}`}
           >
             <Image
@@ -67,7 +67,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 66vw"
-              className="object-cover"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/16 via-transparent to-transparent" />
           </button>
@@ -78,7 +78,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
                 key={image.src}
                 type="button"
                 onClick={() => openGallery(index + 1)}
-                className="relative min-h-[150px] overflow-hidden rounded-[20px] bg-surface-muted text-left sm:min-h-[200px]"
+                className="group relative min-h-[180px] overflow-hidden rounded-[20px] bg-surface-muted text-left transition-transform duration-300 sm:min-h-[220px] lg:min-h-[270px]"
                 aria-label={`Open gallery image ${index + 2} for ${title}`}
               >
                 <Image
@@ -86,7 +86,7 @@ export const PropertyGallery: React.FC<PropertyGalleryProps> = ({ title, images 
                   alt={image.alt || `${title} gallery image ${index + 2}`}
                   fill
                   sizes="(max-width: 1024px) 50vw, 25vw"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
                 {index === 3 ? (
                   <div className="absolute inset-x-3 bottom-3 rounded-full bg-[rgba(255,255,255,0.92)] px-3 py-2 text-center text-[12px] font-semibold text-text-primary shadow-soft">
