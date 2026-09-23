@@ -452,6 +452,20 @@ export const AdminDestinationsPage: React.FC = () => {
               />
             </label>
 
+            <label className="block">
+              <span className="mb-2 block text-[13px] font-semibold text-text-primary">Location hero image URL</span>
+              <input
+                type="text"
+                value={formValues.heroImage || ""}
+                onChange={(event) => handleFormChange("heroImage", event.target.value)}
+                placeholder="https://..."
+                className={inputClassName}
+              />
+              <p className="mt-2 text-[12px] text-text-secondary">
+                Background image for the top of the public destination page.
+              </p>
+            </label>
+
             <div className="rounded-[22px] border border-border-light bg-surface p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-text-secondary mb-3">
                 Heading &amp; hero for Transport section
