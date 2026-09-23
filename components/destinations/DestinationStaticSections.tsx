@@ -355,6 +355,7 @@ const DestinationStaticSectionInner = <TItem,>({
                 sizes="(max-width: 1024px) 100vw, 1280px"
                 className="object-cover"
                 priority={false}
+                unoptimized
               />
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/35" />
