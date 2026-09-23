@@ -648,6 +648,28 @@ export const AdminDestinationDetailPage: React.FC<AdminDestinationDetailPageProp
                   </label>
 
                   <label className="block">
+                    <span className="mb-2 block text-[13px] font-semibold text-text-primary">Location hero image URL</span>
+                    <input
+                      type="text"
+                      value={locationForm.heroImage ?? ""}
+                      onChange={(e) => setLocationForm((c) => ({ ...c, heroImage: e.target.value }))}
+                      placeholder="https://..."
+                      className={inputClassName}
+                    />
+                    <p className="mt-2 text-[12px] text-text-secondary">
+                      Background image for the top of the public destination page.
+                    </p>
+                    {locationForm.heroImage?.trim() ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={locationForm.heroImage.trim()}
+                        alt="Location hero preview"
+                        className="mt-3 h-32 w-full rounded-[18px] object-cover"
+                      />
+                    ) : null}
+                  </label>
+
+                  <label className="block">
                     <span className="mb-2 block text-[13px] font-semibold text-text-primary">Sort order</span>
                     <input
                       type="number"
