@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -96,16 +97,46 @@ const DestinationHero: React.FC<{
   const locationLabel = [location.city, location.country]
     .filter(Boolean)
     .join(", ");
+  const heroImageUrl = location.heroImageUrl;
+  const hasHero = Boolean(heroImageUrl);
+
+  const stats = [
+    { label: "Stays", value: page.listingsSection.pagination.total },
+    { label: "Transport", value: page.transportSection.pagination.total },
+    { label: "Food", value: page.foodSection.pagination.total },
+  ];
 
   return (
     <section className="section-shell overflow-visible bg-background pb-4 pt-8 md:pb-6 md:pt-12">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="surface-card-strong relative flex flex-col gap-6 overflow-hidden rounded-[32px] p-6 md:p-8">
+        <div
+          className={`relative flex flex-col gap-6 overflow-hidden rounded-[32px] p-6 md:p-8 ${
+            hasHero
+              ? "min-h-[360px] justify-end border border-border shadow-medium md:min-h-[440px]"
+              : "surface-card-strong"
+          }`}
+        >
+          {heroImageUrl ? (
+            <>
+              <Image
+                src={heroImageUrl}
+                alt={location.name || "Destination"}
+                fill
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/30" />
+            </>
+          ) : null}
+
           <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="min-w-0">
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-text-secondary transition-colors duration-200 hover:text-primary"
+                className={`inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors duration-200 hover:text-primary ${
+                  hasHero ? "text-white/80" : "text-text-secondary"
+                }`}
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M19 12H5" strokeLinecap="round" />
@@ -115,9 +146,22 @@ const DestinationHero: React.FC<{
               </Link>
 
               <div className="mt-5 flex flex-wrap items-center gap-3">
-                <span className="section-badge">Destination</span>
+                {hasHero ? (
+                  <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white shadow-soft backdrop-blur-md ring-1 ring-white/20">
+                    <span className="inline-flex h-2 w-2 rounded-full bg-primary shadow-glow" />
+                    Destination
+                  </span>
+                ) : (
+                  <span className="section-badge">Destination</span>
+                )}
                 {locationLabel ? (
-                  <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-text-secondary shadow-soft">
+                  <span
+                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] shadow-soft ${
+                      hasHero
+                        ? "bg-white/10 text-white/90 backdrop-blur-md ring-1 ring-white/20"
+                        : "border border-border bg-card/80 text-text-secondary"
+                    }`}
+                  >
                     <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
                       <path d="M12 21s-6-4.35-6-10a6 6 0 1112 0c0 5.65-6 10-6 10z" />
                       <circle cx="12" cy="11" r="2.5" />
@@ -127,11 +171,19 @@ const DestinationHero: React.FC<{
                 ) : null}
               </div>
 
-              <h1 className="mt-5 font-sora text-[36px] font-bold leading-[1.05] tracking-[-0.04em] text-text-primary md:text-[48px]">
+              <h1
+                className={`mt-5 font-sora text-[36px] font-bold leading-[1.05] tracking-[-0.04em] md:text-[48px] ${
+                  hasHero ? "text-white [text-shadow:0_8px_30px_rgba(0,0,0,0.45)]" : "text-text-primary"
+                }`}
+              >
                 {location.name || "Destination"}
               </h1>
               {location.description ? (
-                <p className="mt-4 max-w-3xl text-[15px] leading-8 text-text-secondary md:text-[16px]">
+                <p
+                  className={`mt-4 max-w-3xl text-[15px] leading-8 md:text-[16px] ${
+                    hasHero ? "text-white/85" : "text-text-secondary"
+                  }`}
+                >
                   {location.description}
                 </p>
               ) : null}
@@ -160,30 +212,31 @@ const DestinationHero: React.FC<{
 
             <div className="shrink-0 md:min-w-[240px]">
               <div className="grid grid-cols-3 gap-3 md:grid-cols-1 md:gap-4">
-                <div className="rounded-[20px] border border-border bg-card px-4 py-4 shadow-soft md:px-5 md:py-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-                    Stays
-                  </p>
-                  <p className="mt-2 font-sora text-[22px] font-bold tracking-[-0.03em] text-text-primary">
-                    {page.listingsSection.pagination.total}
-                  </p>
-                </div>
-                <div className="rounded-[20px] border border-border bg-card px-4 py-4 shadow-soft md:px-5 md:py-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-                    Transport
-                  </p>
-                  <p className="mt-2 font-sora text-[22px] font-bold tracking-[-0.03em] text-text-primary">
-                    {page.transportSection.pagination.total}
-                  </p>
-                </div>
-                <div className="rounded-[20px] border border-border bg-card px-4 py-4 shadow-soft md:px-5 md:py-5">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-                    Food
-                  </p>
-                  <p className="mt-2 font-sora text-[22px] font-bold tracking-[-0.03em] text-text-primary">
-                    {page.foodSection.pagination.total}
-                  </p>
-                </div>
+                {stats.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className={`rounded-[20px] px-4 py-4 shadow-soft md:px-5 md:py-5 ${
+                      hasHero
+                        ? "bg-black/35 ring-1 ring-white/20 backdrop-blur-md"
+                        : "border border-border bg-card"
+                    }`}
+                  >
+                    <p
+                      className={`text-[11px] font-bold uppercase tracking-[0.18em] ${
+                        hasHero ? "text-white/75" : "text-text-secondary"
+                      }`}
+                    >
+                      {stat.label}
+                    </p>
+                    <p
+                      className={`mt-2 font-sora text-[22px] font-bold tracking-[-0.03em] ${
+                        hasHero ? "text-white" : "text-text-primary"
+                      }`}
+                    >
+                      {stat.value}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
