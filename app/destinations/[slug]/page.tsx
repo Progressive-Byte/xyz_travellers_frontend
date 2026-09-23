@@ -125,6 +125,7 @@ const DestinationHero: React.FC<{
                 sizes="(max-width: 1280px) 100vw, 1280px"
                 className="object-cover"
                 priority
+                unoptimized
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/30" />
             </>

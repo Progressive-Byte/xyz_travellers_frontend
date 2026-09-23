@@ -26,7 +26,6 @@ yarn-error.log*
 
 # local env files
 .env*.local
-.env
 
 # vercel
 .vercel
@@ -39,3 +38,4 @@ debug.log
 api/*
 HOST_PORTAL_DASHBOARD_PLAN.md
 entx.js
+config.bat
