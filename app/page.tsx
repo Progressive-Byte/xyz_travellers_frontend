@@ -72,6 +72,7 @@ export default function Home() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
+        <SundarbanFeature />
         <Listings
           sections={homepageFeed?.sections ?? []}
           isLoading={isLoadingHomepage}
