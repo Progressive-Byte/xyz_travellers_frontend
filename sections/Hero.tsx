@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -179,10 +180,23 @@ export const Hero: React.FC<HeroProps> = ({
   );
 
   return (
-    <section className="section-shell overflow-visible bg-background pt-6">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="relative z-30 mx-auto mt-4 flex w-full max-w-[980px] flex-col justify-center md:mt-6">
-          <LocationPillStrip />
+    // Negative top margin (= sticky Navbar height) lets the photo run behind the frosted navbar.
+    <section className="relative -mt-[77px] overflow-visible pb-8 pt-[101px] md:-mt-[89px] md:pb-12 md:pt-[125px]">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <Image
+          src="/images/hero-sundarban.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-6">
+        <div className="relative z-30 mx-auto flex w-full max-w-[980px] flex-col justify-center">
+          <LocationPillStrip onImage />
           <div className="surface-card-strong w-full rounded-[26px] p-1.5">
             <div className="flex flex-col lg:flex-row lg:items-stretch">
               <div className="flex flex-col divide-y divide-border lg:flex-1 lg:flex-row lg:items-stretch lg:divide-x lg:divide-y-0">
@@ -443,12 +457,12 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
 
         {searchError ? (
-          <p className="mx-auto mt-3 w-full max-w-[980px] text-[13px] font-medium text-[var(--color-danger,#b42318)]">
+          <p className="mx-auto mt-3 w-fit max-w-[980px] rounded-full bg-card px-4 py-1.5 text-[13px] font-medium text-[var(--color-danger,#b42318)] shadow-soft">
             {searchError}
           </p>
         ) : null}
 
-        <div className="mx-auto mt-3 flex w-full max-w-[980px] items-end justify-center gap-8 border-b border-border/80">
+        <div className="mx-auto mt-3 flex w-full max-w-[980px] items-end justify-center gap-8 border-b border-white/30">
           {homepageTabs.map((category) => {
             const active = category.key === activeTab;
             const icon = categoryIcons[category.key] ?? categoryIcons.apartments;
@@ -459,16 +473,14 @@ export const Hero: React.FC<HeroProps> = ({
                 type="button"
                 onClick={() => onTabChange(category.key)}
                 className={`relative inline-flex items-center gap-2 pb-4 pt-2 text-[14px] font-semibold transition-colors duration-200 ${
-                  active
-                    ? "text-text-primary"
-                    : "text-text-secondary hover:text-text-primary"
+                  active ? "text-white" : "text-white/75 hover:text-white"
                 }`}
               >
-                <span className={active ? "text-primary" : "text-text-secondary"}>{icon}</span>
+                <span className={active ? "text-primary" : "text-white/75"}>{icon}</span>
                 <span>{category.label}</span>
                 <span
                   className={`absolute inset-x-0 -bottom-px h-0.5 rounded-full transition-opacity duration-200 ${
-                    active ? "bg-text-primary opacity-100" : "bg-transparent opacity-0"
+                    active ? "bg-primary opacity-100" : "bg-transparent opacity-0"
                   }`}
                 />
               </button>
