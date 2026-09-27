@@ -12,7 +12,12 @@ import { subscribe as subscribeDestinations } from "@/lib/locations-store";
 
 const PILL_AUTO_PX_PER_SECOND = 30;
 
-export const LocationPillStrip: React.FC = () => {
+type LocationPillStripProps = {
+  /** Render over a photo background: light labels and no cream edge fades. */
+  onImage?: boolean;
+};
+
+export const LocationPillStrip: React.FC<LocationPillStripProps> = ({ onImage = false }) => {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const progressRef = useRef(0);
@@ -167,18 +172,26 @@ export const LocationPillStrip: React.FC = () => {
     <div className="mb-4 w-full md:mb-6">
       <div className="mb-3 flex items-end justify-between gap-3 md:mb-4">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-text-secondary">
+          <p
+            className={`text-[10px] font-bold uppercase tracking-[0.24em] ${
+              onImage ? "text-white/90" : "text-text-secondary"
+            }`}
+          >
             Quick locations
           </p>
-          <p className="mt-1.5 text-[13px] leading-5 text-text-secondary/90">
+          <p className={`mt-1.5 text-[13px] leading-5 ${onImage ? "text-white/85" : "text-text-secondary/90"}`}>
             Jump straight to a popular destination.
           </p>
         </div>
       </div>
 
       <div className="relative">
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-background via-background/95 to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-background via-background/95 to-transparent" />
+        {onImage ? null : (
+          <>
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-background via-background/95 to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-background via-background/95 to-transparent" />
+          </>
+        )}
 
         <div className="relative flex items-center gap-2">
           <button
