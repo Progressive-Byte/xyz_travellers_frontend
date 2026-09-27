@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/sections/Hero";
 import { Listings } from "@/sections/Listings";
+import { SundarbanFeature } from "@/sections/SundarbanFeature";
 import { WhyChooseUs } from "@/sections/WhyChooseUs";
 import { AboutXYZTravellers } from "@/sections/AboutXYZTravellers";
 import { FrontServices } from "@/sections/FrontServices";
