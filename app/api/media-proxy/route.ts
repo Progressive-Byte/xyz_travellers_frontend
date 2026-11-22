@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const DEFAULT_API_BASE_URL = "https://xyz.travel.api.progressivebyte.com";
+const DEFAULT_API_BASE_URL = "https://xyz-travel-api.progressivebyte.com";
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_BASE_URL).replace(
   /\/$/,
   "",
